@@ -1,1 +1,0 @@
-Git-repo for the elevator project in the Real Time Systems course.
