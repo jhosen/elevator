@@ -70,7 +70,7 @@ void elev_set_speed(int speed)
 	printf(__FILE__ ": Speed set to %d\n", speed);
 }
 
-// Test comment
+
 
 void elev_set_door_open_lamp(int value)
 {
