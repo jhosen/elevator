@@ -17,6 +17,9 @@
 #define TRUE  1
 #define FALSE 0
 
+
+
+
 // Buffers for send and transmiting data via network
 // {@
 static char buf_in [BUFFER_IN_SIZE ];
@@ -66,15 +69,29 @@ void network_init(void){
 	}
 	
 	// Now that the listen socket is bounded, one may start broadcast its present, and listen for incoming connections. 
+	
+	
 	// We are ready to listen on listen_socket!
-	pthread_t listen_thread; 
-	if ( (pthread_create(&listen_thread, NULL, network_listen_for_incoming_and_accept, (void *) NULL)) < 0){
-		perror("err:pthread_create(listen_thread)\n");
+	pthread_t listen_tcp_thread, listen_udp_thread, send_udp_broadcast_thread; 
+	
+	if ( (pthread_create(&listen_tcp_thread, NULL, network_listen_for_incoming_and_accept, (void *) NULL)) < 0){
+		perror("err:pthread_create(listen_tcp_thread)\n");
 	} 
+	
 	// We are ready to broadcast
+	if ( (pthread_create(&send_udp_broadcast_thread, NULL, send_udp_broadcast, (void *) NULL)) < 0){
+		perror("err:pthread_create(send_udp_broadcast_thread)\n");
+	} 
+	
+	// We are ready to listen for broadcast
+	if ( (pthread_create(&listen_udp_thread, NULL, listen_udp_broadcast, (void *) NULL)) < 0){
+		perror("err:pthread_create(listen_udp_thread)\n");
+	} 
 	
 	
-	pthread_join(listen_thread, NULL);
+	pthread_join(listen_tcp_thread,			NULL);
+	pthread_join(listen_udp_thread,			NULL);
+	pthread_join(send_udp_broadcast_thread, NULL);
 
 }
 
@@ -109,12 +126,12 @@ void *network_listen_for_incoming_and_accept(){
 
 
 
-void connect_to_peer(char * peer_ip){
+void connect_to_peer(in_addr_t peer_ip){
 	int peer_socket = socket(AF_INET, SOCK_STREAM, 0); 
 	
 	struct sockaddr_in peer; 
 	peer.sin_family			= AF_INET;
-	peer.sin_addr.s_addr	= inet_addr(peer_ip);//INADDR_ANY; // inet_pton(AF_INET, "ip.ip.ip.ip", NULL);
+	peer.sin_addr.s_addr	= peer_ip;//INADDR_ANY; // inet_pton(AF_INET, "ip.ip.ip.ip", NULL);
 	peer.sin_port			= htons(LISTEN_PORT); // Connect to listen port.  
 	if (connect(peer_socket, (struct sockaddr *)&peer , sizeof(peer)) < 0){
 		perror("err: connect. Connectinh to peer failed\n");
@@ -160,5 +177,88 @@ void *com_handler(void * peer_socket_p){
 	while(1)
 		;
 
+}
+
+
+
+void* listen_udp_broadcast(){
+	
+	int sock;
+	if ((sock = socket(AF_INET, SOCK_DGRAM, 0)) < 0)
+	{
+		perror("socket");
+		exit(1);
+	}
+	// Bind my UDP socket to a particular port to listen for incoming UDP responses.
+	
+	struct sockaddr_in saSocket;
+	memset(&saSocket, 0, sizeof(saSocket));
+	saSocket.sin_family      = AF_INET;
+	saSocket.sin_addr.s_addr = htonl(INADDR_ANY);
+	saSocket.sin_port        = htons(UDP_LISTEN_PORT);
+	
+	int opt = 1;
+	setsockopt(sock,SOL_SOCKET,SO_REUSEADDR,(char*)&opt,sizeof(opt));
+	
+	if (bind(sock, (struct sockaddr *) &saSocket, sizeof(saSocket)) == 0)
+	{
+		printf("Socket bound\n");
+	}
+	else {
+		perror("Bind");
+	}
+
+	
+	struct sockaddr_in their_addr; // connector's address information
+	int addr_len =  sizeof(their_addr);
+	char messager[50];
+	//	int r;
+	while(1) {
+
+		if (recvfrom(sock, messager, 50 , 0, (struct sockaddr *)&their_addr, &addr_len) == -1) {
+			perror("recvfrom");
+			exit(1);
+		}
+		
+		printf("got packet from %s\n",inet_ntoa(their_addr.sin_addr));
+		// Check if ip is myself or already connected. 
+		connect_to_peer(their_addr.sin_addr.s_addr);
+	}
+}
+
+void* send_udp_broadcast() {
+	
+	int sock;
+	if ((sock = socket(AF_INET, SOCK_DGRAM, 0)) < 0)
+	{
+		perror("socket");
+		exit(1);
+	}
+	
+	int opt = 1;
+	setsockopt(sock,SOL_SOCKET,SO_REUSEADDR,(char*)&opt,sizeof(opt));
+	int broadcastEnable=1;
+	setsockopt(sock, SOL_SOCKET, SO_BROADCAST, &broadcastEnable, sizeof(broadcastEnable));
+	
+	
+	struct sockaddr_in toAddr;
+	memset(&toAddr, 0, sizeof(toAddr));
+	toAddr.sin_family = AF_INET;
+	//	toAddr.sin_addr.s_addr = inet_addr("78.91.25.178");
+	toAddr.sin_addr.s_addr = htonl(INADDR_BROADCAST);
+	toAddr.sin_port        = htons(UDP_LISTEN_PORT);
+	
+	char *message = "Hello, World!";
+	while(1) {
+		if (sendto(sock, message, strlen(message), 0,(struct sockaddr *) &toAddr, sizeof(toAddr))<0) {
+			perror("sendto");
+			exit(1);
+		}
+		else {
+			printf("Sent\n");
+		}
+		sleep(3);
+	}
+	
 }
 
