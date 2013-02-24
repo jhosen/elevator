@@ -21,8 +21,16 @@
 
 #define LAN_BROADCAST_IP 	"129.241.187.255"
 
-/* \!brief Initiate peer for network cooperation.
+
+/* \!brief Function letting this peer enter the network
  *
+ * 1. Bind: one socket for listening for incoming TCP-connections,
+ *	  one socket for broadcasting UDP ID-messages,
+ *	  one socket for listening for UDP broadcasts.
+ * 2. Start UDP-broadcast: send IP-info
+ * 3. Listen for connections
+ * 4a. response: Accept
+ * 4b. timeout: you are only elevator
  */
 void network_init(void);
 
