@@ -31,7 +31,6 @@ static int listen_socket;
 
 
 
-
 /* \!brief Function letting this peer enter the network
  *
  * 1. Bind: one socket for listening for incoming TCP-connections, 
@@ -43,6 +42,13 @@ static int listen_socket;
  * 4b. timeout: you are only elevator
  */
 void network_init(void){
+	// Create file for keeping track of connected peers.
+	FILE * connected_peers = fopen("connected_peers.txt", "w");
+	const char * my_ip = "129.241.187.151\n";
+	fprintf(connected_peers, my_ip);
+	fclose(connected_peers);
+
+
 	
 	int opt = TRUE; 
 	struct sockaddr_in listen_addr;
@@ -220,10 +226,39 @@ void* listen_udp_broadcast(){
 			exit(1);
 		}
 		
-		printf("got packet from %s\n",inet_ntoa(their_addr.sin_addr));
+		printf("Got broadcast packet from %s\n",inet_ntoa(their_addr.sin_addr));
 		// Check if ip is myself or already connected. 
-		connect_to_peer(their_addr.sin_addr.s_addr);
+		char * peer_ip = inet_ntoa(their_addr.sin_addr);
+		//printf("Peer IP: %s\n",peer_ip); //<-RM
+		//printf("Check whether peer already is connected..\n"); 		//<- RM
+		if(!is_connected(peer_ip)){
+			//printf("Peer not connected. Connecting to peer\n");  	//<- RM
+			FILE * connected_peers = fopen("connected_peers.txt", "a+");
+			fprintf(connected_peers, peer_ip);
+			fprintf(connected_peers, "\n");
+			fclose(connected_peers);
+			connect_to_peer(their_addr.sin_addr.s_addr);
+		}
+		else
+			printf("Peer was already connected\n");
 	}
+}
+
+int is_connected(char * peer_ip){
+	FILE *connected_peers = fopen("connected_peers.txt", "r+");	// <-HANGING.
+	//printf("Opened file. Listing connected peers: \n");
+	char peer_ip_str[128];
+	size_t len = 0;
+	char * line = NULL;
+	while (getline(&line, &len, connected_peers)!= -1){//while(fgets(peer_ip_str, sizeof(peer_ip_str), connected_peers)!= NULL){ // (getline(peer_ip_str, &len, connected_peers))!=-1 ){//
+		//fputs(line, stdout);//fputs("connected: %s \n", peer_ip_str);
+		if (*line == *peer_ip){ // already connected
+			//printf("PEER ALREADY CONNECTED\n"); // <-RM
+			return 1;
+		}
+	}
+	fclose(connected_peers);
+	return 0; // not already connected
 }
 
 void* send_udp_broadcast() {
@@ -244,8 +279,8 @@ void* send_udp_broadcast() {
 	struct sockaddr_in toAddr;
 	memset(&toAddr, 0, sizeof(toAddr));
 	toAddr.sin_family = AF_INET;
-	//	toAddr.sin_addr.s_addr = inet_addr("78.91.25.178");
-	toAddr.sin_addr.s_addr = htonl(INADDR_BROADCAST);
+	toAddr.sin_addr.s_addr = inet_addr(LAN_BROADCAST_IP);
+	//toAddr.sin_addr.s_addr = htonl(INADDR_BROADCAST);
 	toAddr.sin_port        = htons(UDP_LISTEN_PORT);
 	
 	char *message = "Hello, World!";
@@ -255,7 +290,7 @@ void* send_udp_broadcast() {
 			exit(1);
 		}
 		else {
-			printf("Sent\n");
+			printf("Sent broadcast\n");
 		}
 		sleep(3);
 	}
