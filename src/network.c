@@ -127,8 +127,17 @@ void *network_listen_for_incoming_and_accept(){
 		printf("New connection\n");
 
 		#warning "Add new peer to list!\n"
-		
-		assign_com_thread(new_peer_socket); 
+		char * peer_ip = inet_ntoa(peer.sin_addr);
+		if(!is_connected(peer_ip)){
+					//printf("Peer not connected. Connecting to peer\n");  	//<- RM
+					FILE * connected_peers = fopen("connected_peers.txt", "a+");
+					fprintf(connected_peers, peer_ip);
+					fprintf(connected_peers, "\n");
+					fclose(connected_peers);
+					assign_com_thread(new_peer_socket);
+		}
+		else
+			NULL;
 	}
 }
 
@@ -231,7 +240,7 @@ void* listen_udp_broadcast(){
 			exit(1);
 		}
 		
-		printf("Got broadcast packet from %s\n",inet_ntoa(their_addr.sin_addr));
+		//printf("Got broadcast packet from %s\n",inet_ntoa(their_addr.sin_addr));
 		// Check if ip is myself or already connected. 
 		char * peer_ip = inet_ntoa(their_addr.sin_addr);
 		//printf("Peer IP: %s\n",peer_ip); //<-RM
@@ -245,7 +254,8 @@ void* listen_udp_broadcast(){
 			connect_to_peer(their_addr.sin_addr.s_addr);
 		}
 		else
-			printf("Peer was already connected\n");
+			NULL;
+			//printf("Peer was already connected\n");
 	}
 }
 
@@ -299,7 +309,8 @@ void* send_udp_broadcast() {
 			exit(1);
 		}
 		else {
-			printf("Sent broadcast\n");
+			NULL;
+			//printf("Sent broadcast\n");
 		}
 		sleep(3);
 	}
