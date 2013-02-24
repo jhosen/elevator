@@ -15,9 +15,9 @@
 #define BUFFER_IN_SIZE		128
 #define BUFFER_OUT_SIZE		128
 #define LISTEN_BACKLOG		5		// number of peers allowed in listen queue.
-#define LISTEN_PORT			3003	// Ports must be between 1024 and 65535
-#define UDP_SEND_PORT		3004
-#define UDP_LISTEN_PORT		3005
+#define LISTEN_PORT			3010	// Ports must be between 1024 and 65535
+#define UDP_SEND_PORT		3011
+#define UDP_LISTEN_PORT		3012
 
 #define LAN_BROADCAST_IP 	"129.241.187.255"
 
@@ -45,8 +45,10 @@ void connect_to_peer(in_addr_t peer_ip);
 void assign_com_thread(int peer_socket);
 
 
-
-
+/*
+ * Checks whether peer with peer_ip already is connected.
+ */
+int is_connected(char * peer_ip);
 
 
 
