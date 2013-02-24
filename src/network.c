@@ -50,6 +50,7 @@ void network_init(void){
 	const char * my_ip = getlocalip();
 	printf("My IP: %s\n",my_ip);
 	fprintf(connected_peers, my_ip);
+	fprintf(connected_peers, "\n");
 	fclose(connected_peers);
 
 
@@ -254,10 +255,14 @@ int is_connected(char * peer_ip){
 	char peer_ip_str[128];
 	size_t len = 0;
 	char * line = NULL;
+	struct in_addr new_peer_struct, old_peer_struct;
 	while (getline(&line, &len, connected_peers)!= -1){//while(fgets(peer_ip_str, sizeof(peer_ip_str), connected_peers)!= NULL){ // (getline(peer_ip_str, &len, connected_peers))!=-1 ){//
+		inet_aton(line, &old_peer_struct);
+		inet_aton(peer_ip, &new_peer_struct);
 		//fputs(line, stdout);//fputs("connected: %s \n", peer_ip_str);
-		if (*line == *peer_ip){ // already connected
-			//printf("PEER ALREADY CONNECTED\n"); // <-RM
+		//if (inet_aton(line, &dummy) == inet_aton(peer_ip, &dummy2)){ // already connected
+		if (new_peer_struct.s_addr == old_peer_struct.s_addr){
+		//printf("PEER ALREADY CONNECTED\n"); // <-RM
 			return 1;
 		}
 	}
