@@ -11,7 +11,10 @@
 #include <stdlib.h>
 #include <sys/socket.h>
 #include <arpa/inet.h>
-
+#include <net/if.h>
+#include <sys/ioctl.h>
+#include <ifaddrs.h>
+#include <netdb.h>
 #include "network.h"
 
 #define TRUE  1
@@ -44,7 +47,8 @@ static int listen_socket;
 void network_init(void){
 	// Create file for keeping track of connected peers.
 	FILE * connected_peers = fopen("connected_peers.txt", "w");
-	const char * my_ip = "129.241.187.151\n";
+	const char * my_ip = getlocalip();
+	printf("My IP: %s\n",my_ip);
 	fprintf(connected_peers, my_ip);
 	fclose(connected_peers);
 
@@ -297,3 +301,39 @@ void* send_udp_broadcast() {
 	
 }
 
+char* getlocalip() {
+    struct ifaddrs *ifaddr, *ifa;
+    int family, s;
+    char host[NI_MAXHOST];
+
+    if (getifaddrs(&ifaddr) == -1)
+    {
+        perror("getifaddrs");
+        exit(EXIT_FAILURE);
+    }
+
+
+    for (ifa = ifaddr; ifa != NULL; ifa = ifa->ifa_next)
+    {
+        if (ifa->ifa_addr == NULL)
+            continue;
+
+        s=getnameinfo(ifa->ifa_addr,sizeof(struct sockaddr_in),host, NI_MAXHOST, NULL, 0, NI_NUMERICHOST);
+
+        if((strcmp(ifa->ifa_name,"eth0")==0)&&(ifa->ifa_addr->sa_family==AF_INET))
+        {
+            if (s != 0)
+            {
+                printf("getnameinfo() failed: %s\n", gai_strerror(s));
+                exit(EXIT_FAILURE);
+            }
+            printf("\tInterface : <%s>\n",ifa->ifa_name );
+            printf("\t  Address : <%s>\n", host);
+            freeifaddrs(ifaddr);
+            return host;
+        }
+    }
+
+    freeifaddrs(ifaddr);
+    return -1;
+}

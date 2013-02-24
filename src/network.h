@@ -50,7 +50,7 @@ void assign_com_thread(int peer_socket);
  */
 int is_connected(char * peer_ip);
 
-
+char* getlocalip();
 
 void* listen_udp_broadcast();
 
