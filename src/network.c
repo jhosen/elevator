@@ -178,11 +178,13 @@ void *com_handler(void * peer_socket_p){
 	// The connection is established. This is the function describing what to communicate.
 	int peer_socket = *(int*)peer_socket_p; 
 	printf("New communication handler thread created for peer connected to socket %d \n", peer_socket);
-	
+	write(peer_socket, "Hi\n", 3);
 	// start receiving thread and send thread
-	while(1)
-		;
-
+	char rec_msg[2000];
+	while(1){
+		recv(peer_socket, rec_msg, 2000, 0);
+		printf(rec_msg);
+	}
 }
 
 
