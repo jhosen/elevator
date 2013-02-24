@@ -35,10 +35,13 @@ void *network_listen_for_incoming_and_accept();
  *
  */
 void *com_handler(void * peer_socket_p);
+
 /* \!brief Connect to peer. 
  * This is called from listen_udp thread
+ *
+ * \retval Whether connecting went ok or not (1/0).
  */
-void connect_to_peer(in_addr_t peer_ip);
+int connect_to_peer(in_addr_t peer_ip);
 /* \!brief Assigning a communication handler thread to a connection
  *
  */

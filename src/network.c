@@ -124,17 +124,16 @@ void *network_listen_for_incoming_and_accept(){
 			perror("err: accept\n");
 			exit(1); 
 		}
-		printf("New connection\n");
+		printf("Some Peer initiated a new TCP connection to me.\n");
 
-		#warning "Add new peer to list!\n"
 		char * peer_ip = inet_ntoa(peer.sin_addr);
 		if(!is_connected(peer_ip)){
-					//printf("Peer not connected. Connecting to peer\n");  	//<- RM
-					FILE * connected_peers = fopen("connected_peers.txt", "a+");
-					fprintf(connected_peers, peer_ip);
-					fprintf(connected_peers, "\n");
-					fclose(connected_peers);
-					assign_com_thread(new_peer_socket);
+			//printf("Peer not connected. Connecting to peer\n");  	//<- RM
+			FILE * connected_peers = fopen("connected_peers.txt", "a+");
+			fprintf(connected_peers, peer_ip);
+			fprintf(connected_peers, "\n");
+			fclose(connected_peers);
+			assign_com_thread(new_peer_socket);
 		}
 		else
 			NULL;
@@ -146,7 +145,7 @@ void *network_listen_for_incoming_and_accept(){
 
 
 
-void connect_to_peer(in_addr_t peer_ip){
+int connect_to_peer(in_addr_t peer_ip){
 	int peer_socket = socket(AF_INET, SOCK_STREAM, 0); 
 	
 	struct sockaddr_in peer; 
@@ -154,7 +153,7 @@ void connect_to_peer(in_addr_t peer_ip){
 	peer.sin_addr.s_addr	= peer_ip;//INADDR_ANY; // inet_pton(AF_INET, "ip.ip.ip.ip", NULL);
 	peer.sin_port			= htons(LISTEN_PORT); // Connect to listen port.  
 	if (connect(peer_socket, (struct sockaddr *)&peer , sizeof(peer)) < 0){
-		perror("err: connect. Connectinh to peer failed\n");
+		perror("err: connect. Connecting to peer failed\n");
 		return -1; 
 	}
 
@@ -251,7 +250,13 @@ void* listen_udp_broadcast(){
 			fprintf(connected_peers, peer_ip);
 			fprintf(connected_peers, "\n");
 			fclose(connected_peers);
-			connect_to_peer(their_addr.sin_addr.s_addr);
+
+			if( connect_to_peer(their_addr.sin_addr.s_addr)==-1){
+				perror("err: connect_to_peer.\n Error when trying to initate a new connection to a peer by TCP\n");
+			}
+			else{
+				printf("Successful connected to a new peer by TPC after I received an UDP broadcast.\n");
+			}
 		}
 		else
 			NULL;
@@ -269,10 +274,8 @@ int is_connected(char * peer_ip){
 	while (getline(&line, &len, connected_peers)!= -1){//while(fgets(peer_ip_str, sizeof(peer_ip_str), connected_peers)!= NULL){ // (getline(peer_ip_str, &len, connected_peers))!=-1 ){//
 		inet_aton(line, &old_peer_struct);
 		inet_aton(peer_ip, &new_peer_struct);
-		//fputs(line, stdout);//fputs("connected: %s \n", peer_ip_str);
-		//if (inet_aton(line, &dummy) == inet_aton(peer_ip, &dummy2)){ // already connected
 		if (new_peer_struct.s_addr == old_peer_struct.s_addr){
-		//printf("PEER ALREADY CONNECTED\n"); // <-RM
+			fclose(connected_peers);
 			return 1;
 		}
 	}
