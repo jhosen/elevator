@@ -19,6 +19,7 @@
 #define UDP_SEND_PORT		3004
 #define UDP_LISTEN_PORT		3005
 
+#define LAN_BROADCAST_IP 	"129.241.187.255"
 
 /* \!brief Initiate peer for network cooperation.
  *

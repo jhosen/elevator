@@ -244,8 +244,8 @@ void* send_udp_broadcast() {
 	struct sockaddr_in toAddr;
 	memset(&toAddr, 0, sizeof(toAddr));
 	toAddr.sin_family = AF_INET;
-	//	toAddr.sin_addr.s_addr = inet_addr("78.91.25.178");
-	toAddr.sin_addr.s_addr = htonl(INADDR_BROADCAST);
+	toAddr.sin_addr.s_addr = inet_addr(LAN_BROADCAST_IP);
+	//toAddr.sin_addr.s_addr = htonl(INADDR_BROADCAST);
 	toAddr.sin_port        = htons(UDP_LISTEN_PORT);
 	
 	char *message = "Hello, World!";
