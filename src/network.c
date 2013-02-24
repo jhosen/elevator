@@ -115,15 +115,16 @@ void *network_listen_for_incoming_and_accept(){
 		printf("Some Peer initiated a new TCP connection to me.\n");
 
 		char * peer_ip = inet_ntoa(peer.sin_addr);
+		printf("peer_ip : %s\n", peer_ip);
 		if(!is_connected(peer_ip)){
 			FILE * connected_peers = fopen("connected_peers.txt", "a+");
 			fprintf(connected_peers, peer_ip);
 			fprintf(connected_peers, "\n");
 			fclose(connected_peers);
-			assign_com_thread(new_peer_socket);
+			assign_com_thread(new_peer_socket, peer_ip );
 		}
 		else
-			NULL;
+			close(new_peer_socket);
 	}
 }
 
@@ -143,27 +144,33 @@ int connect_to_peer(in_addr_t peer_ip){
 		perror("err: connect. Connecting to peer failed\n");
 		return -1; 
 	}
+	printf("peer_socket : %i, peer_ip : %s\n", peer_socket, inet_ntoa(peer.sin_addr));
 
-	assign_com_thread(peer_socket);
+	assign_com_thread(peer_socket, inet_ntoa(peer.sin_addr));
 	// Add to list off peers
 	
 	return 1; 
 }
 
 
-
+struct peer_info {
+	int socket;
+	char * ip;
+};
 /* \!brief Assign a thread for handling one dedicated connection. 
  *
  */
-void assign_com_thread(int peer_socket){
+void assign_com_thread(int peer_socket, char* peer_ip){
 	// We have a connection! Now assign a communication handler thread. 
-	int * peer_socket_p;
-	peer_socket_p = (int *)malloc(1);	
-	*peer_socket_p = peer_socket; 
-	
+
+	struct peer_info *pinf = malloc(sizeof(struct peer_info));
+	pinf->socket 	= peer_socket;
+	pinf->ip		= peer_ip;
+//	printf("peer_socket : %i, peer_ip : %s\n", pinf->socket, pinf->ip);
+
 	pthread_t com_thread;
 	
-	if( pthread_create( &com_thread , NULL ,  com_handler , (void*) peer_socket_p) < 0){
+	if( pthread_create( &com_thread , NULL ,  com_handler , pinf)<0){// peer_socket_p) < 0){
 		perror("err: pthread_create\n");
 		exit(1);
 	}
@@ -174,15 +181,37 @@ void assign_com_thread(int peer_socket){
 /* \!brief Communication handler
  *
  */
-void *com_handler(void * peer_socket_p){
+void *com_handler(void * peer_inf){
 	// The connection is established. This is the function describing what to communicate.
-	int peer_socket = *(int*)peer_socket_p; 
+	struct peer_info* pinf = (struct peer_info*) peer_inf;
+//	printf("peer_socket : %i, peer_ip : %s\n", pinf->socket, pinf->ip);
+	int peer_socket = pinf->socket;
+	char * peer_ip  = pinf->ip;
+
 	printf("New communication handler thread created for peer connected to socket %d \n", peer_socket);
-	write(peer_socket, "Hi\n", 3);
+	printf("peer_socket : %i, peer_ip : %s\n", peer_socket, peer_ip);
+
+	printf("Write success: %i\n", write(peer_socket, "Hi\n", 3));
 	// start receiving thread and send thread
 	char rec_msg[2000];
+	int read_size;
 	while(1){
-		recv(peer_socket, rec_msg, 2000, 0);
+		if((read_size=recv(peer_socket, rec_msg, 2000, 0))<=0){
+			perror("err:recv. Receive failed.\n");
+			if (read_size == 0){
+				perror("err:peer disconnected.\n");
+				#warning "Remove peer and socket from list, and close socket connection";
+				printf("peer_socket : %i, peer_ip : %s\n", peer_socket, peer_ip);
+				rm_from_connected_list(peer_ip);
+				close(peer_socket);
+				perror("Closed socket, terminating thread\n");
+				pthread_exit(0);
+			}
+			else if (read_size==-1){
+				perror("err:received failed\n.");
+			}
+
+	}
 		printf(rec_msg);
 	}
 }
@@ -263,6 +292,39 @@ int is_connected(char * peer_ip){
 	fclose(connected_peers);
 	return 0;
 }
+void rm_from_connected_list(char *peer_ip){
+	FILE *connected_peers = fopen("connected_peers.txt", "r+");
+	FILE *tmp_file = fopen("temp.txt", "w");
+	size_t len = 0;
+	char * line = NULL;
+	printf("Deleting peer with ip: %s\n", peer_ip);
+	struct in_addr delete_peer, iterate_peer;
+	inet_aton(peer_ip, &delete_peer);
+	while (getline(&line, &len, connected_peers)!= -1){
+		inet_aton(line, &iterate_peer);
+		if (delete_peer.s_addr == iterate_peer.s_addr){
+			printf("Removed peer from list\n");
+		}
+		else{
+			fprintf(tmp_file, line);
+			//fprintf(tmp_file, "\n");
+		}
+	}
+	fclose(tmp_file);
+	fclose(connected_peers);
+
+	// COPY from temp to con_peers list
+	connected_peers = fopen("connected_peers.txt", "w");
+	tmp_file = fopen("temp.txt", "r");
+	while (getline(&line, &len, tmp_file)!= -1){
+		fprintf(connected_peers, line);
+	}
+	fclose(tmp_file);
+	fclose(connected_peers);
+
+}
+
+
 
 void* send_udp_broadcast() {
 	

@@ -42,7 +42,7 @@ void *network_listen_for_incoming_and_accept();
 /* \!brief Communication handler thread
  *
  */
-void *com_handler(void * peer_socket_p);
+void *com_handler(void * peer_inf);
 
 /* \!brief Connect to peer. 
  * This is called from listen_udp thread
@@ -53,7 +53,7 @@ int connect_to_peer(in_addr_t peer_ip);
 /* \!brief Assigning a communication handler thread to a connection
  *
  */
-void assign_com_thread(int peer_socket);
+void assign_com_thread(int peer_socket, char* peer_ip);
 
 
 /*
