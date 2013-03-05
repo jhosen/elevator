@@ -7,19 +7,25 @@
  *
  */
 #include <arpa/inet.h>
+#include <pthread.h>
 
 
 
 
-
-#define BUFFER_IN_SIZE		128
-#define BUFFER_OUT_SIZE		128
+#define BUFFER_SIZE		128
+//#define BUFFER_OUT_SIZE		128
 #define LISTEN_BACKLOG		5		// number of peers allowed in listen queue.
 #define LISTEN_PORT			3010	// Ports must be between 1024 and 65535
 #define UDP_SEND_PORT		3011
 #define UDP_LISTEN_PORT		3012
 
 #define LAN_BROADCAST_IP 	"129.241.187.255"
+
+typedef struct {
+	char buf [BUFFER_SIZE ];
+	int unread;
+	pthread_mutex_t mutex;
+} buffer_t;
 
 
 /* \!brief Function letting this peer enter the network
@@ -67,5 +73,11 @@ void* listen_udp_broadcast();
 
 void* send_udp_broadcast();
 	
+
+void *func_receive(void * peer_inf);
+
+void *func_send(void *arg);
+
+void put_to_buf(char * value, buffer_t buf);
 	
 

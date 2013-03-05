@@ -2,7 +2,7 @@
  *  network.c
  *  elevator
  *
- *  Created by Jesper Hosen on 23.02.13.
+ *  Created by Jesper Hosen & Dag Sletteboe on 23.02.13.
  *  Copyright 2013 __MyCompanyName__. All rights reserved.
  *
  */
@@ -16,6 +16,7 @@
 #include <ifaddrs.h>
 #include <netdb.h>
 #include "network.h"
+			
 
 #define TRUE  1
 #define FALSE 0
@@ -23,10 +24,13 @@
 
 
 
-// Buffers for send and transmiting data via network
+// Buffers for send and transmitting data via network
 // {@
-static char buf_in [BUFFER_IN_SIZE ];
-static char buf_out[BUFFER_OUT_SIZE];
+
+static  buffer_t buf_in;
+		//buf_in.buf = malloc(BUFFER_SIZE);
+static  buffer_t buf_out;
+
 // @}
 
 static int listen_socket;
@@ -191,10 +195,45 @@ void *com_handler(void * peer_inf){
 	printf("New communication handler thread created for peer connected to socket %d \n", peer_socket);
 	printf("peer_socket : %i, peer_ip : %s\n", peer_socket, peer_ip);
 
-	printf("Write success: %i\n", write(peer_socket, "Hi\n", 3));
+	//printf("Write success: %i\n", write(peer_socket, "Hi\n", 3));
 	// start receiving thread and send thread
+	//char rec_msg[2000];
+	//int read_size;
+
+// ---------------- New part -------------------------
+
+	
+	
+
+	pthread_t send;
+    	if(pthread_create(&send, NULL, &func_send, peer_inf)) {
+		printf("Could not create thread\n");
+		return -1;
+   	 }
+
+   
+
+	pthread_t receive;
+    	if(pthread_create(&receive, NULL, &func_receive, peer_inf)) {
+		printf("Could not create thread\n");
+		return -1;
+ 	}
+   	pthread_join(receive, NULL);
+   	pthread_join(send, NULL);
+	printf("Kill com handler thread\n");
+
+   	pthread_exit(0);
+}
+
+// ------------------------------------------------------
+void *func_receive(void * peer_inf){
 	char rec_msg[2000];
 	int read_size;
+
+	struct peer_info* pinf = (struct peer_info*) peer_inf;
+	int peer_socket = pinf->socket;
+	char * peer_ip  = pinf->ip;
+
 	while(1){
 		if((read_size=recv(peer_socket, rec_msg, 2000, 0))<=0){
 			perror("err:recv. Receive failed.\n");
@@ -211,10 +250,56 @@ void *com_handler(void * peer_inf){
 				perror("err:received failed\n.");
 			}
 
-	}
-		printf(rec_msg);
+		}	
+		else{
+			put_to_buf(rec_msg, buf_in);
+			memset(rec_msg, 0, sizeof(rec_msg)); // flush network receive buffer  
+		}
 	}
 }
+
+void *func_send(void *peer_inf){
+	struct peer_info* pinf = (struct peer_info*) peer_inf;
+	int peer_socket = pinf->socket;
+	char * peer_ip  = pinf->ip;
+	while(1){
+		// Check for new data in buf_out
+		if(send(peer_socket, "I'm sending you an SMS.", 25, NULL)<=0){
+			printf("Kill send thread\n");
+			pthread_exit(0);
+		}
+
+		sleep(2);
+		; 
+	}
+}
+
+
+void put_to_buf(char * value, buffer_t buf){
+	while(buf.unread){ // make sure "brain" has collected information from buffer, to avoid overwriting.
+		#warning "One should add a timeout for this while loop to avoid infinte hanging"
+		; // Do wait. 
+	}
+	pthread_mutex_lock(&buf_in.mutex);
+
+	//buf.buf = *value;
+	printf("Received: %s\n", value);
+	buf.unread = 1;
+	pthread_mutex_unlock(&buf_in.mutex);
+}
+
+
+/*
+
+void brain(message) {
+	char* action;
+	char* elevator
+	for (int i = 0; i<sizeof(message); i++) {
+		char[i] = message[i] 
+		
+*/
+
+// ------------------------------------------------------
 
 
 
