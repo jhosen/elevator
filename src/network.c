@@ -188,22 +188,11 @@ void assign_com_thread(int peer_socket, char* peer_ip){
 void *com_handler(void * peer_inf){
 	// The connection is established. This is the function describing what to communicate.
 	struct peer_info* pinf = (struct peer_info*) peer_inf;
-//	printf("peer_socket : %i, peer_ip : %s\n", pinf->socket, pinf->ip);
 	int peer_socket = pinf->socket;
 	char * peer_ip  = pinf->ip;
 
 	printf("New communication handler thread created for peer connected to socket %d \n", peer_socket);
 	printf("peer_socket : %i, peer_ip : %s\n", peer_socket, peer_ip);
-
-	//printf("Write success: %i\n", write(peer_socket, "Hi\n", 3));
-	// start receiving thread and send thread
-	//char rec_msg[2000];
-	//int read_size;
-
-// ---------------- New part -------------------------
-
-	
-	
 
 	pthread_t send;
     	if(pthread_create(&send, NULL, &func_send, peer_inf)) {
@@ -225,7 +214,7 @@ void *com_handler(void * peer_inf){
    	pthread_exit(0);
 }
 
-// ------------------------------------------------------
+
 void *func_receive(void * peer_inf){
 	char rec_msg[2000];
 	int read_size;
@@ -289,17 +278,6 @@ void put_to_buf(char * value, buffer_t buf){
 }
 
 
-/*
-
-void brain(message) {
-	char* action;
-	char* elevator
-	for (int i = 0; i<sizeof(message); i++) {
-		char[i] = message[i] 
-		
-*/
-
-// ------------------------------------------------------
 
 
 
