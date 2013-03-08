@@ -15,9 +15,9 @@
 #define BUFFER_SIZE		128
 //#define BUFFER_OUT_SIZE		128
 #define LISTEN_BACKLOG		5		// number of peers allowed in listen queue.
-#define LISTEN_PORT			3010	// Ports must be between 1024 and 65535
-#define UDP_SEND_PORT		3011
-#define UDP_LISTEN_PORT		3012
+#define LISTEN_PORT			3000 //10	// Ports must be between 1024 and 65535
+#define UDP_SEND_PORT		3001 //11
+#define UDP_LISTEN_PORT		3002 //12
 
 //#define JH_BC_IP			"78.91.26.255"
 #define LAN_BROADCAST_IP	"129.241.187.255"
@@ -95,10 +95,10 @@ int rm(struct peer p);
 
 int find(struct peer p);
 
-int printlist(); 
+int printlist();
 
 struct peer {
-	int socket; 
+	int socket;
 	in_addr_t ip;
 };
 
@@ -107,3 +107,4 @@ struct node {
 	struct peer p;
 	struct node *next, *prev;
 };
+
