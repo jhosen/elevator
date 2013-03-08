@@ -23,7 +23,6 @@
 
 
 
-
 // Buffers for send and transmitting data via network
 // {@
 
@@ -459,4 +458,72 @@ char* getlocalip() {
 
     freeifaddrs(ifaddr);
     return -1;
+}
+
+
+
+/* Linked list for keeping track of connected peers
+ *
+ *
+ */
+
+struct peer {
+	int socket; 
+	int ip;
+};
+
+struct node {
+	struct peer p;
+	struct node *next, *prev;
+};
+
+static struct node *root;  
+
+void initlist(){ //struct peer *root
+	root = malloc( sizeof(struct node) );  
+  	root->p.socket 	= 0; 
+    root->p.ip 		= 0;
+    root->next 		= 0;  
+    root->prev		= 0;  
+}
+
+int add(struct peer new){
+	struct node * iter, *prev; 
+	iter = root; 
+	if(iter!=0){
+		while(iter->next!=0){
+			iter = iter->next; 
+		}
+	}
+	iter->next = malloc(sizeof(struct node));
+	prev = iter; 
+	iter = iter->next; 
+	if(iter==0){
+		return 0; //out of memory
+	}
+	iter->p.socket 	= new.socket; 	
+	iter->p.ip	 	= new.ip; 	
+	iter->next  	= 0; 
+	iter->prev		= prev; 
+	return 1; // success
+	
+}
+
+int rm(struct peer p){
+	struct node * iter, *prev, *tmp; 
+	iter = root; 
+	if(iter!=0){
+		while(iter!=0){
+			if((iter->p.ip) == p.ip && (iter->p.socket)==p.socket){
+				tmp = iter; 
+				iter->prev->next = iter->next; 
+				iter->next->prev = iter->prev; 
+				free(tmp); 
+				return 1; 
+			}
+			prev = iter; 	
+			iter = iter->next; 
+		}
+	}
+	return 0;
 }
