@@ -86,6 +86,8 @@ void put_to_buf(char * value, buffer_t buf);
 
 void initlist();
 
+struct peer peer_object(int socket, int ip);
+
 int add(struct peer new);
 
 int rm(struct peer p);

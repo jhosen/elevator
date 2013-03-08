@@ -119,12 +119,11 @@ void *network_listen_for_incoming_and_accept(){
 
 		char * peer_ip = inet_ntoa(peer.sin_addr);
 		printf("peer_ip : %s\n", peer_ip);
-		if(!is_connected(peer_ip)){
-			FILE * connected_peers = fopen("connected_peers.txt", "a+");
-			fprintf(connected_peers, peer_ip);
-			fprintf(connected_peers, "\n");
-			fclose(connected_peers);
-			assign_com_thread(new_peer_socket, peer_ip );
+		
+		struct peer newpeer = peer_object(0, their_addr.sin_addr);
+		if(!find(newpeer)){
+			add(newpeer); 
+			assign_com_thread(new_peer_socket, peer_ip);
 		}
 		else
 			close(new_peer_socket);
@@ -229,7 +228,8 @@ void *func_receive(void * peer_inf){
 				perror("err:peer disconnected.\n");
 				#warning "Remove peer and socket from list, and close socket connection";
 				printf("peer_socket : %i, peer_ip : %s\n", peer_socket, peer_ip);
-				rm_from_connected_list(peer_ip);
+				struct peer p = peer_object(peer_socket, inet_addr(peer_ip)); 
+				rm(p);
 				close(peer_socket);
 				perror("Closed socket, terminating thread\n");
 				pthread_exit(0);
@@ -317,11 +317,14 @@ void* listen_udp_broadcast(){
 		}
 		// Check if ip is myself or already connected. 
 		char * peer_ip = inet_ntoa(their_addr.sin_addr);
-		if(!is_connected(peer_ip)){
-			FILE * connected_peers = fopen("connected_peers.txt", "a+");
+		printf("peer ip = %s\n", peer_ip);
+		struct peer newpeer = peer_object(0, their_addr.sin_addr);
+		if(!find(newpeer)){
+			add(newpeer); 
+			/*FILE * connected_peers = fopen("connected_peers.txt", "a+");
 			fprintf(connected_peers, peer_ip);
 			fprintf(connected_peers, "\n");
-			fclose(connected_peers);
+			fclose(connected_peers);*/
 
 			if( connect_to_peer(their_addr.sin_addr.s_addr)==-1){
 				perror("err: connect_to_peer.\n Error when trying to initate a new connection to a peer by TCP\n");
@@ -469,8 +472,15 @@ char* getlocalip() {
 
 struct peer {
 	int socket; 
-	int ip;
+	in_addr_t ip;
 };
+
+struct peer peer_object(int socket, in_addr_t ip){
+	struct peer p; 
+	p.socket = socket; 
+	p.ip = ip; 
+	return p; 
+}
 
 struct node {
 	struct peer p;
@@ -534,7 +544,7 @@ int find(struct peer p){
 	iter = root; 
 	if(iter!=0){
 		while(iter!=0){
-			if((iter->p.ip) == p.ip && (iter->p.socket)==p.socket){
+			if((iter->p.ip) == p.ip){
 				return 1; // found it
 			} 	
 			iter = iter->next; 
