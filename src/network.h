@@ -81,3 +81,14 @@ void *func_send(void *arg);
 void put_to_buf(char * value, buffer_t buf);
 	
 
+
+/* List functions for keeping track of connected peers */
+
+void initlist();
+
+int add(struct peer new);
+
+int rm(struct peer p);
+
+int find(struct peer p);
+

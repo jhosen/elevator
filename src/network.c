@@ -527,3 +527,18 @@ int rm(struct peer p){
 	}
 	return 0;
 }
+
+
+int find(struct peer p){
+	struct node * iter; 
+	iter = root; 
+	if(iter!=0){
+		while(iter!=0){
+			if((iter->p.ip) == p.ip && (iter->p.socket)==p.socket){
+				return 1; // found it
+			} 	
+			iter = iter->next; 
+		}
+	}
+	return 0;
+}
