@@ -19,7 +19,8 @@
 #define UDP_SEND_PORT		3011
 #define UDP_LISTEN_PORT		3012
 
-#define LAN_BROADCAST_IP 	"129.241.187.255"
+//#define JH_BC_IP			"78.91.26.255"
+#define LAN_BROADCAST_IP	"129.241.187.255"
 
 typedef struct {
 	char buf [BUFFER_SIZE ];
@@ -65,28 +66,28 @@ void assign_com_thread(int peer_socket, char* peer_ip);
 /*
  * Checks whether peer with peer_ip already is connected.
  */
-int is_connected(char * peer_ip);
+//int is_connected(char * peer_ip);
 
 char* getlocalip();
 
 void* listen_udp_broadcast();
 
 void* send_udp_broadcast();
-	
+
 
 void *func_receive(void * peer_inf);
 
 void *func_send(void *arg);
 
 void put_to_buf(char * value, buffer_t buf);
-	
+
 
 
 /* List functions for keeping track of connected peers */
 
 void initlist();
 
-struct peer peer_object(int socket, int ip);
+struct peer peer_object(int socket, in_addr_t ip);
 
 int add(struct peer new);
 
@@ -94,3 +95,15 @@ int rm(struct peer p);
 
 int find(struct peer p);
 
+int printlist(); 
+
+struct peer {
+	int socket; 
+	in_addr_t ip;
+};
+
+
+struct node {
+	struct peer p;
+	struct node *next, *prev;
+};
