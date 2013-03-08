@@ -22,12 +22,27 @@
 //#define JH_BC_IP			"78.91.26.255"
 #define LAN_BROADCAST_IP	"129.241.187.255"
 
+#define TIMEOUT 			1	// [sec]
+#define PINGPERIOD 			0.1
+#define BROADCAST_PERIOD	1
+
+
+
 typedef struct {
 	char buf [BUFFER_SIZE ];
 	int unread;
 	pthread_mutex_t mutex;
+	pthread_barrier_t sync;
 } buffer_t;
 
+char * getbufin();
+void bufout(char *msg);
+void bufin(char * value);
+
+struct peer {
+	int socket;
+	in_addr_t ip;
+};
 
 /* \!brief Function letting this peer enter the network
  *
@@ -44,7 +59,7 @@ void network_init(void);
 /* \!brief Listen for connections
  *
  */
-void *network_listen_for_incoming_and_accept();
+void *listen_tcp();
 
 /* \!brief Communication handler thread
  *
@@ -60,7 +75,7 @@ int connect_to_peer(in_addr_t peer_ip);
 /* \!brief Assigning a communication handler thread to a connection
  *
  */
-void assign_com_thread(int peer_socket, char* peer_ip);
+void assign_com_thread(struct peer p);//int peer_socket, char* peer_ip);
 
 
 /*
@@ -97,11 +112,7 @@ int find(struct peer p);
 
 int printlist();
 
-struct peer {
-	int socket;
-	in_addr_t ip;
-};
-
+int count();
 
 struct node {
 	struct peer p;
