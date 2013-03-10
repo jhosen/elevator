@@ -16,9 +16,7 @@
 #include <ifaddrs.h>
 #include <netdb.h>
 #include "network.h"
-#include <time.h>
-#include <errno.h>
-#include <fcntl.h>
+
 
 #define TRUE  1
 #define FALSE 0
@@ -33,30 +31,32 @@ static  buffer_t buf_in;
 static  buffer_t buf_out;
 
 // @}
-void bufout(char *msg){
-	int i = 0;
-	while(*(msg+i)!='\0' && i<BUFFER_SIZE){
-		buf_out.buf[i] = *(msg+i);
-		i++;
-	}
-	buf_out.unread = 1;
-}
 
 static int listen_socket;
-static struct node *root;
 
 
 void network_init(void){
-
+	// Create file for keeping track of connected peers.
+	/*FILE * connected_peers = fopen("connected_peers.txt", "w");
+	 const char * my_ip = getlocalip();
+	 printf("My IP: %s\n",my_ip);
+	 fprintf(connected_peers, my_ip);
+	 fprintf(connected_peers, "\n");
+	 fclose(connected_peers);
+	 */
 
 	const char *myip  = getlocalip();
+	printf("gelocalip: %s\n", myip);
+	// Keep track of connected peers
+	initlist();
 	struct in_addr meaddr;
 	inet_pton(AF_INET, myip, &meaddr);
-
-	initlist();
-	root->p.ip = meaddr.s_addr;
-
-
+	char test [30];
+	inet_ntop(AF_INET, &meaddr, test, 30);
+	printf("My ip: %s\n",test);
+	struct peer me = peer_object(0, meaddr.s_addr);
+	add(me);
+	printlist();
 	
 	int opt = TRUE; 
 	struct sockaddr_in listen_addr;
@@ -82,13 +82,13 @@ void network_init(void){
 		exit(1); 
 	}
 	
+	// Now that the listen socket is bounded, one may start broadcast its present, and listen for incoming connections. 
 	
 	
 	// We are ready to listen on listen_socket!
 	pthread_t listen_tcp_thread, listen_udp_thread, send_udp_broadcast_thread; 
 	
-	// listen for incoming tcp connections
-	if ( (pthread_create(&listen_tcp_thread, NULL, listen_tcp, (void *) NULL)) < 0){
+	if ( (pthread_create(&listen_tcp_thread, NULL, network_listen_for_incoming_and_accept, (void *) NULL)) < 0){
 		perror("err:pthread_create(listen_tcp_thread)\n");
 	} 
 	
@@ -102,10 +102,11 @@ void network_init(void){
 		perror("err:pthread_create(listen_udp_thread)\n");
 	} 
 	
-	/*pthread_join(listen_tcp_thread,			NULL);
+	
+	pthread_join(listen_tcp_thread,			NULL);
 	pthread_join(listen_udp_thread,			NULL);
 	pthread_join(send_udp_broadcast_thread, NULL);
-*/
+
 }
 
 
@@ -113,7 +114,7 @@ void network_init(void){
 /* \!brief Listen for TCP connections and accept incoming. 
  *
  */
-void *listen_tcp(){
+void *network_listen_for_incoming_and_accept(){
 	
 	// Be proactive, create objects for new peer connections:
 	struct sockaddr_in peer; 
@@ -126,12 +127,16 @@ void *listen_tcp(){
 			perror("err: accept\n");
 			exit(1); 
 		}
+		printf("Some Peer initiated a new TCP connection to me.\n");
+
 		char * peer_ip = inet_ntoa(peer.sin_addr);
-		printf("Some Peer(ip:%s) initiated a new TCP connection to me.\n", peer_ip);
+		printf("peer_ip : %s\n", peer_ip);
+		printlist();
 		struct peer newpeer = peer_object(new_peer_socket, peer.sin_addr.s_addr);
 		if(!find(newpeer)){
+			printf("the peer is not in my connected list\n");
 			add(newpeer);
-			assign_com_thread(newpeer);//new_peer_socket, peer_ip); //<--- change
+			assign_com_thread(new_peer_socket, peer_ip);
 		}
 		else{
 			printf("Already in connected list\n");
@@ -143,8 +148,183 @@ void *listen_tcp(){
 
 
 
-void* listen_udp_broadcast(){
 
+
+
+int connect_to_peer(in_addr_t peer_ip){
+	int peer_socket = socket(AF_INET, SOCK_STREAM, 0); 
+	
+	struct sockaddr_in peer; 
+	peer.sin_family			= AF_INET;
+	peer.sin_addr.s_addr	= peer_ip;
+	peer.sin_port			= htons(LISTEN_PORT); // Connect to listen port.  
+	if (connect(peer_socket, (struct sockaddr *)&peer , sizeof(peer)) < 0){
+		perror("err: connect. Connecting to peer failed\n");
+		return -1; 
+	}
+	printf("peer_socket : %i, peer_ip : %s\n", peer_socket, inet_ntoa(peer.sin_addr));
+
+//	struct in_addr tmp;
+//	inet_pton(AF_INET, peer_ip, &tmp);
+	struct peer p = peer_object(peer_socket, peer_ip);
+
+	add(p);
+	assign_com_thread(peer_socket, inet_ntoa(peer.sin_addr));
+	// Add to list off peers
+	
+	return 1; 
+}
+
+
+struct peer_info {
+	int socket;
+	char * ip;
+};
+/* \!brief Assign a thread for handling one dedicated connection. 
+ *
+ */
+void assign_com_thread(int peer_socket, char* peer_ip){
+	// We have a connection! Now assign a communication handler thread. 
+
+	struct peer_info *pinf = malloc(sizeof(struct peer_info));
+	pinf->socket 	= peer_socket;
+	pinf->ip		= peer_ip;
+	//	printf("peer_socket : %i, peer_ip : %s\n", pinf->socket, pinf->ip);
+
+	pthread_t com_thread;
+	
+	if( pthread_create( &com_thread , NULL ,  com_handler , pinf)<0){// peer_socket_p) < 0){
+		perror("err: pthread_create\n");
+		exit(1);
+	}
+}
+
+
+
+/* \!brief Communication handler
+ *
+ */
+void *com_handler(void * peer_inf){
+	// The connection is established. This is the function describing what to communicate.
+	struct peer_info* pinf = (struct peer_info*) peer_inf;
+	int peer_socket = pinf->socket;
+	char * peer_ip  = pinf->ip;
+	struct in_addr tmp;
+	inet_pton(AF_INET, peer_ip, &tmp);
+	struct peer p = peer_object(peer_socket, tmp.s_addr);
+
+
+	printf("New communication handler thread created for peer connected to socket %d \n", peer_socket);
+	printf("peer_socket : %i, peer_ip : %s\n", peer_socket, peer_ip);
+
+	pthread_t send;
+	if(pthread_create(&send, NULL, &func_send, peer_inf)) {
+		printf("Could not create thread\n");
+		return -1;
+	}
+
+
+
+	pthread_t receive;
+	if(pthread_create(&receive, NULL, &func_receive, peer_inf)) {
+		printf("Could not create thread\n");
+		return -1;
+ 	}
+   	pthread_join(receive, NULL);
+   	pthread_join(send, NULL);
+   	if(rm(p)){
+		printf("successful removed from list\n");
+	}
+
+	printf("Kill com handler thread\n");
+
+   	pthread_exit(0);
+}
+
+
+void *func_receive(void * peer_inf){
+	char rec_msg[2000];
+	int read_size;
+
+	struct peer_info* pinf = (struct peer_info*) peer_inf;
+	int peer_socket = pinf->socket;
+	char * peer_ip  = pinf->ip;
+	struct in_addr tmp;
+	inet_pton(AF_INET, peer_ip, &tmp);
+	struct peer p = peer_object(peer_socket, tmp.s_addr);
+
+	while(1){
+		if((read_size=recv(peer_socket, rec_msg, 2000, 0))<=0){
+			perror("err:recv. Receive failed.\n");
+			if (read_size == 0){
+				perror("err:peer disconnected.\n");
+#warning "Remove peer and socket from list, and close socket connection";
+				printf("peer_socket : %i, peer_ip : %s\n", peer_socket, peer_ip);
+
+				/*if(rm(p)){
+					printf("successful removed from list\n");
+				}*/
+				close(peer_socket);
+				perror("Closed socket, terminating thread\n");
+				pthread_exit(0);
+			}
+			else if (read_size==-1){
+				perror("err:received failed\n.");
+			}
+
+		}	
+		else{
+			put_to_buf(rec_msg, buf_in);
+			memset(rec_msg, 0, sizeof(rec_msg)); // flush network receive buffer  
+		}
+	}
+}
+
+void *func_send(void *peer_inf){
+	struct peer_info* pinf = (struct peer_info*) peer_inf;
+	int peer_socket = pinf->socket;
+	char * peer_ip  = pinf->ip;
+	struct in_addr tmp;
+	inet_pton(AF_INET, peer_ip, &tmp);
+	struct peer p = peer_object(peer_socket, tmp.s_addr);
+
+
+	while(1){
+		// Check for new data in buf_out
+		if(send(peer_socket, "I'm sending you an SMS.", 25, NULL)<=0){
+			printf("Kill send thread\n");
+			/*if(rm(p)){
+				printf("successful removed from list\n");
+			}*/
+
+			pthread_exit(0);
+		}
+
+		sleep(2);
+		; 
+	}
+}
+
+
+void put_to_buf(char * value, buffer_t buf){
+	while(buf.unread){ // make sure "brain" has collected information from buffer, to avoid overwriting.
+#warning "One should add a timeout for this while loop to avoid infinte hanging"
+		; // Do wait. 
+	}
+	pthread_mutex_lock(&buf_in.mutex);
+
+	//buf.buf = *value;
+	printf("Received: %s\n", value);
+	buf.unread = 1;
+	pthread_mutex_unlock(&buf_in.mutex);
+}
+
+
+
+
+
+void* listen_udp_broadcast(){
+	
 	int sock;
 	if ((sock = socket(AF_INET, SOCK_DGRAM, 0)) < 0)
 	{
@@ -152,13 +332,13 @@ void* listen_udp_broadcast(){
 		exit(1);
 	}
 	// Bind my UDP socket to a particular port to listen for incoming UDP responses.
-
+	
 	struct sockaddr_in saSocket;
 	memset(&saSocket, 0, sizeof(saSocket));
 	saSocket.sin_family      = AF_INET;
 	saSocket.sin_addr.s_addr = htonl(INADDR_ANY);
 	saSocket.sin_port        = htons(UDP_LISTEN_PORT);
-
+	
 	int opt = 1;
 	setsockopt(sock,SOL_SOCKET,SO_REUSEADDR,(char*)&opt,sizeof(opt));
 	
@@ -178,10 +358,17 @@ void* listen_udp_broadcast(){
 			perror("recvfrom");
 			exit(1);
 		}
-		// Check if ip is myself or already connected.
+		// Check if ip is myself or already connected. 
 		char * peer_ip = inet_ntoa(their_addr.sin_addr);
+		//printf("peer ip = %s\n", peer_ip);
 		struct peer newpeer = peer_object(0, their_addr.sin_addr.s_addr);
 		if(!find(newpeer)){
+			//add(newpeer);
+			/*FILE * connected_peers = fopen("connected_peers.txt", "a+");
+			 fprintf(connected_peers, peer_ip);
+			 fprintf(connected_peers, "\n");
+			 fclose(connected_peers);*/
+
 			if( connect_to_peer(their_addr.sin_addr.s_addr)==-1){
 				perror("err: connect_to_peer.\n Error when trying to initate a new connection to a peer by TCP\n");
 			}
@@ -194,6 +381,58 @@ void* listen_udp_broadcast(){
 		}
 	}
 }
+/*
+ int is_connected(char * peer_ip){
+ FILE *connected_peers = fopen("connected_peers.txt", "r+");
+
+ char peer_ip_str[128];
+ size_t len = 0;
+ char * line = NULL;
+ struct in_addr new_peer_struct, old_peer_struct;
+ while (getline(&line, &len, connected_peers)!= -1){
+ inet_aton(line, &old_peer_struct);
+ inet_aton(peer_ip, &new_peer_struct);
+ if (new_peer_struct.s_addr == old_peer_struct.s_addr){
+ fclose(connected_peers);
+ return 1;
+ }
+ }
+ fclose(connected_peers);
+ return 0;
+ }*/
+/*
+ void rm_from_connected_list(char *peer_ip){
+ FILE *connected_peers = fopen("connected_peers.txt", "r+");
+ FILE *tmp_file = fopen("temp.txt", "w");
+ size_t len = 0;
+ char * line = NULL;
+ printf("Deleting peer with ip: %s\n", peer_ip);
+ struct in_addr delete_peer, iterate_peer;
+ inet_aton(peer_ip, &delete_peer);
+ while (getline(&line, &len, connected_peers)!= -1){
+ inet_aton(line, &iterate_peer);
+ if (delete_peer.s_addr == iterate_peer.s_addr){
+ printf("Removed peer from list\n");
+ }
+ else{
+ fprintf(tmp_file, line);
+ //fprintf(tmp_file, "\n");
+ }
+ }
+ fclose(tmp_file);
+ fclose(connected_peers);
+
+ // COPY from temp to con_peers list
+ connected_peers = fopen("connected_peers.txt", "w");
+ tmp_file = fopen("temp.txt", "r");
+ while (getline(&line, &len, tmp_file)!= -1){
+ fprintf(connected_peers, line);
+ }
+ fclose(tmp_file);
+ fclose(connected_peers);
+
+ }
+ */
 
 
 
@@ -205,20 +444,20 @@ void* send_udp_broadcast() {
 		perror("socket");
 		exit(1);
 	}
-
+	
 	int opt = 1;
 	setsockopt(sock,SOL_SOCKET,SO_REUSEADDR,(char*)&opt,sizeof(opt));
 	int broadcastEnable=1;
 	setsockopt(sock, SOL_SOCKET, SO_BROADCAST, &broadcastEnable, sizeof(broadcastEnable));
-
-
+	
+	
 	struct sockaddr_in toAddr;
 	memset(&toAddr, 0, sizeof(toAddr));
 	toAddr.sin_family = AF_INET;
 	toAddr.sin_addr.s_addr = inet_addr(LAN_BROADCAST_IP);
 	toAddr.sin_port        = htons(UDP_LISTEN_PORT);
-
-	char *message = "UDP Broadcast!";
+	
+	char *message = "Hello, World!";
 	while(1) {
 		if (sendto(sock, message, strlen(message), 0,(struct sockaddr *) &toAddr, sizeof(toAddr))<0) {
 			perror("sendto");
@@ -227,177 +466,10 @@ void* send_udp_broadcast() {
 		else {
 			NULL;
 		}
-		sleep(BROADCAST_PERIOD);
+		sleep(3);
 	}
-
-}
-
-
-
-
-
-/* \!brief Communication handler
- *
- */
-void *com_handler(void * peer){
-	// The connection is established. This is the function describing what to communicate.
-	struct peer* pinf = (struct peer*) peer;
-	struct peer p;
-	p.socket = pinf->socket;
-	p.ip = pinf->ip;
-
-	pthread_barrier_init(&buf_out.sync, NULL, count());
-
-
-	printf("New communication handler thread created for peer connected to socket %d \n", p.socket);
-
-	char recv_msg[2000];
-	char send_msg[2000];
-	int read_size;
-
-	clock_t timeout = clock();
-	clock_t pingtime = clock();
-	clock_t currenttime;
-	int flags;
-
-	/* Set non-blocking state */
-	if (-1 == (flags = fcntl(p.socket, F_GETFL, 0))){
-		flags = 0;
-	}
-	fcntl(p.socket, F_SETFL, flags | O_NONBLOCK);
-
-
-	while(1){
-		/* Maintain connection by passing and receiving I'm alive */
-		currenttime = clock();
-
-		if((double)(currenttime-pingtime)/CLOCKS_PER_SEC >= PINGPERIOD){
-			send(p.socket, "I'm alive", sizeof("I'm alive"), 0);
-			pingtime = clock();
-			//printf("Sent im alive to:  %d \n", p.socket);
-		}
-
-		/* Receive data */
-		if((read_size=recv(p.socket, recv_msg, 2000, 0)) <= 0){ // Error mode
-				if(read_size == 0){
-					perror("err:peer disconnected.\n");
-					break;}
-				else if((read_size==-1)&& (errno != EAGAIN) && (errno != EWOULDBLOCK) ){
-					perror("Receiving failed\n");
-					break;
-				}
-				else{
-					// Did not receive anything, but no error
-				}
-		}
-		else {	// Receive data mode
-			timeout = clock();
-			//if(recv_msg!="I'm alive"){
-			printf("msg = %s, read size = %i\n", recv_msg, read_size);
-//			bufin(recv_msg);
-			//}
-			memset(recv_msg, 0, sizeof(recv_msg)); // flush network receive buffer
-		}
-		if((double)(currenttime-timeout)/CLOCKS_PER_SEC > TIMEOUT){
-			printf("TIMEOUT ON I'M ALIVE\n");
-			break;
-		}
-		/* Send data */
-		if(buf_out.unread){
-			// Read from buffer, send
-			send(p.socket, buf_out.buf, sizeof(buf_out.buf), 0);
-			// Sync so that every thread sends the message
-			int rc=pthread_barrier_wait(&buf_out.sync);	// <---- THIS IS REASON FOR A BUG
-			if( rc!=0 && rc!=PTHREAD_BARRIER_SERIAL_THREAD){
-				printf("Could not wait for barrier\n");
-			}
-			else{
-				buf_out.unread = 0;
-			}
-
-			// Update unread = false
-		}
-
-	}
-	terminate(p);
-
-	printf("Kill com handler thread\n");
-
-   	pthread_exit(0);
-}
-
-
-
-int connect_to_peer(in_addr_t peer_ip){
-	int peer_socket = socket(AF_INET, SOCK_STREAM, 0);
-
-	struct sockaddr_in peer;
-	peer.sin_family			= AF_INET;
-	peer.sin_addr.s_addr	= peer_ip;
-	peer.sin_port			= htons(LISTEN_PORT); // Connect to listen port.
-	if (connect(peer_socket, (struct sockaddr *)&peer , sizeof(peer)) < 0){
-		perror("err: connect. Connecting to peer failed\n");
-		return -1;
-	}
-
-	struct peer p = peer_object(peer_socket, peer_ip);
-
-	add(p);
-	assign_com_thread(p); //peer_socket, inet_ntoa(peer.sin_addr)); //<-----------change
-
-	return 1;
-}
-
-
-/*struct peer_info {
-	int socket;
-	char * ip;
-};*/
-/* \!brief Assign a thread for handling one dedicated connection.
- *
- */
-void assign_com_thread(struct peer p){//int peer_socket, char* peer_ip){
-	// We have a connection! Now assign a communication handler thread.
-
-	struct peer *pinf = malloc(sizeof(struct peer));
-	pinf->socket 	= p.socket;
-	pinf->ip		= p.ip;
-
-
-	pthread_t com_thread;
 	
-	if( pthread_create( &com_thread , NULL ,  com_handler , pinf)<0){// peer_socket_p) < 0){
-		perror("err: pthread_create\n");
-		exit(1);
-	}
 }
-
-void terminate(struct peer p){
-	if(rm(p)){
-		printf("successful removed from list\n");
-	}
-	pthread_barrier_init(&buf_out.sync, 0, count()); // update barrier variable
-	close(p.socket);
-}
-
-void bufin(char * value){
-	/*while(buf_in.unread){ // make sure "brain" has collected information from buffer, to avoid overwriting.
-		//#warning "One should add a timeout for this while loop to avoid infinte hanging"
-		; // Do wait.
-	}*/
-	pthread_mutex_lock(&buf_in.mutex);
-	int i = 0;
-	while(*(value+i)!='\0' && i<BUFFER_SIZE){
-		buf_in.buf[i] = *(value+i);
-	}
-	buf_in.unread = 1;
-	pthread_mutex_unlock(&buf_in.mutex);
-	printf("Bufin(%s)\n", value);
-}
-
-
-
-
 
 char* getlocalip() {
     struct ifaddrs *ifaddr, *ifa;
@@ -409,11 +481,15 @@ char* getlocalip() {
         perror("getifaddrs");
         exit(EXIT_FAILURE);
     }
+
+
     for (ifa = ifaddr; ifa != NULL; ifa = ifa->ifa_next)
     {
         if (ifa->ifa_addr == NULL)
             continue;
+
         s=getnameinfo(ifa->ifa_addr,sizeof(struct sockaddr_in),host, NI_MAXHOST, NULL, 0, NI_NUMERICHOST);
+
         if((strcmp(ifa->ifa_name,"eth0")==0)&&(ifa->ifa_addr->sa_family==AF_INET))
         {
             if (s != 0)
@@ -438,18 +514,30 @@ char* getlocalip() {
  *
  *
  */
+/*
+ struct peer {
+ int socket;
+ in_addr_t ip;
+ };
 
 
+ struct node {
+ struct peer p;
+ struct node *next, *prev;
+ };*/
+
+static struct node *root;
 
 
 struct peer peer_object(int socket, in_addr_t ip){
+	//printf("Constructing peer: socket = %i\n", socket);
 	struct peer p;
 	p.socket = socket;
 	p.ip = ip;
 	return p;
 }
 
-void initlist(){
+void initlist(){ //struct peer *root
 	root = malloc( sizeof(struct node) );
   	root->p.socket 	= 0;
     root->p.ip 		= 0;
@@ -470,20 +558,8 @@ int printlist(){
 	return 1;
 }
 
-int count(){
-	struct node * iter;
-	iter = root;
-	int i = 0;
-	if(iter!=0){
-		while(iter!=0){
-			iter = iter->next;
-			i++;
-		}
-	}
-	return i-1; // Do not count yourself
-}
-
 int add(struct peer new){
+	//printf("ADDING PEER: %i,%i\n", new.socket, new.ip);
 	struct node * iter, *prev;
 	iter = root;
 	if(iter!=0){
@@ -506,10 +582,12 @@ int add(struct peer new){
 }
 
 int rm(struct peer p){
+	//printf("REMOVING PEER: %i,%i\n", p.socket, p.ip);
 	struct node * iter, *prev, *tmp;
 	iter = root;
 	if(iter!=0){
 		while(iter!=0){
+			//printf("\tITER.socket = %i, ITER.ip = %i\n\tp.socket = %i, p.ip = %i", iter->p.socket, iter->p.ip, p.socket, p.ip);
 			if((iter->p.ip) == p.ip && (iter->p.socket)==p.socket){
 				tmp = malloc(sizeof(struct node));
 				tmp = iter;
@@ -517,6 +595,7 @@ int rm(struct peer p){
 				if(iter->next!=0){
 					iter->next->prev = iter->prev;
 				}
+				//printf("\n\nfree\n\n");
 				free(tmp);
 				return 1;
 			}
