@@ -22,7 +22,7 @@
 //#define JH_BC_IP			"78.91.26.255"
 #define LAN_BROADCAST_IP	"129.241.187.255"
 
-#define TIMEOUT 			1	// [sec]
+#define TIMEOUT 			3 //1	// [sec]
 #define PINGPERIOD 			0.1
 #define BROADCAST_PERIOD	1
 
@@ -66,7 +66,7 @@ void *listen_tcp();
  */
 void *com_handler(void * peer_inf);
 
-/* \!brief Connect to peer. 
+/* \!brief Connect to peer.
  * This is called from listen_udp thread
  *
  * \retval Whether connecting went ok or not (1/0).

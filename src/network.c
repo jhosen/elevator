@@ -45,9 +45,11 @@ void bufout(char *msg){
 static int listen_socket;
 static struct node *root;
 
+pthread_mutex_t errmutex;
 
 void network_init(void){
-
+	pthread_mutex_init(&errmutex,0);
+	pthread_mutex_init(&buf_in.mutex,0);
 
 	const char *myip  = getlocalip();
 	struct in_addr meaddr;
@@ -57,51 +59,51 @@ void network_init(void){
 	root->p.ip = meaddr.s_addr;
 
 
-	
-	int opt = TRUE; 
+
+	int opt = TRUE;
 	struct sockaddr_in listen_addr;
-	
+
 	listen_addr.sin_family = AF_INET;
 	listen_addr.sin_port = htons(LISTEN_PORT);
 	listen_addr.sin_addr.s_addr = htons(INADDR_ANY); // Binding local IP-address
-	
+
 	printf("Listen socket config:\n listen_addr.sin_family = %i;\n listen_addr.sin_port = %i;\n listen_addr.sin_addr.s_addr = %i;\n",
 		   listen_addr.sin_family ,
 		   LISTEN_PORT,
 		   listen_addr.sin_addr.s_addr
 		   );
-	
+
 	listen_socket = socket(AF_INET, SOCK_STREAM, 0);
 	if (setsockopt(listen_socket, SOL_SOCKET, SO_REUSEADDR, (char*)&opt, sizeof(opt)) == -1){
 		perror("err: setsockopt\n");
-		exit(1); 
+		exit(1);
 	}
-	
+
 	if ( bind(listen_socket, (struct sockaddr *)&listen_addr, sizeof listen_addr) == -1){
 		perror("err: bind\n");
-		exit(1); 
+		exit(1);
 	}
-	
-	
-	
+
+
+
 	// We are ready to listen on listen_socket!
-	pthread_t listen_tcp_thread, listen_udp_thread, send_udp_broadcast_thread; 
-	
+	pthread_t listen_tcp_thread, listen_udp_thread, send_udp_broadcast_thread;
+
 	// listen for incoming tcp connections
 	if ( (pthread_create(&listen_tcp_thread, NULL, listen_tcp, (void *) NULL)) < 0){
 		perror("err:pthread_create(listen_tcp_thread)\n");
-	} 
-	
+	}
+
 	// We are ready to broadcast
 	if ( (pthread_create(&send_udp_broadcast_thread, NULL, send_udp_broadcast, (void *) NULL)) < 0){
 		perror("err:pthread_create(send_udp_broadcast_thread)\n");
-	} 
-	
+	}
+
 	// We are ready to listen for broadcast
 	if ( (pthread_create(&listen_udp_thread, NULL, listen_udp_broadcast, (void *) NULL)) < 0){
 		perror("err:pthread_create(listen_udp_thread)\n");
-	} 
-	
+	}
+
 	/*pthread_join(listen_tcp_thread,			NULL);
 	pthread_join(listen_udp_thread,			NULL);
 	pthread_join(send_udp_broadcast_thread, NULL);
@@ -110,21 +112,21 @@ void network_init(void){
 
 
 
-/* \!brief Listen for TCP connections and accept incoming. 
+/* \!brief Listen for TCP connections and accept incoming.
  *
  */
 void *listen_tcp(){
-	
+
 	// Be proactive, create objects for new peer connections:
-	struct sockaddr_in peer; 
-	int new_peer_socket, c; 
+	struct sockaddr_in peer;
+	int new_peer_socket, c;
 	c = sizeof(struct sockaddr_in);
 
 	while(1){
 		listen(listen_socket, LISTEN_BACKLOG);
 		if ( (new_peer_socket = accept(listen_socket, (struct sockaddr *)&peer, (socklen_t*)&c)) == -1 ){
 			perror("err: accept\n");
-			exit(1); 
+			exit(1);
 		}
 		char * peer_ip = inet_ntoa(peer.sin_addr);
 		printf("Some Peer(ip:%s) initiated a new TCP connection to me.\n", peer_ip);
@@ -161,7 +163,7 @@ void* listen_udp_broadcast(){
 
 	int opt = 1;
 	setsockopt(sock,SOL_SOCKET,SO_REUSEADDR,(char*)&opt,sizeof(opt));
-	
+
 	if (bind(sock, (struct sockaddr *) &saSocket, sizeof(saSocket)) == 0)
 	{
 		printf("Socket bound\n");
@@ -198,7 +200,7 @@ void* listen_udp_broadcast(){
 
 
 void* send_udp_broadcast() {
-	
+
 	int sock;
 	if ((sock = socket(AF_INET, SOCK_DGRAM, 0)) < 0)
 	{
@@ -246,7 +248,8 @@ void *com_handler(void * peer){
 	p.socket = pinf->socket;
 	p.ip = pinf->ip;
 
-	pthread_barrier_init(&buf_out.sync, NULL, count());
+//	printlist();
+//	pthread_barrier_init(&buf_out.sync, NULL, count());
 
 
 	printf("New communication handler thread created for peer connected to socket %d \n", p.socket);
@@ -266,7 +269,6 @@ void *com_handler(void * peer){
 	}
 	fcntl(p.socket, F_SETFL, flags | O_NONBLOCK);
 
-
 	while(1){
 		/* Maintain connection by passing and receiving I'm alive */
 		currenttime = clock();
@@ -278,32 +280,47 @@ void *com_handler(void * peer){
 		}
 
 		/* Receive data */
-		if((read_size=recv(p.socket, recv_msg, 2000, 0)) <= 0){ // Error mode
+		pthread_mutex_lock(&buf_in.mutex);
+		read_size = recv(p.socket, recv_msg, 2000, 0);
+		pthread_mutex_unlock(&buf_in.mutex);
+		if(read_size <= 0){ // Error mode
 				if(read_size == 0){
-					perror("err:peer disconnected.\n");
-					break;}
-				else if((read_size==-1)&& (errno != EAGAIN) && (errno != EWOULDBLOCK) ){
-					perror("Receiving failed\n");
-					break;
+
+						printf("socket: %i \n", p.socket);
+						perror("err:peer disconnected.\n");
+						break;
+				}
+
+				else if((read_size==-1) ){
+
+					pthread_mutex_lock(&errmutex);
+					if( (errno != EAGAIN) && (errno != EWOULDBLOCK) ) {
+						perror("Receiving failed\n");
+						pthread_mutex_unlock(&errmutex);
+						break;
+					}
+					else{
+						pthread_mutex_unlock(&errmutex);
+					}
 				}
 				else{
-					// Did not receive anything, but no error
+					0;// Did not receive anything, but no error
 				}
 		}
 		else {	// Receive data mode
 			timeout = clock();
 			//if(recv_msg!="I'm alive"){
-			printf("msg = %s, read size = %i\n", recv_msg, read_size);
+//			printf("msg = %s, read size = %i\n", recv_msg, read_size); // DO SOMETHING
 //			bufin(recv_msg);
 			//}
-			memset(recv_msg, 0, sizeof(recv_msg)); // flush network receive buffer
+//			memset(recv_msg, 0, sizeof(recv_msg)); // flush network receive buffer
 		}
 		if((double)(currenttime-timeout)/CLOCKS_PER_SEC > TIMEOUT){
-			printf("TIMEOUT ON I'M ALIVE\n");
+			printf("TIMEOUT ON I'M ALIVE, socket: %i\n", p.socket);
 			break;
 		}
 		/* Send data */
-		if(buf_out.unread){
+	/*	if(buf_out.unread){
 			// Read from buffer, send
 			send(p.socket, buf_out.buf, sizeof(buf_out.buf), 0);
 			// Sync so that every thread sends the message
@@ -317,7 +334,7 @@ void *com_handler(void * peer){
 
 			// Update unread = false
 		}
-
+	 */
 	}
 	terminate(p);
 
@@ -349,13 +366,7 @@ int connect_to_peer(in_addr_t peer_ip){
 }
 
 
-/*struct peer_info {
-	int socket;
-	char * ip;
-};*/
-/* \!brief Assign a thread for handling one dedicated connection.
- *
- */
+
 void assign_com_thread(struct peer p){//int peer_socket, char* peer_ip){
 	// We have a connection! Now assign a communication handler thread.
 
@@ -365,7 +376,7 @@ void assign_com_thread(struct peer p){//int peer_socket, char* peer_ip){
 
 
 	pthread_t com_thread;
-	
+
 	if( pthread_create( &com_thread , NULL ,  com_handler , pinf)<0){// peer_socket_p) < 0){
 		perror("err: pthread_create\n");
 		exit(1);
@@ -374,26 +385,27 @@ void assign_com_thread(struct peer p){//int peer_socket, char* peer_ip){
 
 void terminate(struct peer p){
 	if(rm(p)){
-		printf("successful removed from list\n");
+//		printf("successful removed from list\n");
 	}
-	pthread_barrier_init(&buf_out.sync, 0, count()); // update barrier variable
+//	pthread_barrier_init(&buf_out.sync, 0, count()); // update barrier variable
+
 	close(p.socket);
 }
 
-void bufin(char * value){
-	/*while(buf_in.unread){ // make sure "brain" has collected information from buffer, to avoid overwriting.
-		//#warning "One should add a timeout for this while loop to avoid infinte hanging"
-		; // Do wait.
-	}*/
-	pthread_mutex_lock(&buf_in.mutex);
-	int i = 0;
-	while(*(value+i)!='\0' && i<BUFFER_SIZE){
-		buf_in.buf[i] = *(value+i);
-	}
-	buf_in.unread = 1;
-	pthread_mutex_unlock(&buf_in.mutex);
-	printf("Bufin(%s)\n", value);
-}
+//void bufin(char * value){
+//	/*while(buf_in.unread){ // make sure "brain" has collected information from buffer, to avoid overwriting.
+//		//#warning "One should add a timeout for this while loop to avoid infinte hanging"
+//		; // Do wait.
+//	}*/
+//	pthread_mutex_lock(&buf_in.mutex);
+//	int i = 0;
+//	while(*(value+i)!='\0' && i<BUFFER_SIZE){
+//		buf_in.buf[i] = *(value+i);
+//	}
+//	buf_in.unread = 1;
+//	pthread_mutex_unlock(&buf_in.mutex);
+//	printf("Bufin(%s)\n", value);
+//}
 
 
 
