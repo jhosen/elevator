@@ -129,7 +129,7 @@ void *listen_tcp(){
 			exit(1);
 		}
 		char * peer_ip = inet_ntoa(peer.sin_addr);
-		printf("Some Peer(ip:%s) initiated a new TCP connection to me.\n", peer_ip);
+//		printf("Some Peer(ip:%s) initiated a new TCP connection to me.\n", peer_ip);
 		struct peer newpeer = peer_object(new_peer_socket, peer.sin_addr.s_addr);
 		if(!find(newpeer)){
 			add(newpeer);
@@ -188,7 +188,7 @@ void* listen_udp_broadcast(){
 				perror("err: connect_to_peer.\n Error when trying to initate a new connection to a peer by TCP\n");
 			}
 			else{
-				printf("Successful connected to a new peer by TPC after I received an UDP broadcast.\n");
+//				printf("Successful connected to a new peer by TPC after I received an UDP broadcast.\n");
 			}
 		}
 		else{
@@ -258,9 +258,10 @@ void *com_handler(void * peer){
 	char send_msg[2000];
 	int read_size;
 
-	clock_t timeout = clock();
-	clock_t pingtime = clock();
-	clock_t currenttime;
+	time_t timeout = time(0); //clock();
+	time_t pingtime = clock();
+	time_t currenttime;
+
 	int flags;
 
 	/* Set non-blocking state */
@@ -271,12 +272,11 @@ void *com_handler(void * peer){
 
 	while(1){
 		/* Maintain connection by passing and receiving I'm alive */
-		currenttime = clock();
+//		currenttime = clock();
 
-		if((double)(currenttime-pingtime)/CLOCKS_PER_SEC >= PINGPERIOD){
+		if((double)(clock()-pingtime)/CLOCKS_PER_SEC >= PINGPERIOD){
 			send(p.socket, "I'm alive", sizeof("I'm alive"), 0);
 			pingtime = clock();
-			//printf("Sent im alive to:  %d \n", p.socket);
 		}
 
 		/* Receive data */
@@ -285,22 +285,17 @@ void *com_handler(void * peer){
 		pthread_mutex_unlock(&buf_in.mutex);
 		if(read_size <= 0){ // Error mode
 				if(read_size == 0){
-
 						printf("socket: %i \n", p.socket);
 						perror("err:peer disconnected.\n");
 						break;
 				}
-
 				else if((read_size==-1) ){
-
-					pthread_mutex_lock(&errmutex);
 					if( (errno != EAGAIN) && (errno != EWOULDBLOCK) ) {
 						perror("Receiving failed\n");
-						pthread_mutex_unlock(&errmutex);
 						break;
 					}
 					else{
-						pthread_mutex_unlock(&errmutex);
+//						pthread_mutex_unlock(&errmutex);
 					}
 				}
 				else{
@@ -308,33 +303,20 @@ void *com_handler(void * peer){
 				}
 		}
 		else {	// Receive data mode
-			timeout = clock();
+			timeout = time(0);
 			//if(recv_msg!="I'm alive"){
 //			printf("msg = %s, read size = %i\n", recv_msg, read_size); // DO SOMETHING
 //			bufin(recv_msg);
 			//}
 //			memset(recv_msg, 0, sizeof(recv_msg)); // flush network receive buffer
 		}
-		if((double)(currenttime-timeout)/CLOCKS_PER_SEC > TIMEOUT){
+		currenttime = time(0);
+		if((currenttime-timeout) > TIMEOUT){
+			printf("Currtime : % i , timeout : % i\n, if(%i > %i)\n", currenttime, timeout,(currenttime-timeout), TIMEOUT);
 			printf("TIMEOUT ON I'M ALIVE, socket: %i\n", p.socket);
 			break;
 		}
 		/* Send data */
-	/*	if(buf_out.unread){
-			// Read from buffer, send
-			send(p.socket, buf_out.buf, sizeof(buf_out.buf), 0);
-			// Sync so that every thread sends the message
-			int rc=pthread_barrier_wait(&buf_out.sync);	// <---- THIS IS REASON FOR A BUG
-			if( rc!=0 && rc!=PTHREAD_BARRIER_SERIAL_THREAD){
-				printf("Could not wait for barrier\n");
-			}
-			else{
-				buf_out.unread = 0;
-			}
-
-			// Update unread = false
-		}
-	 */
 	}
 	terminate(p);
 
