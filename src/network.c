@@ -19,7 +19,7 @@
 #include <time.h>
 #include <errno.h>
 #include <fcntl.h>
-
+#include "cJSON.h"
 #define TRUE  1
 #define FALSE 0
 
@@ -258,7 +258,7 @@ void *com_handler(void * peer){
 	char send_msg[2000];
 	int read_size;
 
-	time_t timeout = time(0); //clock();
+	time_t timeout = time(0);
 	time_t pingtime = clock();
 	time_t currenttime;
 
@@ -302,8 +302,9 @@ void *com_handler(void * peer){
 					0;// Did not receive anything, but no error
 				}
 		}
-		else {	// Receive data mode
+		else {
 			timeout = time(0);
+			/* Receive data */
 			//if(recv_msg!="I'm alive"){
 //			printf("msg = %s, read size = %i\n", recv_msg, read_size); // DO SOMETHING
 //			bufin(recv_msg);
@@ -317,9 +318,15 @@ void *com_handler(void * peer){
 			break;
 		}
 		/* Send data */
+
+		//printf("Waiting for sync on send\n");
+//		pthread_barrier_wait(&buf_out.sync);
+
 	}
 	terminate(p);
-
+//	printf("\n Connected peers: \n");
+//	printlist();
+//	printf("\n");
 	printf("Kill com handler thread\n");
 
    	pthread_exit(0);
@@ -342,7 +349,7 @@ int connect_to_peer(in_addr_t peer_ip){
 	struct peer p = peer_object(peer_socket, peer_ip);
 
 	add(p);
-	assign_com_thread(p); //peer_socket, inet_ntoa(peer.sin_addr)); //<-----------change
+	assign_com_thread(p);
 
 	return 1;
 }
@@ -369,6 +376,7 @@ void terminate(struct peer p){
 	if(rm(p)){
 //		printf("successful removed from list\n");
 	}
+//	pthread_barrier_destroy(&buf_out.sync);
 //	pthread_barrier_init(&buf_out.sync, 0, count()); // update barrier variable
 
 	close(p.socket);
@@ -534,5 +542,58 @@ int find(struct peer p){
 		}
 	}
 	return 0;
+}
+
+
+ /*
+  * cJSON parser functions
+  */
+
+
+char * struct_to_byte(struct msg msg_struct){
+	cJSON *root, *msgtype, *from, *to, *data;
+
+	char* msg;
+
+	root 	= cJSON_CreateObject();
+	msgtype = cJSON_CreateObject();
+	from 	= cJSON_CreateObject();
+	to 		= cJSON_CreateObject();
+	data 	= cJSON_CreateObject();
+
+	cJSON_AddNumberToObject(root, "msgtype"	, msg_struct.msgtype);
+	cJSON_AddNumberToObject(root, "from"	, msg_struct.from	);
+	cJSON_AddNumberToObject(root, "to"		, msg_struct.to		);
+	cJSON_AddItemToObject(	root, "data"	, data);
+	int i;
+	for(i = 0; i < DATALENGTH; i++){
+
+		cJSON_AddNumberToObject(data, "int", msg_struct.data[i]);
+	}
+
+	msg = cJSON_Print(root);
+	return(msg);
+}
+
+struct msg byte_to_struct(char *msg){
+	struct msg msg_struct;
+	cJSON *root, *msgtype, *from, *to, *data, *dataiter;
+
+	root = cJSON_Parse(msg);
+	msgtype = cJSON_GetObjectItem(root, "msgtype");
+	from 	= cJSON_GetObjectItem(root, "from");
+	to	 	= cJSON_GetObjectItem(root, "to");
+	data 	= cJSON_GetObjectItem(root, "data");
+	dataiter= cJSON_GetObjectItem(data, "int");
+
+	msg_struct.msgtype 	= msgtype->valueint	;
+	msg_struct.from	   	= from->valueint	;
+	msg_struct.to		= to->valueint		;
+	int i;
+	for(i = 0; i < DATALENGTH; i++){
+		msg_struct.data[i] = dataiter->valueint;
+		dataiter = dataiter->next;
+	}
+	return(msg_struct);
 }
 

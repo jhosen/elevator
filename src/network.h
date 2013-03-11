@@ -119,3 +119,17 @@ struct node {
 	struct node *next, *prev;
 };
 
+
+
+/* Parser functions */
+#define DATALENGTH 8
+
+struct msg {
+	int msgtype;
+	int from;
+	int to;
+	int data[DATALENGTH];
+};
+
+char* struct_to_byte(struct msg msg_struct);
+struct msg byte_to_struct(char *msg);
