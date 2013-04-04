@@ -8,13 +8,14 @@
  */
 #include <arpa/inet.h>
 #include <pthread.h>
+#include "buffer_elev.h"
+#include "communication.h"
 
 
 
-
-#define BUFFER_SIZE		128
-//#define BUFFER_OUT_SIZE		128
+#define BUFFER_SIZE			128
 #define LISTEN_BACKLOG		5		// number of peers allowed in listen queue.
+
 #define LISTEN_PORT			3000 //10	// Ports must be between 1024 and 65535
 #define UDP_SEND_PORT		3001 //11
 #define UDP_LISTEN_PORT		3002 //12
@@ -22,18 +23,20 @@
 //#define JH_BC_IP			"78.91.26.255"
 #define LAN_BROADCAST_IP	"129.241.187.255"
 
-#define TIMEOUT 			3 //1	// [sec]
-#define PINGPERIOD 			0.1
-#define BROADCAST_PERIOD	1
+#define TIMEOUT 			3 			//1		// [seconds]
+#define PINGPERIOD 			0.1 				// [seconds]
+#define UPPERIOD 			100000 	// [microseconds]
+#define BROADCAST_PERIOD	1					// [seconds]
 
+#define CBUFSIZE 128
 
-
+/*
 typedef struct {
-	char buf [BUFFER_SIZE ];
+	char buf [MSGSIZE ];
 	int unread;
 	pthread_mutex_t mutex;
 	pthread_barrier_t sync;
-} buffer_t;
+} buffer_t;*/
 
 char * getbufin();
 void bufout(char *msg);
@@ -41,7 +44,9 @@ void bufin(char * value);
 
 struct peer {
 	int socket;
+	int active;
 	in_addr_t ip;
+	CircularBuffer bufout;
 };
 
 /* \!brief Function letting this peer enter the network
@@ -94,9 +99,9 @@ void *func_receive(void * peer_inf);
 
 void *func_send(void *arg);
 
-void put_to_buf(char * value, buffer_t buf);
+//void put_to_buf(char * value, buffer_t buf);
 
-
+int terminate(struct peer p);
 
 /* List functions for keeping track of connected peers */
 
@@ -106,9 +111,15 @@ struct peer peer_object(int socket, in_addr_t ip);
 
 int add(struct peer new);
 
+int activate(struct peer p);
+
+int deactivate(struct peer p);
+
 int rm(struct peer p);
 
 int find(struct peer p);
+
+struct peer * get(struct peer p);
 
 int printlist();
 
@@ -121,15 +132,7 @@ struct node {
 
 
 
-/* Parser functions */
-#define DATALENGTH 8
 
-struct msg {
-	int msgtype;
-	int from;
-	int to;
-	int data[DATALENGTH];
-};
+int sendtoallpeer(struct msg package);
+int sendtopeer(struct msg package, struct peer p);
 
-char* struct_to_byte(struct msg msg_struct);
-struct msg byte_to_struct(char *msg);

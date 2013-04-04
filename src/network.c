@@ -20,36 +20,19 @@
 #include <errno.h>
 #include <fcntl.h>
 #include "cJSON.h"
+#include "buffer_elev.h"
+#include "communication.h"
 #define TRUE  1
 #define FALSE 0
 
 
 
-// Buffers for send and transmitting data via network
-// {@
-
-static  buffer_t buf_in;
-//buf_in.buf = malloc(BUFFER_SIZE);
-static  buffer_t buf_out;
-
-// @}
-void bufout(char *msg){
-	int i = 0;
-	while(*(msg+i)!='\0' && i<BUFFER_SIZE){
-		buf_out.buf[i] = *(msg+i);
-		i++;
-	}
-	buf_out.unread = 1;
-}
 
 static int listen_socket;
 static struct node *root;
 
-pthread_mutex_t errmutex;
 
 void network_init(void){
-	pthread_mutex_init(&errmutex,0);
-	pthread_mutex_init(&buf_in.mutex,0);
 
 	const char *myip  = getlocalip();
 	struct in_addr meaddr;
@@ -104,10 +87,6 @@ void network_init(void){
 		perror("err:pthread_create(listen_udp_thread)\n");
 	}
 
-	/*pthread_join(listen_tcp_thread,			NULL);
-	pthread_join(listen_udp_thread,			NULL);
-	pthread_join(send_udp_broadcast_thread, NULL);
-*/
 }
 
 
@@ -235,9 +214,6 @@ void* send_udp_broadcast() {
 }
 
 
-
-
-
 /* \!brief Communication handler
  *
  */
@@ -245,47 +221,48 @@ void *com_handler(void * peer){
 	// The connection is established. This is the function describing what to communicate.
 	struct peer* pinf = (struct peer*) peer;
 	struct peer p;
-	p.socket = pinf->socket;
+	p.socket = pinf->socket; // creating a local copy of the peer object
 	p.ip = pinf->ip;
 
-//	printlist();
-//	pthread_barrier_init(&buf_out.sync, NULL, count());
+	struct peer * pp = get(p);
 
 
 	printf("New communication handler thread created for peer connected to socket %d \n", p.socket);
 
-	char recv_msg[2000];
-	char send_msg[2000];
+	char recv_msg[MSGSIZE];//[2000];
+	char send_msg[MSGSIZE];//[2000];
 	int read_size;
-
-	time_t timeout = time(0);
-	time_t pingtime = clock();
-	time_t currenttime;
+	struct timeval ctime, ptime, ttime;
+	gettimeofday(&ttime,0);
 
 	int flags;
 
 	/* Set non-blocking state */
-	if (-1 == (flags = fcntl(p.socket, F_GETFL, 0))){
+	if (-1 == (flags = fcntl(pinf->socket, F_GETFL, 0))){
 		flags = 0;
 	}
 	fcntl(p.socket, F_SETFL, flags | O_NONBLOCK);
 
+
 	while(1){
 		/* Maintain connection by passing and receiving I'm alive */
-//		currenttime = clock();
-
-		if((double)(clock()-pingtime)/CLOCKS_PER_SEC >= PINGPERIOD){
-			send(p.socket, "I'm alive", sizeof("I'm alive"), 0);
-			pingtime = clock();
+		gettimeofday(&ctime, 0);
+		if((ctime.tv_usec - ptime.tv_usec) >= UPPERIOD || (ctime.tv_usec<ptime.tv_usec)){ // check if ctime has been zeroed out. ctime<1000000
+			struct msg packet = {
+					.msgtype = OPCODE_IMALIVE,
+			};
+			//cbWrite(&pp->bufout, &packet); // <- This does not send imalive instant. it only put msg to buffer.
+			char * cout  = struct_to_byte(packet);
+			send(p.socket, cout, MSGSIZE, 0);
+			gettimeofday(&ptime, 0);
 		}
 
+
 		/* Receive data */
-		pthread_mutex_lock(&buf_in.mutex);
-		read_size = recv(p.socket, recv_msg, 2000, 0);
-		pthread_mutex_unlock(&buf_in.mutex);
-		if(read_size <= 0){ // Error mode
+		read_size = recv(pinf->socket, recv_msg, MSGSIZE, 0);
+		if(read_size <= 0){ // ERROR/RECOVERY mode
 				if(read_size == 0){
-						printf("socket: %i \n", p.socket);
+						printf("socket: %i \n", pinf->socket);
 						perror("err:peer disconnected.\n");
 						break;
 				}
@@ -295,7 +272,6 @@ void *com_handler(void * peer){
 						break;
 					}
 					else{
-//						pthread_mutex_unlock(&errmutex);
 					}
 				}
 				else{
@@ -303,32 +279,28 @@ void *com_handler(void * peer){
 				}
 		}
 		else {
-			timeout = time(0);
 			/* Receive data */
-			//if(recv_msg!="I'm alive"){
-//			printf("msg = %s, read size = %i\n", recv_msg, read_size); // DO SOMETHING
-//			bufin(recv_msg);
-			//}
-//			memset(recv_msg, 0, sizeof(recv_msg)); // flush network receive buffer
+			struct msg packetin = byte_to_struct(recv_msg);
+			handle_msg(packetin, &ttime);
 		}
-		currenttime = time(0);
-		if((currenttime-timeout) > TIMEOUT){
-			printf("Currtime : % i , timeout : % i\n, if(%i > %i)\n", currenttime, timeout,(currenttime-timeout), TIMEOUT);
-			printf("TIMEOUT ON I'M ALIVE, socket: %i\n", p.socket);
+
+		gettimeofday(&ctime, 0);
+		if((ctime.tv_sec-ttime.tv_sec) > TIMEOUT){
+			printf("Currtime : % i , timeout : % i\n, if(%i > %i)\n", ctime.tv_sec, ttime.tv_sec,(ctime.tv_sec-ttime.tv_sec), TIMEOUT);
+			printf("TIMEOUT ON I'M ALIVE, socket: %i\n", pinf->socket);
 			break;
 		}
 		/* Send data */
-
-		//printf("Waiting for sync on send\n");
-//		pthread_barrier_wait(&buf_out.sync);
-
+		struct msg elem;
+		while(!cbIsEmpty(&pp->bufout)){  // Send data from buffer
+			 cbRead(&pp->bufout, &elem);
+			 char * cout  = struct_to_byte(elem);
+			 send(pinf->socket, cout, MSGSIZE, 0);
+		}
 	}
-	terminate(p);
-//	printf("\n Connected peers: \n");
-//	printlist();
-//	printf("\n");
-	printf("Kill com handler thread\n");
 
+	terminate(p);
+	printf("Kill com handler thread\n");
    	pthread_exit(0);
 }
 
@@ -372,30 +344,14 @@ void assign_com_thread(struct peer p){//int peer_socket, char* peer_ip){
 	}
 }
 
-void terminate(struct peer p){
+int terminate(struct peer p){
 	if(rm(p)){
-//		printf("successful removed from list\n");
+		close(p.socket);
+		return 1;
 	}
-//	pthread_barrier_destroy(&buf_out.sync);
-//	pthread_barrier_init(&buf_out.sync, 0, count()); // update barrier variable
-
-	close(p.socket);
+	return 0;
 }
 
-//void bufin(char * value){
-//	/*while(buf_in.unread){ // make sure "brain" has collected information from buffer, to avoid overwriting.
-//		//#warning "One should add a timeout for this while loop to avoid infinte hanging"
-//		; // Do wait.
-//	}*/
-//	pthread_mutex_lock(&buf_in.mutex);
-//	int i = 0;
-//	while(*(value+i)!='\0' && i<BUFFER_SIZE){
-//		buf_in.buf[i] = *(value+i);
-//	}
-//	buf_in.unread = 1;
-//	pthread_mutex_unlock(&buf_in.mutex);
-//	printf("Bufin(%s)\n", value);
-//}
 
 
 
@@ -438,16 +394,13 @@ char* getlocalip() {
 
 /* Linked list for keeping track of connected peers
  *
- *
  */
-
-
-
 
 struct peer peer_object(int socket, in_addr_t ip){
 	struct peer p;
 	p.socket = socket;
 	p.ip = ip;
+	p.active = TRUE;
 	return p;
 }
 
@@ -501,6 +454,7 @@ int add(struct peer new){
 	}
 	iter->p.socket 	= new.socket;
 	iter->p.ip	 	= new.ip;
+	cbInit(&iter->p.bufout, BUFFER_SIZE);
 	iter->next  	= 0;
 	iter->prev		= prev;
 	return 1; // success
@@ -544,56 +498,67 @@ int find(struct peer p){
 	return 0;
 }
 
-
- /*
-  * cJSON parser functions
-  */
-
-
-char * struct_to_byte(struct msg msg_struct){
-	cJSON *root, *msgtype, *from, *to, *data;
-
-	char* msg;
-
-	root 	= cJSON_CreateObject();
-	msgtype = cJSON_CreateObject();
-	from 	= cJSON_CreateObject();
-	to 		= cJSON_CreateObject();
-	data 	= cJSON_CreateObject();
-
-	cJSON_AddNumberToObject(root, "msgtype"	, msg_struct.msgtype);
-	cJSON_AddNumberToObject(root, "from"	, msg_struct.from	);
-	cJSON_AddNumberToObject(root, "to"		, msg_struct.to		);
-	cJSON_AddItemToObject(	root, "data"	, data);
-	int i;
-	for(i = 0; i < DATALENGTH; i++){
-
-		cJSON_AddNumberToObject(data, "int", msg_struct.data[i]);
+int activate(struct peer p){
+	struct peer * pp = get(p);
+	if(pp!=0){
+		pp->active = TRUE;
+		return 1;
 	}
+	return 0;
 
-	msg = cJSON_Print(root);
-	return(msg);
 }
 
-struct msg byte_to_struct(char *msg){
-	struct msg msg_struct;
-	cJSON *root, *msgtype, *from, *to, *data, *dataiter;
-
-	root = cJSON_Parse(msg);
-	msgtype = cJSON_GetObjectItem(root, "msgtype");
-	from 	= cJSON_GetObjectItem(root, "from");
-	to	 	= cJSON_GetObjectItem(root, "to");
-	data 	= cJSON_GetObjectItem(root, "data");
-	dataiter= cJSON_GetObjectItem(data, "int");
-
-	msg_struct.msgtype 	= msgtype->valueint	;
-	msg_struct.from	   	= from->valueint	;
-	msg_struct.to		= to->valueint		;
-	int i;
-	for(i = 0; i < DATALENGTH; i++){
-		msg_struct.data[i] = dataiter->valueint;
-		dataiter = dataiter->next;
+int deactivate(struct peer p){
+	struct peer * pp = get(p);
+	if(pp!=0){
+		pp->active = FALSE;
+		return 1;
 	}
-	return(msg_struct);
+	return 0;
+}
+
+struct peer * get(struct peer p){
+	struct node * iter;
+	iter = root;
+	if(iter!=0){
+		while(iter!=0){
+			if((iter->p.ip) == p.ip){
+				return &iter->p; // found it
+			}
+			iter = iter->next;
+		}
+	}
+	return 0;
+}
+
+
+
+
+
+/* !\brief Add struct msg to out buf for all peers.
+ *
+ */
+
+int sendtoallpeer(struct msg package){
+	struct peer p = {
+			.ip = TOALLIP
+	};
+	return sendtopeer(package, p);
+
+}
+
+int sendtopeer(struct msg package, struct peer p){
+	struct node * iter;
+	iter = root;
+	iter = iter->next;
+
+	while(iter!=0){
+		if((iter->p.ip) == p.ip || p.ip == TOALLIP){
+			struct peer * pp = get(iter->p);
+			cbWrite(&pp->bufout, &package);
+		}
+		iter = iter->next;
+	}
+	return 1;
 }
 
