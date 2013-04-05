@@ -2,7 +2,112 @@
 #include "order.h"
 #include "elev.h"
 
+
+/** Linked list for keeping track of connected elevators **/
+
+static struct node head;
+
+void initlist(struct node * root){
+	root = malloc( sizeof(struct node) );
+    root->id 		= 0;
+    root->next 		= 0;
+    root->prev		= 0;
+}
+int printlist(struct node * root){
+	struct node * iter;
+	iter = root;
+	int i = 0;
+	if(iter!=0){
+		while(iter!=0){
+			printf("Node %i, id = %i\n", i, iter->id);
+			iter = iter->next;
+			i++;
+		}
+	}
+	return 1;
+}
+
+int count(struct node * root){
+	struct node * iter;
+	iter = root;
+	int i = 0;
+	if(iter!=0){
+		while(iter!=0){
+			iter = iter->next;
+			i++;
+		}
+	}
+	return i; // Does also count the root
+}
+
+int add(struct node * root, struct node * new){
+	struct node * iter, *prev;
+	iter = root;
+	if(iter!=0){
+		while(iter->next!=0){
+			iter = iter->next;
+		}
+	}
+	iter->next = new;
+	prev = iter;
+	iter = iter->next;
+	if(iter==0){
+		return 0; //out of memory
+	}
+	iter->next  	= 0;
+	iter->prev		= prev;
+	return 1; // success
+    
+}
+
+int rm(struct node* root, struct node n){
+	struct node * iter, *prev, *tmp;
+	iter = root;
+	while(iter!=0){
+		if((iter->id) == n.id){
+			tmp = iter;
+			iter->prev->next = iter->next;
+			if(iter->next!=0){
+				iter->next->prev = iter->prev;
+			}
+			free(tmp);
+			return 1;
+		}
+		prev = iter;
+		iter = iter->next;
+	}
+	return 0;
+}
+
+
+int find(struct node * root, struct node n){
+	struct node * iter;
+	iter = root;
+	while(iter!=0){
+		if((iter->id) == n.id){
+			return 1; // found it
+		}
+		iter = iter->next;
+	}
+	return 0;
+}
+
+struct node * get(struct node * root, struct node n){
+	struct node * iter;
+	iter = root;
+	while(iter!=0){
+		if((iter->id) == n.id){
+			return iter;
+		}
+		iter = iter->next;
+	}
+	return 0;
+}
+
 /*****************************          Variables:      **********************************/
+
+
+
 
 static int order_table[N_FLOORS][N_PANELS];     /*Orders are saved in order_table. There are one column for each panel-type(call_down, call_up and 
                                                 command). As an example order_table[2][CALL_UP] refers to orders made from call_up-panel in 

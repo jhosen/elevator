@@ -35,4 +35,45 @@ void order_handle_button_lamps();
 // Function available for service engineers for testing.
 void order_print(void);
 
+/* Linked list for keeping track of all elevators online */
+#define FLOORS 4
+
+struct orderlist{
+	int panel_cmd[FLOORS];
+	int panel_up[FLOORS];
+	int panel_down[FLOORS];
+};
+
+struct state{
+	int floor;
+	int direction;
+	int internal_state;
+};
+
+struct elevator{
+	int active;
+	struct state current_state;
+	struct orderlist current_orders;
+};
+
+static struct node {
+	int id;
+	struct node *next, *prev;
+	struct elevator elevinfo;
+};
+
+/* List functions for keeping track of elevators */
+
+static void initlist(struct node * root);
+
+static int printlist(struct node * root);
+
+static int count(struct node * root);
+
+static int add(struct node * root, struct node * new);
+
+static int rm(struct node* root, struct node n);
+
+static int find(struct node * root, struct node n);
+
 #endif
