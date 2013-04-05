@@ -105,31 +105,31 @@ int terminate(struct peer p);
 
 /* List functions for keeping track of connected peers */
 
-static void initlist();
+static void nw_initlist();
 
 static struct peer peer_object(int socket, in_addr_t ip);
 
-static int add(struct peer new);
+static int nw_add(struct peer new);
 
 static int activate(struct peer p);
 
 static int deactivate(struct peer p);
 
-static int rm(struct peer p);
+static int nw_rm(struct peer p);
 
-static int find(struct peer p);
+static int nw_find(struct peer p);
 
 static in_addr_t highest_ip();
 
-static struct peer * get(struct peer p);
+static struct peer * nw_get(struct peer p);
 
-static int printlist();
+static int nw_printlist();
 
-static int count();
+static int nw_count();
 
-struct node {
+struct nw_node {
 	struct peer p;
-	struct node *next, *prev;
+	struct nw_node *next, *prev;
 };
 
 

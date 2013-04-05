@@ -8,13 +8,27 @@ int main (int argc, const char * argv[]) {
 
 
     // insert code here...
-    printf("Hello, WorldFOO!\n");
+    printf("Hello, World!\n");
 	network_init();
 
+	if(!statemachine_initialize()) {
+			printf("Unable to initialize elevator hardware\n");
+			return(0);
+	}
+	while (1) {
+		//system("clear");
+		//statemachine_print_state();
+		//order_print();
+		order_add();
+		order_handle_button_lamps();
+		statemachine(statemachine_get_event());
+	}
 
-	while(1){
-		sleep(1);
-		int data [] = {1,2,3};
+
+
+
+		//sleep(1);
+		//int data [] = {1,2,3};
 		//send_msg(OPCODE_NOOP, TOALLIP, data);
 /*		struct orders o;
 		send_msg(OPCODE_NOOP, TOALLIP, o, 0, 0, data);
@@ -33,7 +47,6 @@ int main (int argc, const char * argv[]) {
 				.ip = 0
 		};
 		sendtopeer(package, p);*/
-	}
     return 0;
 
 //

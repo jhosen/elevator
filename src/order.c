@@ -1,15 +1,20 @@
 #include <stdio.h>
 #include "order.h"
 #include "elev.h"
-
-
-/** Linked list for keeping track of connected elevators **/
+#include "communication.h"
 
 static struct node head;
 
+
+void init_order(){
+	initlist(&head);
+}
+
+/** Linked list for keeping track of connected elevators **/
+
+
 void initlist(struct node * root){
 	root = malloc( sizeof(struct node) );
-    root->id 		= 0;
     root->next 		= 0;
     root->prev		= 0;
 }
@@ -19,7 +24,7 @@ int printlist(struct node * root){
 	int i = 0;
 	if(iter!=0){
 		while(iter!=0){
-			printf("Node %i, id = %i\n", i, iter->id);
+			printf("Node %i, id = %i\n", i, iter->elevinfo.ip);
 			iter = iter->next;
 			i++;
 		}
@@ -64,7 +69,7 @@ int rm(struct node* root, struct node n){
 	struct node * iter, *prev, *tmp;
 	iter = root;
 	while(iter!=0){
-		if((iter->id) == n.id){
+		if((iter->elevinfo.ip) == n.elevinfo.ip){
 			tmp = iter;
 			iter->prev->next = iter->next;
 			if(iter->next!=0){
@@ -84,7 +89,7 @@ int find(struct node * root, struct node n){
 	struct node * iter;
 	iter = root;
 	while(iter!=0){
-		if((iter->id) == n.id){
+		if((iter->elevinfo.ip) == n.elevinfo.ip){
 			return 1; // found it
 		}
 		iter = iter->next;
@@ -96,13 +101,42 @@ struct node * get(struct node * root, struct node n){
 	struct node * iter;
 	iter = root;
 	while(iter!=0){
-		if((iter->id) == n.id){
+		if((iter->elevinfo.ip) == n.elevinfo.ip){
 			return iter;
 		}
 		iter = iter->next;
 	}
 	return 0;
 }
+
+
+/** Elevator list     **/
+
+struct node * getelevnode(struct node n){
+	return get(&head, n);
+}
+void addelev(struct elevator elev){
+	struct node * n = malloc(sizeof(struct node));
+	n->elevinfo = elev;
+	add(&head, n);
+
+}
+
+
+void addorder(struct node * elevnode, struct order ordr){
+	switch (ordr.paneltype){
+	case PANEL_CMD:
+		elevnode->elevinfo.current_orders.panel_cmd[ordr.floor] = 1;
+		break;
+	case PANEL_UP:
+		elevnode->elevinfo.current_orders.panel_up[ordr.floor] = 1;
+		break;
+	case PANEL_DOWN:
+		elevnode->elevinfo.current_orders.panel_down[ordr.floor] = 1;
+		break;
+	}
+}
+
 
 /*****************************          Variables:      **********************************/
 
@@ -207,6 +241,9 @@ int order_check_request_below(enum panel_type panel){
 }
 
 /************************* Actions made on order table: **************************************/
+void order_add_order(struct order ord){
+	order_table[ord.floor][ord.paneltype] = 1;
+}
 void order_add() {
 	int floor = 0;
 	for(floor=0; floor<N_FLOORS; floor++) {
@@ -215,6 +252,9 @@ void order_add() {
 		}
 		if(floor!=N_FLOORS-1 && elev_get_button_signal(BUTTON_CALL_UP, floor)) {	//There are no BUTTON_CALL_UP in the highest floor.	
 			order_table[floor][CALL_UP] = 1;
+			struct orderlist or;
+			int gp[] = {floor, PANEL_UP};
+			send_msg(OPCODE_NEWORDER, TOALLIP, or, 0, 0, gp);
 		}
 		if(floor!=0 && elev_get_button_signal(BUTTON_CALL_DOWN, floor)) {			//There are no BUTTON_CALL_DOWN in the lowest floor.	
 				order_table[floor][CALL_DOWN] = 1;

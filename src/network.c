@@ -29,7 +29,7 @@
 
 
 static int listen_socket;
-static struct node *root;
+static struct nw_node *root;
 
 
 void network_init(void){
@@ -38,7 +38,7 @@ void network_init(void){
 	struct in_addr meaddr;
 	inet_pton(AF_INET, myip, &meaddr);
 
-	initlist();
+	nw_initlist();
 	root->p.ip = meaddr.s_addr;
 
 
@@ -110,13 +110,13 @@ void *listen_tcp(){
 		char * peer_ip = inet_ntoa(peer.sin_addr);
 //		printf("Some Peer(ip:%s) initiated a new TCP connection to me.\n", peer_ip);
 		struct peer newpeer = peer_object(new_peer_socket, peer.sin_addr.s_addr);
-		if(!find(newpeer)){
-			add(newpeer);
+		if(!nw_find(newpeer)){
+			nw_add(newpeer);
 			assign_com_thread(newpeer);//new_peer_socket, peer_ip); //<--- change
 		}
 		else{
 			printf("Already in connected list\n");
-			printlist();
+			nw_printlist();
 			close(new_peer_socket);
 		}
 	}
@@ -162,7 +162,7 @@ void* listen_udp_broadcast(){
 		// Check if ip is myself or already connected.
 		char * peer_ip = inet_ntoa(their_addr.sin_addr);
 		struct peer newpeer = peer_object(0, their_addr.sin_addr.s_addr);
-		if(!find(newpeer)){
+		if(!nw_find(newpeer)){
 			if( connect_to_peer(their_addr.sin_addr.s_addr)==-1){
 				perror("err: connect_to_peer.\n Error when trying to initate a new connection to a peer by TCP\n");
 			}
@@ -224,10 +224,15 @@ void *com_handler(void * peer){
 	p.socket = pinf->socket; // creating a local copy of the peer object
 	p.ip = pinf->ip;
 
-	struct peer * pp = get(p);
+	struct peer * pp = nw_get(p);
 
 
 	printf("New communication handler thread created for peer connected to socket %d \n", p.socket);
+	struct msg adder = {
+			.msgtype = OPCODE_NEWPEER,
+			.from	 = p.ip,
+	};
+	handle_msg(adder, 0);
 
 	char recv_msg[MAXRECVSIZE];//[2000];
 	char send_msg[MAXRECVSIZE];//[2000];
@@ -300,7 +305,7 @@ void *com_handler(void * peer){
 	}
 	// Recovery mode:
 
-	rm(p);
+	nw_rm(p);
 
 	if(highest_ip() == root->p.ip){ // I have the lowest ip on the network
 		printf("I have the highest ip (ip:%i), and will take over for lost peer (ip:%i)\n", root->p.ip, pinf->ip);
@@ -339,7 +344,7 @@ int connect_to_peer(in_addr_t peer_ip){
 
 	struct peer p = peer_object(peer_socket, peer_ip);
 
-	add(p);
+	nw_add(p);
 	assign_com_thread(p);
 
 	return 1;
@@ -364,7 +369,7 @@ void assign_com_thread(struct peer p){//int peer_socket, char* peer_ip){
 }
 
 int terminate(struct peer p){
-	if(rm(p)){
+	if(nw_rm(p)){
 		close(p.socket);
 		return 1;
 	}
@@ -423,20 +428,20 @@ struct peer peer_object(int socket, in_addr_t ip){
 	return p;
 }
 
-void initlist(){
-	root = malloc( sizeof(struct node) );
+void nw_initlist(){
+	root = malloc( sizeof(struct nw_node) );
   	root->p.socket 	= 0;
     root->p.ip 		= 0;
     root->next 		= 0;
     root->prev		= 0;
 }
-int printlist(){
-	struct node * iter;
+int nw_printlist(){
+	struct nw_node * iter;
 	iter = root;
 	int i = 0;
 	if(iter!=0){
 		while(iter!=0){
-			printf("Node%i, socket = %i, ip = %i\n", i, iter->p.socket, iter->p.ip);//inet_ntoa(tmp.sin_addr) ); // <-- ERROR
+			printf("nw_node%i, socket = %i, ip = %i\n", i, iter->p.socket, iter->p.ip);//inet_ntoa(tmp.sin_addr) ); // <-- ERROR
 			iter = iter->next;
 			i++;
 		}
@@ -444,8 +449,8 @@ int printlist(){
 	return 1;
 }
 
-int count(){
-	struct node * iter;
+int nw_count(){
+	struct nw_node * iter;
 	iter = root;
 	int i = 0;
 	if(iter!=0){
@@ -457,15 +462,15 @@ int count(){
 	return i-1; // Do not count yourself
 }
 
-int add(struct peer new){
-	struct node * iter, *prev;
+int nw_add(struct peer new){
+	struct nw_node * iter, *prev;
 	iter = root;
 	if(iter!=0){
 		while(iter->next!=0){
 			iter = iter->next;
 		}
 	}
-	iter->next = malloc(sizeof(struct node));
+	iter->next = malloc(sizeof(struct nw_node));
 	prev = iter;
 	iter = iter->next;
 	if(iter==0){
@@ -480,13 +485,13 @@ int add(struct peer new){
 
 }
 
-int rm(struct peer p){
-	struct node * iter, *prev, *tmp;
+int nw_rm(struct peer p){
+	struct nw_node * iter, *prev, *tmp;
 	iter = root;
 	if(iter!=0){
 		while(iter!=0){
 			if((iter->p.ip) == p.ip && (iter->p.socket)==p.socket){
-				tmp = malloc(sizeof(struct node));
+				tmp = malloc(sizeof(struct nw_node));
 				tmp = iter;
 				iter->prev->next = iter->next;
 				if(iter->next!=0){
@@ -503,8 +508,8 @@ int rm(struct peer p){
 }
 
 
-int find(struct peer p){
-	struct node * iter;
+int nw_find(struct peer p){
+	struct nw_node * iter;
 	iter = root;
 	if(iter!=0){
 		while(iter!=0){
@@ -518,7 +523,7 @@ int find(struct peer p){
 }
 
 in_addr_t highest_ip(){
-	struct node * iter;
+	struct nw_node * iter;
 	iter = root;
 	in_addr_t highest = 0;
 	while(iter!=0){
@@ -531,7 +536,7 @@ in_addr_t highest_ip(){
 }
 
 int activate(struct peer p){
-	struct peer * pp = get(p);
+	struct peer * pp = nw_get(p);
 	if(pp!=0){
 		pp->active = TRUE;
 		return 1;
@@ -541,7 +546,7 @@ int activate(struct peer p){
 }
 
 int deactivate(struct peer p){
-	struct peer * pp = get(p);
+	struct peer * pp = nw_get(p);
 	if(pp!=0){
 		pp->active = FALSE;
 		return 1;
@@ -549,8 +554,8 @@ int deactivate(struct peer p){
 	return 0;
 }
 
-struct peer * get(struct peer p){
-	struct node * iter;
+struct peer * nw_get(struct peer p){
+	struct nw_node * iter;
 	iter = root;
 	if(iter!=0){
 		while(iter!=0){
@@ -580,13 +585,13 @@ int sendtoallpeer(struct msg package){
 }
 
 int sendtopeer(struct msg package, struct peer p){
-	struct node * iter;
+	struct nw_node * iter;
 	iter = root;
 	iter = iter->next;
 
 	while(iter!=0){
 		if((iter->p.ip) == p.ip || p.ip == TOALLIP){
-			struct peer * pp = get(iter->p);
+			struct peer * pp = nw_get(iter->p);
 			cbWrite(&pp->bufout, &package);
 		}
 		iter = iter->next;

@@ -12,38 +12,38 @@ static enum state_t state = IDLE;
 /************************************ Get-event **************************************/
 
 enum event_t statemachine_get_event(void){ 	//Returns events in prioritized order
-	printf("Event: ");             
+	//printf("Event: ");
 	
 	if(state == EMERGENCY && control_new_floor() ){ // Highest priority if state is EMERGENCY
-		printf("NEW FLOOR\n");
+		//printf("NEW FLOOR\n");
 		return NEW_FLOOR;     		
 	}
 	else if(check_stop()){  	
-	    printf("STOP\n");
+		//printf("STOP\n");
 		return STOP_BUTTON;
 	}
 	else if(check_obstruction()){
-	    printf("OBSTRUCTION\n");
+		//printf("OBSTRUCTION\n");
 		return OBSTRUCTION;
     }
 	else if(control_new_floor()){
-		printf("NEW FLOOR\n");
+		//printf("NEW FLOOR\n");
 		return NEW_FLOOR;     		
 	}
 	else if(order_check_request_current_floor(ALL)){
-		printf("REQUEST HERE\n");
+		//printf("REQUEST HERE\n");
 		return REQUEST_HERE;
 	}
 	else if(order_check_request_above(ALL)){
-	    printf("REQUEST ABOVE\n");
+		//printf("REQUEST ABOVE\n");
 		return REQUEST_ABOVE;
 	}
 	else if(order_check_request_below(ALL)){
-		printf("REQUEST BELOW\n"); 				 
+		//printf("REQUEST BELOW\n");
 		return REQUEST_BELOW;  
 	}
 	else {
-	    printf("NOEVENT\n");
+		//printf("NOEVENT\n");
 	    return NOEVENT;
 	    }
 }

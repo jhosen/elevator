@@ -11,6 +11,7 @@
 #include "network.h"
 #include "cJSON.h"
 #include <time.h>
+#include "order.h"
 
 void handle_msg(struct msg package, struct timeval *ttime){
 	if(ttime!=0)
@@ -18,13 +19,35 @@ void handle_msg(struct msg package, struct timeval *ttime){
 
 	//in_addr_t ip = package.from;
 	//struct peer *pp = get(peer_object(0, ip));
+	struct elevator elev;
+
+	elev.ip = package.from;
+	elev.current_state.floor = package.floor;
+	elev.current_state.direction = package.direction;
+	int floor;
+	for(floor = 0; floor < FLOORS; floor ++){
+		elev.current_orders.panel_cmd[floor] = package.orders.panel_cmd[floor];
+		elev.current_orders.panel_up[floor] = package.orders.panel_up[floor];
+		elev.current_orders.panel_down[floor] = package.orders.panel_down[floor];
+	}
+	struct order neworder;
+	struct node n;
+
 
 	switch (package.msgtype){
+	case OPCODE_NEWPEER:
+		addelev(elev);
+		break;
 	case OPCODE_IMALIVE:
 
 		break;
 	case OPCODE_NEWORDER:
+		neworder.floor 		= package.gpdata[0];
+		neworder.paneltype	= package.gpdata[1];
+		order_add_order(neworder);
+		//n.elevinfo = elev;
 
+		//addorder(getelevnode(n), neworder);
 		break;
 	case OPCODE_BUTTONHIT:
 
@@ -50,7 +73,7 @@ void handle_msg(struct msg package, struct timeval *ttime){
 	}
 }
 
-void send_msg(int msgtype, int to, struct orders orderlist, int direction, int floor, int gpdata[]){
+void send_msg(int msgtype, int to, struct orderlist orders, int direction, int floor, int gpdata[]){
 	struct msg packet = {
 			.msgtype = msgtype,
 			.to = to,
@@ -58,9 +81,9 @@ void send_msg(int msgtype, int to, struct orders orderlist, int direction, int f
 	};
 	int flooriter;
 	for(flooriter = 0; flooriter<FLOORS; flooriter++){
-		packet.orderlist.panel_cmd[flooriter] = orderlist.panel_cmd[flooriter];
-		packet.orderlist.panel_up[flooriter]  = orderlist.panel_up[flooriter];
-		packet.orderlist.panel_down[flooriter]= orderlist.panel_down[flooriter];
+		packet.orders.panel_cmd[flooriter] = orders.panel_cmd[flooriter];
+		packet.orders.panel_up[flooriter]  = orders.panel_up[flooriter];
+		packet.orders.panel_down[flooriter]= orders.panel_down[flooriter];
 	}
 
 	int i;
@@ -103,9 +126,9 @@ char * struct_to_byte(struct msg msg_struct){
 	cJSON_AddItemToObject(root, "panel_down", panel_down);
 	int flooriter;
 	for(flooriter = 0; flooriter<FLOORS; flooriter++){
-		cJSON_AddNumberToObject(panel_cmd, "order", msg_struct.orderlist.panel_cmd[flooriter]);
-		cJSON_AddNumberToObject(panel_up, "order", msg_struct.orderlist.panel_up[flooriter]);
-		cJSON_AddNumberToObject(panel_down, "order", msg_struct.orderlist.panel_down[flooriter]);
+		cJSON_AddNumberToObject(panel_cmd, "order", msg_struct.orders.panel_cmd[flooriter]);
+		cJSON_AddNumberToObject(panel_up, "order", msg_struct.orders.panel_up[flooriter]);
+		cJSON_AddNumberToObject(panel_down, "order", msg_struct.orders.panel_down[flooriter]);
 	}
 
 	cJSON_AddItemToObject(	root, "gpdata"		, gpdata);
@@ -143,9 +166,9 @@ struct msg byte_to_struct(char *mesg){
 	cJSON * downiter	= cJSON_GetObjectItem(panel_down,"order");
 	int flooriter;
 	for (flooriter= 0; flooriter<FLOORS; flooriter++){
-		msg_struct.orderlist.panel_cmd[flooriter] 	= cmditer->valueint;
-		msg_struct.orderlist.panel_up[flooriter] 	= upiter->valueint;
-		msg_struct.orderlist.panel_down[flooriter] 	= downiter->valueint;
+		msg_struct.orders.panel_cmd[flooriter] 	= cmditer->valueint;
+		msg_struct.orders.panel_up[flooriter] 	= upiter->valueint;
+		msg_struct.orders.panel_down[flooriter] 	= downiter->valueint;
 		cmditer = cmditer->next;
 		upiter = upiter->next;
 		downiter = downiter->next;

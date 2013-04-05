@@ -1,8 +1,11 @@
 #ifndef _ORDER_H
 #define _ORDER_H
 
+#include <arpa/inet.h>
+
 #define N_PANELS 3
 #define BETWEEN_FLOORS -1
+
 
 //Creating different panel types: "ALL" is not a panel-type, but is used if user wants to check all panels.
 enum panel_type {CALL_UP, CALL_DOWN, COMMAND, ALL};
@@ -43,24 +46,29 @@ struct orderlist{
 	int panel_up[FLOORS];
 	int panel_down[FLOORS];
 };
+struct order{
+	int floor;
+	int paneltype;
+};
 
-struct state{
+struct elevstate{
 	int floor;
 	int direction;
 	int internal_state;
 };
 
 struct elevator{
+	in_addr_t ip;
 	int active;
-	struct state current_state;
+	struct elevstate current_state;
 	struct orderlist current_orders;
 };
 
 static struct node {
-	int id;
 	struct node *next, *prev;
 	struct elevator elevinfo;
 };
+
 
 /* List functions for keeping track of elevators */
 
@@ -75,5 +83,22 @@ static int add(struct node * root, struct node * new);
 static int rm(struct node* root, struct node n);
 
 static int find(struct node * root, struct node n);
+
+
+void order_add_order(struct order ord);
+
+
+
+
+#define PANEL_CMD 2
+#define PANEL_UP 0
+#define PANEL_DOWN 1
+
+struct node * getelevnode(struct node n);
+
+void addelev(struct elevator elev);
+
+void addorder(struct node * elevnode, struct order ordr);
+
 
 #endif
