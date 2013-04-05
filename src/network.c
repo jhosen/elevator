@@ -229,8 +229,8 @@ void *com_handler(void * peer){
 
 	printf("New communication handler thread created for peer connected to socket %d \n", p.socket);
 
-	char recv_msg[MSGSIZE];//[2000];
-	char send_msg[MSGSIZE];//[2000];
+	char recv_msg[MAXRECVSIZE];//[2000];
+	char send_msg[MAXRECVSIZE];//[2000];
 	int read_size;
 	struct timeval ctime, ptime, ttime;
 	gettimeofday(&ttime,0);
@@ -251,15 +251,14 @@ void *com_handler(void * peer){
 			struct msg packet = {
 					.msgtype = OPCODE_IMALIVE,
 			};
-			//cbWrite(&pp->bufout, &packet); // <- This does not send imalive instant. it only put msg to buffer.
 			char * cout  = struct_to_byte(packet);
-			send(p.socket, cout, MSGSIZE, 0);
+			send(p.socket, cout, strlen(cout), 0);//MAXRECVSIZE
 			gettimeofday(&ptime, 0);
 		}
 
 
 		/* Receive data */
-		read_size = recv(pinf->socket, recv_msg, MSGSIZE, 0);
+		read_size = recv(pinf->socket, recv_msg, MAXRECVSIZE, 0);
 		if(read_size <= 0){ // ERROR/RECOVERY mode
 				if(read_size == 0){
 						printf("socket: %i \n", pinf->socket);
@@ -281,6 +280,7 @@ void *com_handler(void * peer){
 		else {
 			/* Receive data */
 			struct msg packetin = byte_to_struct(recv_msg);
+			packetin.from = p.ip;
 			handle_msg(packetin, &ttime);
 		}
 
@@ -295,11 +295,30 @@ void *com_handler(void * peer){
 		while(!cbIsEmpty(&pp->bufout)){  // Send data from buffer
 			 cbRead(&pp->bufout, &elem);
 			 char * cout  = struct_to_byte(elem);
-			 send(pinf->socket, cout, MSGSIZE, 0);
+			 send(pinf->socket, cout, strlen(cout), 0);//MAXRECVSIZE
 		}
 	}
+	// Recovery mode:
 
-	terminate(p);
+	rm(p);
+
+	if(highest_ip() == root->p.ip){ // I have the lowest ip on the network
+		printf("I have the highest ip (ip:%i), and will take over for lost peer (ip:%i)\n", root->p.ip, pinf->ip);
+		// Tell com.module that it should be the lost peers process pair
+		struct msg recovermsg = {
+			.msgtype	= OPCODE_PEERLOSTTAKEOVER,
+			.from 		= p.ip,
+			.to			= root->p.ip
+		};
+		handle_msg(recovermsg, 0);
+	}
+	else{
+		printf("I do not have the highest ip (ip:%i), and will not take over for lost peer (ip:%i)\n", root->p.ip, pinf->ip);
+	}
+	//
+	close(p.socket);
+
+
 	printf("Kill com handler thread\n");
    	pthread_exit(0);
 }
@@ -496,6 +515,19 @@ int find(struct peer p){
 		}
 	}
 	return 0;
+}
+
+in_addr_t highest_ip(){
+	struct node * iter;
+	iter = root;
+	in_addr_t highest = 0;
+	while(iter!=0){
+		if((iter->p.ip) > highest){
+				highest = iter->p.ip;
+		}
+		iter = iter->next;
+	}
+	return highest;
 }
 
 int activate(struct peer p){

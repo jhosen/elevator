@@ -12,7 +12,7 @@
 #include "communication.h"
 
 
-
+#define MAXRECVSIZE 		4096
 #define BUFFER_SIZE			128
 #define LISTEN_BACKLOG		5		// number of peers allowed in listen queue.
 
@@ -20,7 +20,6 @@
 #define UDP_SEND_PORT		3001 //11
 #define UDP_LISTEN_PORT		3002 //12
 
-//#define JH_BC_IP			"78.91.26.255"
 #define LAN_BROADCAST_IP	"129.241.187.255"
 
 #define TIMEOUT 			3 			//1		// [seconds]
@@ -47,6 +46,7 @@ struct peer {
 	int active;
 	in_addr_t ip;
 	CircularBuffer bufout;
+	struct information info;
 };
 
 /* \!brief Function letting this peer enter the network
@@ -118,6 +118,8 @@ int deactivate(struct peer p);
 int rm(struct peer p);
 
 int find(struct peer p);
+
+in_addr_t highest_ip();
 
 struct peer * get(struct peer p);
 
