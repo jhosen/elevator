@@ -46,7 +46,7 @@ struct peer {
 	int active;
 	in_addr_t ip;
 	CircularBuffer bufout;
-	struct information info;
+	//struct information info;
 };
 
 /* \!brief Function letting this peer enter the network

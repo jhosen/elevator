@@ -2,11 +2,14 @@
 #include "order.h"
 #include "elev.h"
 #include "communication.h"
+#include "network.h"
+#include <arpa/inet.h>
 
 static struct node head;
 
 
-void init_order(){
+void init_order(in_addr_t this_ip){
+	head.elevinfo.ip = this_ip;
 	initlist(&head);
 }
 
@@ -25,8 +28,10 @@ int printlist(struct node * root){
 	if(iter!=0){
 		while(iter!=0){
 			printf("Node %i, id = %i\n", i, iter->elevinfo.ip);
+			order_print_list(iter->elevinfo.current_orders);
 			iter = iter->next;
 			i++;
+
 		}
 	}
 	return 1;
@@ -83,7 +88,11 @@ int rm(struct node* root, struct node n){
 	}
 	return 0;
 }
-
+int rmelev(struct elevator elev){
+	struct node n;
+	n.elevinfo = elev;
+	return rm(&head, n);
+}
 
 int find(struct node * root, struct node n){
 	struct node * iter;
@@ -112,29 +121,23 @@ struct node * get(struct node * root, struct node n){
 
 /** Elevator list     **/
 
-struct node * getelevnode(struct node n){
+struct node * getelevnode(struct elevator elev){
+	struct node n;
+	n.elevinfo = elev;
 	return get(&head, n);
 }
 void addelev(struct elevator elev){
 	struct node * n = malloc(sizeof(struct node));
 	n->elevinfo = elev;
 	add(&head, n);
+	printf("Added new elev to order list\n");
+	printlist(&head);
 
 }
 
 
 void addorder(struct node * elevnode, struct order ordr){
-	switch (ordr.paneltype){
-	case PANEL_CMD:
-		elevnode->elevinfo.current_orders.panel_cmd[ordr.floor] = 1;
-		break;
-	case PANEL_UP:
-		elevnode->elevinfo.current_orders.panel_up[ordr.floor] = 1;
-		break;
-	case PANEL_DOWN:
-		elevnode->elevinfo.current_orders.panel_down[ordr.floor] = 1;
-		break;
-	}
+		elevnode->elevinfo.current_orders[ordr.floor][ordr.paneltype] = 1;
 }
 
 
@@ -143,7 +146,8 @@ void addorder(struct node * elevnode, struct order ordr){
 
 
 
-static int order_table[N_FLOORS][N_PANELS];     /*Orders are saved in order_table. There are one column for each panel-type(call_down, call_up and 
+//static int head.elevinfo.current_orders[N_FLOORS][N_PANELS];
+/*Orders are saved in order_table. There are one column for each panel-type(call_down, call_up and
                                                 command). As an example order_table[2][CALL_UP] refers to orders made from call_up-panel in 
                                                 3rd floor.*/ 
 static enum direction_t last_pass_floor_dir;	// last_pass_floor_dir keeps track of the position of the elevator by remembering the direction the elevator went when passing a floor. 
@@ -172,17 +176,17 @@ int order_check_request_current_floor(enum panel_type panel){
 	
 	/* Wants to check all panels: */
 	if(panel==ALL && last_pass_floor_dir==UP){
-		if(order_table[current_floor][COMMAND] || order_table[current_floor][CALL_UP]) {
+		if(head.elevinfo.current_orders[current_floor][COMMAND] || head.elevinfo.current_orders[current_floor][CALL_UP]) {
 			return 1;
 		}
 	}
 	else if(panel==ALL && last_pass_floor_dir==DOWN) {
-		if(order_table[current_floor][COMMAND] || order_table[current_floor][CALL_DOWN]) {
+		if(head.elevinfo.current_orders[current_floor][COMMAND] || head.elevinfo.current_orders[current_floor][CALL_DOWN]) {
 						return 1;
 		}
 	}
 	else 
-		return(order_table[current_floor][panel]);
+		return(head.elevinfo.current_orders[current_floor][panel]);
 	return 0;
 }
 
@@ -201,13 +205,13 @@ int order_check_request_above(enum panel_type panel){
 		int panel_counter = 0;
 		for(panel_counter = CALL_UP; panel_counter<=COMMAND; panel_counter++){
 			for(floor = current_floor+1; floor<N_FLOORS; floor ++){
-				if(order_table[floor][panel_counter]==1) return 1;
+				if(head.elevinfo.current_orders[floor][panel_counter]==1) return 1;
 			}
-		}	
+		}
 	}
 	else{                                               //Check requests from spesific panel
 		for(floor = current_floor+1; floor<N_FLOORS; floor ++){
-			if(order_table[floor][panel]==1) return 1;
+			if(head.elevinfo.current_orders[floor][panel]==1) return 1;
 		}
 	}
 	return 0;
@@ -228,13 +232,13 @@ int order_check_request_below(enum panel_type panel){
 		int panel_counter = 0;
 		for(panel_counter = CALL_UP; panel_counter<=COMMAND; panel_counter++){
 			for(floor = current_floor-1; floor>=0; floor--){
-				if(order_table[floor][panel_counter]==1) return 1;
+				if(head.elevinfo.current_orders[floor][panel_counter]==1) return 1;
 			}
 		}	
 	}
 	else{                                               //Check requests from spesific panel
 		for(floor = current_floor-1; floor>=0; floor--){
-			if(order_table[floor][panel]==1) return 1;
+			if(head.elevinfo.current_orders[floor][panel]==1) return 1;
 		}
 	}
 	return 0;
@@ -242,23 +246,36 @@ int order_check_request_below(enum panel_type panel){
 
 /************************* Actions made on order table: **************************************/
 void order_add_order(struct order ord){
-	order_table[ord.floor][ord.paneltype] = 1;
+	head.elevinfo.current_orders[ord.floor][ord.paneltype] = 1;
 }
 void order_add() {
 	int floor = 0;
 	for(floor=0; floor<N_FLOORS; floor++) {
 		if(elev_get_button_signal(BUTTON_COMMAND, floor)) {	
-			order_table[floor][COMMAND]=1;
+			head.elevinfo.current_orders[floor][PANEL_CMD] = 1;
+			//head.elevinfo.current_orders[floor][COMMAND]=1;
 		}
 		if(floor!=N_FLOORS-1 && elev_get_button_signal(BUTTON_CALL_UP, floor)) {	//There are no BUTTON_CALL_UP in the highest floor.	
-			order_table[floor][CALL_UP] = 1;
-			struct orderlist or;
+			//head.elevinfo.current_orders[floor][CALL_UP] = 1;
+			int or[FLOORS][N_PANELS];// = {0};
+			struct order neworder = {
+					.floor = floor,
+					.paneltype = PANEL_UP,
+			};
+			struct node * n = weightfunction(&head, neworder);
+			n->elevinfo.current_orders[neworder.floor][neworder.paneltype];
 			int gp[] = {floor, PANEL_UP};
-			send_msg(OPCODE_NEWORDER, TOALLIP, or, 0, 0, gp);
+			send_msg(OPCODE_NEWORDER, n->elevinfo.ip, or, 0, 0, gp);
 		}
 		if(floor!=0 && elev_get_button_signal(BUTTON_CALL_DOWN, floor)) {			//There are no BUTTON_CALL_DOWN in the lowest floor.	
-			order_table[floor][CALL_DOWN] = 1;
-			struct orderlist or;
+			int or[FLOORS][N_PANELS];// = {0};
+			struct order neworder = {
+					.floor = floor,
+					.paneltype = PANEL_UP,
+			};
+			struct node * n = weightfunction(&head, neworder);
+			n->elevinfo.current_orders[neworder.floor][neworder.paneltype];
+			//head.elevinfo.current_orders[floor][CALL_DOWN] = 1;
 			int gp[] = {floor, PANEL_DOWN};
 			send_msg(OPCODE_NEWORDER, TOALLIP, or, 0, 0, gp);
 		}		
@@ -272,13 +289,13 @@ void order_empty(enum panel_type panel){
 		int panel = 0;
 		for(floor=0; floor < N_FLOORS; floor++){
 			for(panel = CALL_UP; panel <=COMMAND; panel++){
-				order_table[floor][panel]=0;
+				head.elevinfo.current_orders[floor][panel]=0;
 			}
 		}
 	}
 	else{
 		for(floor=0; floor < N_FLOORS; floor++){
-			order_table[floor][panel]=0;
+			head.elevinfo.current_orders[floor][panel]=0;
 		}
 	}
 }
@@ -287,17 +304,17 @@ void order_empty(enum panel_type panel){
 void order_reset_current_floor(){
 	int floor = elev_get_floor_sensor_signal();
 	if(floor!=BETWEEN_FLOORS){
-		order_table[floor][COMMAND]=0;
+		head.elevinfo.current_orders[floor][COMMAND]=0;
 	    if(last_pass_floor_dir == UP) {
-		    order_table[floor][CALL_UP]=0;
+		    head.elevinfo.current_orders[floor][CALL_UP]=0;
 		    if(!(orders_above(floor))) {
-		    	order_table[floor][CALL_DOWN]=0;
+		    	head.elevinfo.current_orders[floor][CALL_DOWN]=0;
 		    }
 	    }
 	    else {
-	    	order_table[floor][CALL_DOWN] =0;
+	    	head.elevinfo.current_orders[floor][CALL_DOWN] =0;
 	    	if(!(orders_below(floor))) {
-	    		order_table[floor][CALL_UP]=0;
+	    		head.elevinfo.current_orders[floor][CALL_UP]=0;
 	    	}
 	    }
 	}
@@ -311,7 +328,7 @@ int orders_above(int c_floor) {
 	int panel = 0;
 	for(i=c_floor+1; i<N_FLOORS; i++) {
 		for(panel = CALL_UP; panel <=COMMAND; panel++){
-			if(order_table[i][panel]) {
+			if(head.elevinfo.current_orders[i][panel]) {
 			  return 1;
 			}
 		}
@@ -327,7 +344,7 @@ int orders_below(int c_floor) {
 	int panel = 0;
 	for(i=c_floor-1; i>=0; i--) {
 		for(panel = CALL_UP; panel <=COMMAND; panel++){
-			if(order_table[i][panel]) {
+			if(head.elevinfo.current_orders[i][panel]) {
 			  return 1;
 			}
 		}
@@ -343,7 +360,7 @@ void order_handle_button_lamps(){
 	for(floor = 0; floor < N_FLOORS; floor++){
 	    for(button = BUTTON_CALL_UP; button<=BUTTON_COMMAND; button++){
 			if(!((floor==0 && button==BUTTON_CALL_DOWN) || (floor==N_FLOORS-1 && button==BUTTON_CALL_UP))){ 	//Not considering invalid buttons.
-			    if(order_table[floor][button]==0)																//Button and panel is represented by corresponing numbers", so we can take button as input for order_table[][]
+			    if(head.elevinfo.current_orders[floor][button]==0)																//Button and panel is represented by corresponding numbers", so we can take button as input for head.elevinfo.current_orders[][]
 			       elev_set_button_lamp(button,floor,0);
 			    else    
 			       elev_set_button_lamp(button, floor, 1);
@@ -360,7 +377,7 @@ void order_print(void){
 		printf("Floor %d ", floor+1);		
 		for(panel=CALL_UP; panel<=COMMAND; panel++){
 			if(!((floor==0 && panel==CALL_DOWN) || (floor==N_FLOORS-1 && panel==CALL_UP)))
-			printf("|%d	", order_table[floor][panel]); 
+			printf("|%d	", head.elevinfo.current_orders[floor][panel]);
 			else 
 			printf("|	");
 		}
@@ -369,6 +386,22 @@ void order_print(void){
 	printf("\n");
 }
 
+void order_print_list(int orders[][N_PANELS]){
+	printf("|	C_UP	|C_DOWN	|COMMAND|\n");
+	int floor = 0;
+	int panel = 0;
+	for(floor=N_FLOORS-1; floor>=0;floor--){
+		printf("Floor %d ", floor+1);
+		for(panel=CALL_UP; panel<=COMMAND; panel++){
+			if(!((floor==0 && panel==CALL_DOWN) || (floor==N_FLOORS-1 && panel==CALL_UP)))
+			printf("|%d	", orders[floor][panel]);
+			else
+			printf("|	");
+		}
+		printf("| \n");
+	}
+	printf("\n");
+}
 /*********************************************************************/
 
 struct node * weightfunction(struct node* root, struct order new_order) {
@@ -384,7 +417,7 @@ struct node * weightfunction(struct node* root, struct order new_order) {
 	while(iter!=0) {
 		//Add weight if elevator has order to floors (different weighting for different floors)
 		for(floor_counter=0;floor_counter<N_FLOORS; floor_counter++) {
-			if(iter->elevinfo.current_orders.panel_cmd[floor_counter]) {
+			if(iter->elevinfo.current_orders[floor_counter][PANEL_CMD]) {
 				if(floor_counter == ordered_floor) {
 					weight[current]-=10;
 				}
@@ -392,7 +425,7 @@ struct node * weightfunction(struct node* root, struct order new_order) {
 					weight[current]+=3;
 				}
 			}
-			if(floor_counter<N_FLOORS-1 && iter->elevinfo.current_orders.panel_up[floor_counter]) {
+			if(floor_counter<N_FLOORS-1 && iter->elevinfo.current_orders[floor_counter][PANEL_UP]) {
 				if(floor_counter == ordered_floor) {
 					weight[current]-=5;
 				}
@@ -400,7 +433,7 @@ struct node * weightfunction(struct node* root, struct order new_order) {
 					weight[current]+=3;
 				}
 			}
-			if(floor_counter>0 && iter->elevinfo.current_orders.panel_down[floor_counter]) {
+			if(floor_counter>0 && iter->elevinfo.current_orders[floor_counter][PANEL_DOWN]) {
 				if(floor_counter == ordered_floor) {
 					weight[current]-=5;
 				}

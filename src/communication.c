@@ -20,22 +20,25 @@ void handle_msg(struct msg package, struct timeval *ttime){
 	//in_addr_t ip = package.from;
 	//struct peer *pp = get(peer_object(0, ip));
 	struct elevator elev;
+	struct order neworder;
 
-	elev.ip = package.from;
+	elev.ip = package.to;
+	struct node *n = getelevnode(elev);
+
 	elev.current_state.floor = package.floor;
 	elev.current_state.direction = package.direction;
 	int floor;
 	for(floor = 0; floor < FLOORS; floor ++){
-		elev.current_orders.panel_cmd[floor] = package.orders.panel_cmd[floor];
-		elev.current_orders.panel_up[floor] = package.orders.panel_up[floor];
-		elev.current_orders.panel_down[floor] = package.orders.panel_down[floor];
+		elev.current_orders[floor][PANEL_CMD] = package.orders[floor][PANEL_CMD];
+		elev.current_orders[floor][PANEL_UP] = package.orders[floor][PANEL_UP];
+		elev.current_orders[floor][PANEL_DOWN] = package.orders[floor][PANEL_DOWN];
 	}
-	struct order neworder;
-	struct node n;
+
 
 
 	switch (package.msgtype){
 	case OPCODE_NEWPEER:
+		elev.ip = package.from;
 		addelev(elev);
 		break;
 	case OPCODE_IMALIVE:
@@ -44,7 +47,9 @@ void handle_msg(struct msg package, struct timeval *ttime){
 	case OPCODE_NEWORDER:
 		neworder.floor 		= package.gpdata[0];
 		neworder.paneltype	= package.gpdata[1];
-		order_add_order(neworder);
+		n->elevinfo.current_orders[package.gpdata[0]][package.gpdata[1]] = 1;
+		printf("Got new order for ip: %i\n", n->elevinfo.ip);
+//		order_add_order(neworder);
 		//n.elevinfo = elev;
 
 		//addorder(getelevnode(n), neworder);
@@ -68,12 +73,17 @@ void handle_msg(struct msg package, struct timeval *ttime){
 		break;
 	case OPCODE_PEERLOSTTAKEOVER:
 		printf("Redirect tasks of the lost peer(ip:%i)\n", package.from);
-
+		elev.ip = package.from;
+		rmelev(elev);
+		break;
+	case OPCODE_PEERLOST:
+		elev.ip = package.from;
+		rmelev(elev);
 		break;
 	}
 }
 
-void send_msg(int msgtype, int to, struct orderlist orders, int direction, int floor, int gpdata[]){
+void send_msg(int msgtype, in_addr_t to, int orders[][N_PANELS], int direction, int floor, int gpdata[]){
 	struct msg packet = {
 			.msgtype = msgtype,
 			.to = to,
@@ -81,9 +91,9 @@ void send_msg(int msgtype, int to, struct orderlist orders, int direction, int f
 	};
 	int flooriter;
 	for(flooriter = 0; flooriter<FLOORS; flooriter++){
-		packet.orders.panel_cmd[flooriter] = orders.panel_cmd[flooriter];
-		packet.orders.panel_up[flooriter]  = orders.panel_up[flooriter];
-		packet.orders.panel_down[flooriter]= orders.panel_down[flooriter];
+		packet.orders[flooriter][PANEL_CMD] = orders[flooriter][PANEL_CMD];
+		packet.orders[flooriter][PANEL_UP]  = orders[flooriter][PANEL_UP];
+		packet.orders[flooriter][PANEL_DOWN] = orders[flooriter][PANEL_DOWN];
 	}
 
 	int i;
@@ -126,9 +136,9 @@ char * struct_to_byte(struct msg msg_struct){
 	cJSON_AddItemToObject(root, "panel_down", panel_down);
 	int flooriter;
 	for(flooriter = 0; flooriter<FLOORS; flooriter++){
-		cJSON_AddNumberToObject(panel_cmd, "order", msg_struct.orders.panel_cmd[flooriter]);
-		cJSON_AddNumberToObject(panel_up, "order", msg_struct.orders.panel_up[flooriter]);
-		cJSON_AddNumberToObject(panel_down, "order", msg_struct.orders.panel_down[flooriter]);
+		cJSON_AddNumberToObject(panel_cmd, "order", msg_struct.orders[flooriter][PANEL_CMD]);
+		cJSON_AddNumberToObject(panel_up, "order", msg_struct.orders[flooriter][PANEL_UP]);
+		cJSON_AddNumberToObject(panel_down, "order", msg_struct.orders[flooriter][PANEL_DOWN]);
 	}
 
 	cJSON_AddItemToObject(	root, "gpdata"		, gpdata);
@@ -168,9 +178,9 @@ struct msg byte_to_struct(char *mesg){
 			cJSON * downiter	= cJSON_GetObjectItem(panel_down,"order");
 			int flooriter;
 			for (flooriter= 0; flooriter<FLOORS; flooriter++){
-				msg_struct.orders.panel_cmd[flooriter] 	= cmditer->valueint;
-				msg_struct.orders.panel_up[flooriter] 	= upiter->valueint;
-				msg_struct.orders.panel_down[flooriter] 	= downiter->valueint;
+				msg_struct.orders[flooriter][PANEL_CMD] 	= cmditer->valueint;
+				msg_struct.orders[flooriter][PANEL_UP] 	= upiter->valueint;
+				msg_struct.orders[flooriter][PANEL_DOWN] 	= downiter->valueint;
 				cmditer = cmditer->next;
 				upiter = upiter->next;
 				downiter = downiter->next;

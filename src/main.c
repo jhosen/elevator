@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include "network.h"
 #include "communication.h"
-
+#include <arpa/inet.h>
 
 
 int main (int argc, const char * argv[]) {
@@ -9,16 +9,18 @@ int main (int argc, const char * argv[]) {
 
     // insert code here...
     printf("Hello, World!\n");
-	network_init();
+
+    network_init();
+	init_order(inet_addr(getlocalip()));
 
 	if(!statemachine_initialize()) {
 			printf("Unable to initialize elevator hardware\n");
 			return(0);
 	}
 	while (1) {
-		system("clear");
-		statemachine_print_state();
-		order_print();
+		//system("clear");
+		//statemachine_print_state();
+		//order_print();
 		order_add();
 		order_handle_button_lamps();
 		statemachine(statemachine_get_event());

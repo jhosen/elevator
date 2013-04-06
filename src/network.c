@@ -308,20 +308,22 @@ void *com_handler(void * peer){
 	// Recovery mode:
 
 	nw_rm(p);
+	struct msg recovermsg = {
+		//.msgtype	= OPCODE_PEERLOSTTAKEOVER,
+		.from 		= p.ip,
+		.to			= root->p.ip
+	};
 
-	if(highest_ip() == root->p.ip){ // I have the lowest ip on the network
+	if(highest_ip() == root->p.ip){ // I have the highest ip on the network
 		printf("I have the highest ip (ip:%i), and will take over for lost peer (ip:%i)\n", root->p.ip, pinf->ip);
 		// Tell com.module that it should be the lost peers process pair
-		struct msg recovermsg = {
-			.msgtype	= OPCODE_PEERLOSTTAKEOVER,
-			.from 		= p.ip,
-			.to			= root->p.ip
-		};
-		handle_msg(recovermsg, 0);
+		recovermsg.msgtype = OPCODE_PEERLOSTTAKEOVER;
 	}
 	else{
 		printf("I do not have the highest ip (ip:%i), and will not take over for lost peer (ip:%i)\n", root->p.ip, pinf->ip);
+		recovermsg.msgtype = OPCODE_PEERLOST;
 	}
+	handle_msg(recovermsg, 0);
 	//
 	close(p.socket);
 

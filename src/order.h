@@ -38,14 +38,13 @@ void order_handle_button_lamps();
 // Function available for service engineers for testing.
 void order_print(void);
 
+void order_print_list(int orders[][N_PANELS]);
+
 /* Linked list for keeping track of all elevators online */
 #define FLOORS 4
+#define N_PANELS 3
 
-struct orderlist{
-	int panel_cmd[FLOORS];
-	int panel_up[FLOORS];
-	int panel_down[FLOORS];
-};
+
 struct order{
 	int floor;
 	int paneltype;
@@ -61,7 +60,7 @@ struct elevator{
 	in_addr_t ip;
 	int active;
 	struct elevstate current_state;
-	struct orderlist current_orders;
+	int current_orders[FLOORS][N_PANELS];
 };
 
 static struct node {
@@ -94,11 +93,16 @@ void order_add_order(struct order ord);
 #define PANEL_UP 0
 #define PANEL_DOWN 1
 
-struct node * getelevnode(struct node n);
+struct node * getelevnode(struct elevator elev);
 
 void addelev(struct elevator elev);
 
+int rmelev(struct elevator elev);
+
 void addorder(struct node * elevnode, struct order ordr);
 
+void init_order(in_addr_t this_ip);
+
+struct node * weightfunction(struct node* root, struct order new_order);
 
 #endif
