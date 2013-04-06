@@ -63,7 +63,7 @@ void handle_msg(struct msg package, struct timeval *ttime){
 		break;
 	case OPCODE_NOOP:
 
-		printf("Noop received.\n");
+		//printf("Noop received.\n");
 
 		break;
 	case OPCODE_PEERLOSTTAKEOVER:
@@ -144,43 +144,49 @@ char * struct_to_byte(struct msg msg_struct){
 
 struct msg byte_to_struct(char *mesg){
 	struct msg msg_struct;
+	//if(strlen(mesg)>256){
 	cJSON *root = cJSON_Parse(mesg);
+	if(root!=0){
+		cJSON * msgtype = cJSON_GetObjectItem(root, "msgtype");
+		cJSON * from 	= cJSON_GetObjectItem(root, "from");
+		cJSON * to	 	= cJSON_GetObjectItem(root, "to");
+		cJSON * direction=cJSON_GetObjectItem(root, "direction");
+		cJSON * floor	=cJSON_GetObjectItem(root, "floor");
 
-	cJSON * msgtype = cJSON_GetObjectItem(root, "msgtype");
-	cJSON * from 	= cJSON_GetObjectItem(root, "from");
-	cJSON * to	 	= cJSON_GetObjectItem(root, "to");
-	cJSON * direction=cJSON_GetObjectItem(root, "direction");
-	cJSON * floor	=cJSON_GetObjectItem(root, "floor");
+		if(msgtype!=0){
+			msg_struct.msgtype 	= msgtype->valueint	;
+			msg_struct.from	   	= from->valueint	;
+			msg_struct.to		= to->valueint		;
+			msg_struct.direction= direction->valueint;
+			msg_struct.floor	= floor->valueint	;
 
-	msg_struct.msgtype 	= msgtype->valueint	;
-	msg_struct.from	   	= from->valueint	;
-	msg_struct.to		= to->valueint		;
-	msg_struct.direction= direction->valueint;
-	msg_struct.floor	= floor->valueint	;
+			cJSON * panel_cmd	= cJSON_GetObjectItem(root, 	"panel_cmd");
+			cJSON * panel_up	= cJSON_GetObjectItem(root, 	"panel_up");
+			cJSON * panel_down	= cJSON_GetObjectItem(root, 	"panel_down");
+			cJSON * cmditer		= cJSON_GetObjectItem(panel_cmd,"order");
+			cJSON * upiter		= cJSON_GetObjectItem(panel_up, "order");
+			cJSON * downiter	= cJSON_GetObjectItem(panel_down,"order");
+			int flooriter;
+			for (flooriter= 0; flooriter<FLOORS; flooriter++){
+				msg_struct.orders.panel_cmd[flooriter] 	= cmditer->valueint;
+				msg_struct.orders.panel_up[flooriter] 	= upiter->valueint;
+				msg_struct.orders.panel_down[flooriter] 	= downiter->valueint;
+				cmditer = cmditer->next;
+				upiter = upiter->next;
+				downiter = downiter->next;
+			}
 
-	cJSON * panel_cmd	= cJSON_GetObjectItem(root, 	"panel_cmd");
-	cJSON * panel_up	= cJSON_GetObjectItem(root, 	"panel_up");
-	cJSON * panel_down	= cJSON_GetObjectItem(root, 	"panel_down");
-	cJSON * cmditer		= cJSON_GetObjectItem(panel_cmd,"order");
-	cJSON * upiter		= cJSON_GetObjectItem(panel_up, "order");
-	cJSON * downiter	= cJSON_GetObjectItem(panel_down,"order");
-	int flooriter;
-	for (flooriter= 0; flooriter<FLOORS; flooriter++){
-		msg_struct.orders.panel_cmd[flooriter] 	= cmditer->valueint;
-		msg_struct.orders.panel_up[flooriter] 	= upiter->valueint;
-		msg_struct.orders.panel_down[flooriter] 	= downiter->valueint;
-		cmditer = cmditer->next;
-		upiter = upiter->next;
-		downiter = downiter->next;
+			cJSON * gpdata 	= cJSON_GetObjectItem(root, "gpdata");
+			cJSON * dataiter= cJSON_GetObjectItem(gpdata, "int");
+
+			int i;
+			for(i = 0; i < DATALENGTH; i++){
+				msg_struct.gpdata[i] = dataiter->valueint;
+				dataiter = dataiter->next;
+			}
+			return(msg_struct);
+		}
 	}
-
-	cJSON * gpdata 	= cJSON_GetObjectItem(root, "gpdata");
-	cJSON * dataiter= cJSON_GetObjectItem(gpdata, "int");
-
-	int i;
-	for(i = 0; i < DATALENGTH; i++){
-		msg_struct.gpdata[i] = dataiter->valueint;
-		dataiter = dataiter->next;
-	}
-	return(msg_struct);
+	msg_struct.msgtype = OPCODE_CORRUPT;
+	return msg_struct;
 }

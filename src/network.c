@@ -299,8 +299,10 @@ void *com_handler(void * peer){
 		struct msg elem;
 		while(!cbIsEmpty(&pp->bufout)){  // Send data from buffer
 			 cbRead(&pp->bufout, &elem);
-			 char * cout  = struct_to_byte(elem);
-			 send(pinf->socket, cout, strlen(cout), 0);//MAXRECVSIZE
+			 if (elem.msgtype!=OPCODE_CORRUPT){
+				 char * cout  = struct_to_byte(elem);
+				 send(pinf->socket, cout, strlen(cout), 0);//MAXRECVSIZE
+			 }
 		}
 	}
 	// Recovery mode:

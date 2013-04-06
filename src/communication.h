@@ -27,6 +27,7 @@
 #define OPCODE_NOOP			6
 #define OPCODE_PEERLOSTTAKEOVER	7
 #define OPCODE_NEWPEER		8
+#define OPCODE_CORRUPT		9
 // @}
 
 

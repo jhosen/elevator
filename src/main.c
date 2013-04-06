@@ -16,9 +16,9 @@ int main (int argc, const char * argv[]) {
 			return(0);
 	}
 	while (1) {
-		//system("clear");
-		//statemachine_print_state();
-		//order_print();
+		system("clear");
+		statemachine_print_state();
+		order_print();
 		order_add();
 		order_handle_button_lamps();
 		statemachine(statemachine_get_event());
