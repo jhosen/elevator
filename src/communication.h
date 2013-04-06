@@ -29,6 +29,7 @@
 #define OPCODE_NEWPEER		8
 #define OPCODE_CORRUPT		9
 #define OPCODE_PEERLOST		10
+#define OPCODE_ORDERDONE	11
 // @}
 
 
@@ -71,7 +72,7 @@ struct information{
 };*/
 
 void handle_msg(struct msg package, struct timeval *ttime);
-void send_msg(int msgtype, in_addr_t to,  int orders[][N_PANELS], int direction, int floor, int gpdata[]);
+void send_msg(int msgtype, int to,  int orders[][N_PANELS], int direction, int floor, int gpdata[]);
 /* Parser functions */
 char* 	struct_to_byte(	struct msg msg_struct);
 struct msg byte_to_struct(char *msg);

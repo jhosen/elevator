@@ -254,6 +254,10 @@ void order_add() {
 		if(elev_get_button_signal(BUTTON_COMMAND, floor)) {	
 			head.elevinfo.current_orders[floor][PANEL_CMD] = 1;
 			//head.elevinfo.current_orders[floor][COMMAND]=1;
+			int or[FLOORS][N_PANELS];// = {0};
+			int gp[] = {floor, PANEL_CMD};
+			send_msg(OPCODE_NEWORDER, head.elevinfo.ip, or, 0, 0, gp);
+			// <----- SEND ORDERS
 		}
 		if(floor!=N_FLOORS-1 && elev_get_button_signal(BUTTON_CALL_UP, floor)) {	//There are no BUTTON_CALL_UP in the highest floor.	
 			//head.elevinfo.current_orders[floor][CALL_UP] = 1;
@@ -263,7 +267,7 @@ void order_add() {
 					.paneltype = PANEL_UP,
 			};
 			struct node * n = weightfunction(&head, neworder);
-			n->elevinfo.current_orders[neworder.floor][neworder.paneltype];
+			n->elevinfo.current_orders[neworder.floor][neworder.paneltype] = 1;
 			int gp[] = {floor, PANEL_UP};
 			send_msg(OPCODE_NEWORDER, n->elevinfo.ip, or, 0, 0, gp);
 		}
@@ -271,13 +275,13 @@ void order_add() {
 			int or[FLOORS][N_PANELS];// = {0};
 			struct order neworder = {
 					.floor = floor,
-					.paneltype = PANEL_UP,
+					.paneltype = PANEL_DOWN,
 			};
 			struct node * n = weightfunction(&head, neworder);
-			n->elevinfo.current_orders[neworder.floor][neworder.paneltype];
+			n->elevinfo.current_orders[neworder.floor][neworder.paneltype] = 1;
 			//head.elevinfo.current_orders[floor][CALL_DOWN] = 1;
 			int gp[] = {floor, PANEL_DOWN};
-			send_msg(OPCODE_NEWORDER, TOALLIP, or, 0, 0, gp);
+			send_msg(OPCODE_NEWORDER, n->elevinfo.ip, or, 0, 0, gp);
 		}		
 	}
 }
@@ -305,16 +309,41 @@ void order_reset_current_floor(){
 	int floor = elev_get_floor_sensor_signal();
 	if(floor!=BETWEEN_FLOORS){
 		head.elevinfo.current_orders[floor][COMMAND]=0;
+		// SEND COMMAND DONE
+		int gp[] = {floor, PANEL_CMD};
+		int or[FLOORS][N_PANELS];
+		send_msg(OPCODE_ORDERDONE, head.elevinfo.ip, or, 0, 0, gp);
+
 	    if(last_pass_floor_dir == UP) {
 		    head.elevinfo.current_orders[floor][CALL_UP]=0;
+		    // SEND CALLUP
+			int gp[] = {floor, PANEL_UP};
+			int or[FLOORS][N_PANELS];
+			send_msg(OPCODE_ORDERDONE, head.elevinfo.ip, or, 0, 0, gp);
+
 		    if(!(orders_above(floor))) {
 		    	head.elevinfo.current_orders[floor][CALL_DOWN]=0;
+		    	// SEND CALLDWN
+				int gp[] = {floor, PANEL_DOWN};
+				int or[FLOORS][N_PANELS];
+				send_msg(OPCODE_ORDERDONE, head.elevinfo.ip, or, 0, 0, gp);
+
 		    }
 	    }
 	    else {
 	    	head.elevinfo.current_orders[floor][CALL_DOWN] =0;
+	    	// SEND CALLDWN
+			int gp[] = {floor, PANEL_DOWN};
+			int or[FLOORS][N_PANELS];
+			send_msg(OPCODE_ORDERDONE, head.elevinfo.ip, or, 0, 0, gp);
+
 	    	if(!(orders_below(floor))) {
 	    		head.elevinfo.current_orders[floor][CALL_UP]=0;
+	    		//SENDCALLUP
+	    		int gp[] = {floor, PANEL_UP};
+	    		int or[FLOORS][N_PANELS];
+	    		send_msg(OPCODE_ORDERDONE, head.elevinfo.ip, or, 0, 0, gp);
+
 	    	}
 	    }
 	}
@@ -407,14 +436,17 @@ void order_print_list(int orders[][N_PANELS]){
 struct node * weightfunction(struct node* root, struct order new_order) {
 	int n_elevs = count(root);
 	int weight[n_elevs];
-	int lowest_weight = 1000;
+	int lowest_weight = 500;
 	int current = 0;
 	struct node *iter, *best_elev;
 	iter = root;
+	best_elev = root;
 	int floor_counter;
 	int ordered_floor = new_order.floor;
 	int current_floor, current_dir;
 	while(iter!=0) {
+		weight[current] = 0;
+		printf("elev %i -weight:%i\n", iter->elevinfo.ip, weight[current]);
 		//Add weight if elevator has order to floors (different weighting for different floors)
 		for(floor_counter=0;floor_counter<N_FLOORS; floor_counter++) {
 			if(iter->elevinfo.current_orders[floor_counter][PANEL_CMD]) {
@@ -442,6 +474,7 @@ struct node * weightfunction(struct node* root, struct order new_order) {
 				}
 			}
 		}
+		printf("elev %i -weight:%i\n", iter->elevinfo.ip, weight[current]);
 		//Add weight based on the number of floors the elevator will pass before reaching the ordered floor
 		current_floor = iter->elevinfo.current_state.floor;
 		current_dir = iter->elevinfo.current_state.direction;
@@ -452,6 +485,7 @@ struct node * weightfunction(struct node* root, struct order new_order) {
 			else if(ordered_floor<current_floor) {
 				weight[current]+=(3*(current_floor-ordered_floor));
 			}
+			printf("elev %i -weight:%i\n", iter->elevinfo.ip, weight[current]);
 		}
 		else if(current_dir==UP) {
 			if(ordered_floor>current_floor) {
@@ -461,12 +495,17 @@ struct node * weightfunction(struct node* root, struct order new_order) {
 				weight[current]+=(3*(2*(N_FLOORS-current_floor)+(current_floor-ordered_floor)));
 			}
 		}
+		printf("elev %i - weight: %i\n", iter->elevinfo.ip, weight[current]);
 		if(weight[current]<lowest_weight){
 			lowest_weight = weight[current];
 			best_elev = iter;
+			printf("NEW BESTelev %i -weight:%i\n", iter->elevinfo.ip, weight[current]);
 		}
+		printf("elev %i -weight:%i\n", iter->elevinfo.ip, weight[current]);
 		current++;
 		iter = iter->next;
 	}
+	printf("best elev : %i\n", best_elev->elevinfo.ip);
+	order_print();
 	return best_elev;
 }

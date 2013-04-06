@@ -4,6 +4,7 @@
 #include "control.h"
 #include "elev.h"
 #include "order.h"
+#include "communication.h"
 /************************************ Variables **************************************/
 
 static time_t timer, t_now, timer_stop;
@@ -72,6 +73,12 @@ int control_new_floor(){
 			set_last_floor(new_floor);							//and last_floor is updated.
             set_newly_emergency(0);				                //If elevator is stopped at floor, there is no need for newly_emergency flag for detecting new floors, because floor is defined.
 			set_dragged_out(0);
+
+			//void send_msg(int msgtype, in_addr_t to, int orders[][N_PANELS], int direction, int floor, int gpdata[]);
+			int orders[FLOORS][N_PANELS];
+			int gp[1];
+
+			send_msg(OPCODE_ELEVSTATE, 0, orders, last_dir, new_floor, gp );//<---
             return 1;
 	    }
 	}

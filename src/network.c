@@ -495,7 +495,7 @@ int nw_rm(struct peer p){
 	if(iter!=0){
 		while(iter!=0){
 			if((iter->p.ip) == p.ip && (iter->p.socket)==p.socket){
-				tmp = malloc(sizeof(struct nw_node));
+				//tmp = malloc(sizeof(struct nw_node));
 				tmp = iter;
 				iter->prev->next = iter->next;
 				if(iter->next!=0){
