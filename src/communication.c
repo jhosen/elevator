@@ -36,7 +36,7 @@ void handle_msg(struct msg package, struct timeval *ttime){
 		if(!getelevnode(elevfrom))
 			addelev(elevfrom);
 		else{
-			activateelev(elevfrom);
+			activate(gethead(), nfrom);
 			sendcommands(nfrom, nfrom->elevinfo.current_orders);
 			// Send commands!
 		}
@@ -78,12 +78,12 @@ void handle_msg(struct msg package, struct timeval *ttime){
 		ordertablemerge(nto->elevinfo.current_orders, nfrom->elevinfo.current_orders, CALL_DOWN);
 
 		//rmelev(elevfrom);
-		deactivateelev(elevfrom);
+		deactivate(gethead(), nfrom);
 		order_print_list(nto->elevinfo.current_orders);
 		break;
 	case OPCODE_PEERLOST:
 	//	rmelev(elevfrom);
-		deactivateelev(elevfrom);
+		deactivate(gethead(), nfrom);
 		break;
 	}
 }

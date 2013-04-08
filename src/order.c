@@ -14,17 +14,24 @@ struct node * gethead(){
 void init_order(in_addr_t this_ip){
 	head.elevinfo.ip = this_ip;
 	head.elevinfo.active = 1;
-	initlist(&head);
+    head.next 		= 0;
+    head.prev		= 0;
+    
+    /* Start thread for monitoring ordered floors and set lamps */
+    pthread_t lamp_monitor;
+    if ( (pthread_create(&lamp_monitor, NULL, order_handle_button_lamps, (void *) NULL)) < 0){
+		perror("err:pthread_create(lamp_monitor)\n");
+	}
 }
 
 /** Linked list for keeping track of connected elevators **/
 
 
-void initlist(struct node * root){
+/*void initlist(struct node * root){
 	root = malloc( sizeof(struct node) );
     root->next 		= 0;
     root->prev		= 0;
-}
+}*/
 int printlist(struct node * root){
 	struct node * iter;
 	iter = root;
@@ -104,23 +111,7 @@ int rm(struct node* root, struct node n){
 	}
 	return 0;
 }
-int rmelev(struct elevator elev){
-	struct node n;
-	n.elevinfo = elev;
-	return rm(&head, n);
-}
 
-int find(struct node * root, struct node n){
-	struct node * iter;
-	iter = root;
-	while(iter!=0){
-		if((iter->elevinfo.ip) == n.elevinfo.ip){
-			return 1; // found it
-		}
-		iter = iter->next;
-	}
-	return 0;
-}
 void activate(struct node * root, struct node n){
 	struct node * np = get(root, n);
 	np->elevinfo.active = 1;
@@ -131,6 +122,7 @@ void deactivate(struct node * root, struct node n){
 	np->elevinfo.active = 0;
 }
 
+/*
 void activateelev(struct elevator elev){
 	struct node * n = getelevnode(elev);
 	n->elevinfo.active = 1;
@@ -138,7 +130,7 @@ void activateelev(struct elevator elev){
 void deactivateelev(struct elevator elev){
 	struct node * n = getelevnode(elev);
 	n->elevinfo.active = 0;
-}
+}*/
 struct node * get(struct node * root, struct node n){
 	struct node * iter;
 	iter = root;
@@ -159,6 +151,7 @@ struct node * getelevnode(struct elevator elev){
 	n.elevinfo = elev;
 	return get(&head, n);
 }
+
 void addelev(struct elevator elev){
 	struct node * n = malloc(sizeof(struct node));
 	n->elevinfo = elev;
@@ -194,8 +187,6 @@ void ordertablemerge(int ordto[][N_PANELS], int ordfrom[][N_PANELS], enum panel_
 
 
 
-
-//static int head.elevinfo.current_orders[N_FLOORS][N_PANELS];
 /*Orders are saved in order_table. There are one column for each panel-type(call_down, call_up and
                                                 command). As an example order_table[2][CALL_UP] refers to orders made from call_up-panel in 
                                                 3rd floor.*/ 
@@ -323,45 +314,8 @@ int order_check_request_below(enum panel_type panel){
 void order_add_order(struct order ord){
 	head.elevinfo.current_orders[ord.floor][ord.paneltype] = 1;
 }
-//void order_add() {
-//	int floor = 0;
-//	for(floor=0; floor<N_FLOORS; floor++) {
-//		if(elev_get_button_signal(BUTTON_COMMAND, floor)) {
-//			head.elevinfo.current_orders[floor][PANEL_CMD] = 1;
-//			//head.elevinfo.current_orders[floor][COMMAND]=1;
-//			int or[FLOORS][N_PANELS];// = {0};
-//			int gp[] = {floor, PANEL_CMD};
-//			send_msg(OPCODE_NEWORDER, head.elevinfo.ip, or, 0, 0, gp);
-//			// <----- SEND ORDERS
-//		}
-//		if(floor!=N_FLOORS-1 && elev_get_button_signal(BUTTON_CALL_UP, floor)) {	//There are no BUTTON_CALL_UP in the highest floor.
-//			//head.elevinfo.current_orders[floor][CALL_UP] = 1;
-//			int or[FLOORS][N_PANELS];// = {0};
-//			struct order neworder = {
-//					.floor = floor,
-//					.paneltype = PANEL_UP,
-//			};
-//			struct node * n = weightfunction(&head, neworder);
-//			n->elevinfo.current_orders[neworder.floor][neworder.paneltype] = 1;
-//			int gp[] = {floor, PANEL_UP};
-//			send_msg(OPCODE_NEWORDER, n->elevinfo.ip, or, 0, 0, gp);
-//		}
-//		if(floor!=0 && elev_get_button_signal(BUTTON_CALL_DOWN, floor)) {			//There are no BUTTON_CALL_DOWN in the lowest floor.
-//			int or[FLOORS][N_PANELS];// = {0};
-//			struct order neworder = {
-//					.floor = floor,
-//					.paneltype = PANEL_DOWN,
-//			};
-//			struct node * n = weightfunction(&head, neworder);
-//			n->elevinfo.current_orders[neworder.floor][neworder.paneltype] = 1;
-//			//head.elevinfo.current_orders[floor][CALL_DOWN] = 1;
-//			int gp[] = {floor, PANEL_DOWN};
-//			send_msg(OPCODE_NEWORDER, n->elevinfo.ip, or, 0, 0, gp);
-//		}
-//	}
-//}
-//
 
+/*
 void order_empty(enum panel_type panel){
 	int floor = 0;
 	if(panel==ALL){
@@ -377,7 +331,7 @@ void order_empty(enum panel_type panel){
 			head.elevinfo.current_orders[floor][panel]=0;
 		}
 	}
-}
+}*/
 
 
 void order_reset_current_floor(){
@@ -462,20 +416,44 @@ int orders_below(int c_floor) {
 
 /***************************** Other functions *******************************************/
 
-//void order_handle_button_lamps(){
-//    int floor = 0;
-//    int button = 0;
-//	for(floor = 0; floor < N_FLOORS; floor++){
-//	    for(button = BUTTON_CALL_UP; button<=BUTTON_COMMAND; button++){
-//			if(!((floor==0 && button==BUTTON_CALL_DOWN) || (floor==N_FLOORS-1 && button==BUTTON_CALL_UP))){ 	//Not considering invalid buttons.
-//			    if(head.elevinfo.current_orders[floor][button]==0)																//Button and panel is represented by corresponding numbers", so we can take button as input for head.elevinfo.current_orders[][]
-//			       elev_set_button_lamp(button,floor,0);
-//			    else
-//			       elev_set_button_lamp(button, floor, 1);
-//		    }
-//	    }
-//    }
-//}
+
+/* !\brief Routine for monitoring ordered floors for setting button lamps. 
+ *
+ */
+void *order_handle_button_lamps(){
+    int floor, panel
+    struct node * iter = &head;
+    
+    while(1){
+        
+        /* Loop command orders on local elevator */
+        panel = COMMAND; 
+        for(floor = 0; floor < FLOORS; floor++){
+            if(iter->elevinfo.current_orders[floor][panel]==1)
+                elev_set_button_lamp(panel,floor,1);
+            else
+                elev_set_button_lamp(panel, floor, 0);
+        }
+        
+        /* Loop call up and call down */
+        while(iter!=0){
+            for(floor = 0; floor < FLOORS; floor++){
+                for(panel = CALL_UP; panel<COMMAND; panel++){ 
+                    if(!((floor==0 && panel==CALL_DOWN) || (floor==N_FLOORS-1 && panel==CALL_UP))){ 	//Not considering invalid buttons.
+                        if(iter->elevinfo.current_orders[floor][panel]==1)
+                            elev_set_button_lamp(panel,floor,1);
+                        else
+                            elev_set_button_lamp(panel, floor, 0);
+                    }
+                }
+            }
+            iter = iter->next;
+        }
+
+        /* Restart scan */
+        iter = &head; 
+    }
+}
 
 void order_print(void){							
 	printf("|	C_UP	|C_DOWN	|COMMAND|\n");	
