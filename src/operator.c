@@ -5,8 +5,6 @@
  *      Author: student
  */
 
-
-
 #include "order.h"
 #include "operator.h"
 #include "elev.h"
@@ -17,17 +15,10 @@
 static int activeobstr = 0;
 static int current_pos;
 
-
-int obstr_on(){
-	return activeobstr;
-}
-int obstr_off(){
-	return !activeobstr;
-}
+#define DOOROPENTIME 3
+struct timeval dooropentime;
 
 void operator_init(){
-
-
 	elev_register_callback(SIGNAL_TYPE_CALL_UP, 	operator_callback_button);
 	elev_register_callback(SIGNAL_TYPE_CALL_DOWN, 	operator_callback_button);
 	elev_register_callback(SIGNAL_TYPE_COMMAND, 	operator_callback_button);
@@ -37,6 +28,8 @@ void operator_init(){
 
 	elev_enable_callbacks();
 }
+
+//Callback functions
 
 void operator_callback_button(int floor, int value){
 
@@ -52,7 +45,6 @@ void operator_callback_button(int floor, int value){
     order_register_new_order(n, neworder.floor, neworder.paneltype);
 
 }
-
 
 void operator_callback_sensor(int floor, int value){
 	if(value == 1){ // Entering floor
@@ -79,17 +71,10 @@ void operator_callback_sensor(int floor, int value){
 		// Corrupt call
 	}
 }
-
-
-int betweenfloors(){
-	return (current_pos == BETWEEN_FLOORS);
-}
-int getcurrentpos(){
-	return current_pos;
-}
+#include "statemachine.h"
 void operator_callback_stop(int floor, int value){
-	elev_set_stop_lamp(1);
 	set_event(STOP_BUTTON);
+	printf("Stop button was pushed\n");
 	// Push stop event to statemachine
 }
 
@@ -98,28 +83,10 @@ void operator_callback_obstr(int floor, int value){
 	set_event(OBSTRUCTION);
 }
 
-//int request_here(){
-//	//Check if there is a request at current floor in right direction.
-//	if(order_check_request_current_floor(ALL)) {
-//		return 1;
-//	}
-//	//Check if there is a prioritized request above
-//	else if( (order_check_request_above(ALL) && get_last_dir()==UP ) || (!order_check_request_below(ALL)) ){
-//		return 0;
-//	}
-//	//Check if there is a request in the opposite direction in current floor
-//	else if( (get_last_dir()==DOWN && order_check_request_current_floor(CALL_UP)) || (get_last_dir()==UP && order_check_request_current_floor(CALL_DOWN)) ){
-//		return 1;
-//		//do nothing, this is handled in EXECUTE-state.
-//	}
-//	//Check if there is an request below
-//	else if(order_check_request_below(ALL)){
-//		return 0;
-//	}
-//	else{
-//		return 0;
-//	}
-//}
+//Get functions
+int getcurrentpos(){
+	return current_pos;
+}
 
 //Functions used as guards by the state machine
 
@@ -136,13 +103,11 @@ int requests(){
 }
 
 int should_stop(){
-	//enum panel_type panel = ALL;
 	int current_floor = getcurrentpos();
 	if(current_floor==BETWEEN_FLOORS){
 		return 0;
 	}
 	struct node * head = gethead();
-	/* Wants to check all panels: */
 	if(get_last_dir()==UP){
 		if(head->elevinfo.current_orders[current_floor][COMMAND] || head->elevinfo.current_orders[current_floor][CALL_UP]) {
 			return 1;
@@ -160,6 +125,26 @@ int should_stop(){
 		}
 	}
 	return 0;
+}
+
+int timeoutdoor(){
+	struct timeval currtime;
+	gettimeofday(&currtime, 0);
+	if( (currtime.tv_sec - dooropentime.tv_sec)>=DOOROPENTIME){
+		return 1;
+	}
+	return 0;
+}
+
+int obstr_on(){
+	return activeobstr;
+}
+int obstr_off(){
+	return !activeobstr;
+}
+
+int betweenfloors(){
+	return (current_pos == BETWEEN_FLOORS);
 }
 
 //Functions used as actions by the state machine
@@ -188,28 +173,7 @@ int prioritized_dir(){
 	//Check if there is a request above when the direction is DOWN. This is served if there are no requests below.
 	else if(order_check_request_above(ALL) && !(order_check_request_below(ALL))) {
 		return 1;
-	}//int request_here(){
-	//	//Check if there is a request at current floor in right direction.
-	//	if(order_check_request_current_floor(ALL)) {
-	//		return 1;
-	//	}
-	//	//Check if there is a prioritized request above
-	//	else if( (order_check_request_above(ALL) && get_last_dir()==UP ) || (!order_check_request_below(ALL)) ){
-	//		return 0;
-	//	}
-	//	//Check if there is a request in the opposite direction in current floor
-	//	else if( (get_last_dir()==DOWN && order_check_request_current_floor(CALL_UP)) || (get_last_dir()==UP && order_check_request_current_floor(CALL_DOWN)) ){
-	//		return 1;
-	//		//do nothing, this is handled in EXECUTE-state.
-	//	}
-	//	//Check if there is an request below
-	//	else if(order_check_request_below(ALL)){
-	//		return 0;
-	//	}
-	//	else{
-	//		return 0;
-	//	}
-	//}
+	}
 	//Check if there is a request below when the direction is UP. This is served if there are no requests above.
 	else if(order_check_request_below(ALL) && !(order_check_request_above(ALL))) {
 		return -1;
@@ -219,15 +183,29 @@ int prioritized_dir(){
 	}
 }
 
-void em_stop(){
-	// Stop elevator
-	elev_set_stop_lamp(1);
+void opendoor(){
 	control_slow_down();
-	elev_set_speed(0);
+    gettimeofday(&dooropentime, 0);
+    order_reset_current_floor();
+	elev_set_door_open_lamp(1);
+	printf("Door is open \n");
+}
+
+void closedoor(){
+	elev_set_door_open_lamp(0);
+	printf("Door is closed \n");
+}
+
+void em_stop(){
+	elev_set_stop_lamp(1);
+	printf("Stop lamp on\n");
+	control_slow_down();
 }
 
 void em_cancel(){
 	elev_set_stop_lamp(0);
+	printf("Stop lamp off\n");
+
 }
 
 void em_obstr(){
@@ -238,28 +216,10 @@ void em_obstr(){
 	// Stop elev if moving
 	// Open door - keep it open
 }
-#define DOOROPENTIME 3
-struct timeval dooropentime;
 
-void opendoor(){
-	control_slow_down();
-	elev_set_speed(0);
-    gettimeofday(&dooropentime, 0);			//Sets timer.
-    order_reset_current_floor();
-	elev_set_door_open_lamp(1);
-	printf("Door is open \n");
-}
-void closedoor(){
-	elev_set_door_open_lamp(0);
-	printf("Door is closed \n");
-}
 
-int timeoutdoor(){
-	struct timeval currtime;
-	gettimeofday(&currtime, 0);
-	if( (currtime.tv_sec - dooropentime.tv_sec)>=DOOROPENTIME){
-		return 1;
-	}
-	return 0;
-}
+
+
+
+
 

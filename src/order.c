@@ -259,7 +259,7 @@ int order_check_request_current_floor(enum panel_type panel){
 int order_check_request_above(enum panel_type panel){
 	int current_floor = getcurrentpos();
 	if(current_floor==BETWEEN_FLOORS){			        //This would be of interest if elevator is stopped between two floors due to emergency.
-	    if(last_pass_floor_dir==UP){                    //Means elevator is between last_floor and last_floor+1
+	    if(get_last_dir()==UP){                    		//Means elevator is probably between last_floor and last_floor+1
 	        current_floor = last_floor;					//Then the checks are to be done relative to floor recently passed.
 	    }
 	    else{
@@ -286,7 +286,7 @@ int order_check_request_above(enum panel_type panel){
 int order_check_request_below(enum panel_type panel){
 	int current_floor = getcurrentpos();
 	if(current_floor==BETWEEN_FLOORS){					//This would be of interest if elevator is stopped between two floors due to emergency.
-	    if(last_pass_floor_dir==UP){					
+	    if(get_last_dir()==UP){							//Means elevator is probably between last_floor-1 and last_floor
 	        current_floor = last_floor+1;   			//Then the checks are to be done relative to floor above elevator.
 	    }
 	    else{                               

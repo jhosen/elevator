@@ -8,12 +8,9 @@
 #define N_STATES 5
 #define N_EVENTS 4
 
-
 static enum state_t state = IDLE;
 static enum event_t event = NOEVENT;
 pthread_mutex_t eventMutex;
-
-
 
 void statemachine_init(){
 	pthread_mutex_init(&eventMutex, NULL);
@@ -40,18 +37,17 @@ struct state_action_pair_t stateTable[N_STATES][N_EVENTS] = {
 /*IDLE		*/ 	{{EXECUTE, set_direction,requests},		{EM_STOP,	em_stop,	NULL},	{EM_OBSTR,	em_obstr,	obstr_on},		{IDLE ,	NULL,	NULL}					},
 /*EXECUTE	*/	{{DOOROPEN, opendoor,	should_stop},	{EM_STOP,	em_stop,	NULL},	{EM_OBSTR,	em_obstr,	obstr_on}, 		{DOOROPEN , opendoor, 	should_stop} 	},
 /*EM_STOP	*/	{{EM_STOP, NULL,	NULL},				{IDLE,		em_cancel,	NULL},	{EM_STOP,	NULL,		NULL}, 			{EM_STOP, NULL,	NULL} 					},
-/*EM_OBSTR	*/	{{EM_OBSTR, NULL,NULL},					{EM_OBSTR,	NULL,		NULL},	{IDLE,		closedoor,	obstr_off}, 	{EM_OBSTR, NULL, NULL} 					},
+/*EM_OBSTR	*/	{{EM_OBSTR, NULL,NULL},					{EM_OBSTR,	NULL,		NULL},	{IDLE,		closedoor,	obstr_off}, 	{EM_OBSTR, closedoor, NULL}				},
 /*DOOROPEN	*/ 	{{IDLE, closedoor,timeoutdoor},			{EM_STOP, 	em_stop, 	NULL},	{EM_OBSTR, 	em_obstr, 	obstr_on}, 		{IDLE, closedoor, betweenfloors}		},
 };
 
 
 void statemachine_handleEvent(){
-	enum event_t evcpy = get_event();
-	struct state_action_pair_t sap = stateTable[state][evcpy];
-	set_event(NOEVENT);
-//	print_state_event(evcpy);
+	pthread_mutex_lock(&eventMutex);
+	struct state_action_pair_t sap = stateTable[state][event];
+	event = NOEVENT;
+	pthread_mutex_unlock(&eventMutex);
 	if(sap.guard == NULL || sap.guard()){
-		//print_state_event(evcpy);
 		if(sap.action != NULL){
 			sap.action();
 		}
@@ -64,7 +60,6 @@ void statemachine_handleEvent(){
 void statemachine(){
 	statemachine_init();
 	while(1){
-//		system("clear");
 		statemachine_handleEvent();
 
 	}
