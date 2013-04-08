@@ -16,29 +16,26 @@
 void handle_msg(struct msg package, struct timeval *ttime){
 	if(ttime!=0)
 		gettimeofday(ttime,0);
-	struct elevator elevto;
-	struct elevator elevfrom;
-
+	struct elevator elevto, elevfrom;
 	elevto.ip = package.to;
 	elevfrom.ip = package.from;
+    
 	struct node *nto = getelevnode(elevto);
 	struct node *nfrom=getelevnode(elevfrom);
-	elevfrom.current_state.floor = package.floor;
-	elevfrom.current_state.direction = package.direction;
+//	elevfrom.current_state.floor = package.floor;
+//	elevfrom.current_state.direction = package.direction;
 
 #warning "Add a test for whether nto and nfrom is 0??";
 
 
-
-
 	switch (package.msgtype){
 	case OPCODE_NEWPEER:
-		if(!getelevnode(elevfrom))
-			addelev(elevfrom);
-		else{
+        if(!getelevnode(elevfrom)){ // Elevator hasn't been connected earlier
+                addelev(elevfrom);
+        }
+		else{    // Elevator has been connected earlier
 			activate(gethead(), nfrom);
-			sendcommands(nfrom, nfrom->elevinfo.current_orders);
-			// Send commands!
+			recover_elev(nfrom, nfrom->elevinfo.current_orders); // Recover 
 		}
 		break;
 	case OPCODE_IMALIVE:
@@ -46,12 +43,12 @@ void handle_msg(struct msg package, struct timeval *ttime){
 		break;
 	case OPCODE_NEWORDER:
 		nto->elevinfo.current_orders[package.gpdata[0]][package.gpdata[1]] = 1;
-		elev_set_button_lamp(package.gpdata[1], package.gpdata[0], 1);
+		//elev_set_button_lamp(package.gpdata[1], package.gpdata[0], 1);
 		printf("Got new order for ip: %i\n", nto->elevinfo.ip);
 		break;
 	case OPCODE_ORDERDONE:
 		nto->elevinfo.current_orders[package.gpdata[0]][package.gpdata[1]] = 0;
-		elev_set_button_lamp(package.gpdata[1], package.gpdata[0], 0);
+		//elev_set_button_lamp(package.gpdata[1], package.gpdata[0], 0); // <--- This is handled by light monitor thread
 		break;
 	case OPCODE_BUTTONHIT:
 
@@ -72,14 +69,18 @@ void handle_msg(struct msg package, struct timeval *ttime){
 		break;
 	case OPCODE_PEERLOSTTAKEOVER:
 		printf("Redirect tasks of the lost peer(ip:%i)\n", package.from);
-		order_print_list(nto->elevinfo.current_orders);
+        printf("This elev: \n");
+        order_print_list(nto->elevinfo.current_orders);
+        printf("Lost elev: \n");
 		order_print_list(nfrom->elevinfo.current_orders);
 		ordertablemerge(nto->elevinfo.current_orders, nfrom->elevinfo.current_orders, CALL_UP);
 		ordertablemerge(nto->elevinfo.current_orders, nfrom->elevinfo.current_orders, CALL_DOWN);
 
 		//rmelev(elevfrom);
 		deactivate(gethead(), nfrom);
-		order_print_list(nto->elevinfo.current_orders);
+        printf("This elev after merge: \n");
+            
+        order_print_list(nto->elevinfo.current_orders);
 		break;
 	case OPCODE_PEERLOST:
 	//	rmelev(elevfrom);
@@ -87,7 +88,12 @@ void handle_msg(struct msg package, struct timeval *ttime){
 		break;
 	}
 }
-void sendcommands(struct node * n, int orderlist[][N_PANELS]){
+
+/* !\brief Function containing recovery routine for elevator reconnected to network. 
+ *
+ *
+ */
+void recover_elev(struct node * n, int orderlist[][N_PANELS]){
 	int floor;
 	int ordummy[] = {0};
 	int gp[2] = {0,0};
@@ -97,7 +103,6 @@ void sendcommands(struct node * n, int orderlist[][N_PANELS]){
 			gp[0] = floor;
 			gp[1] = COMMAND;
 			send_msg(OPCODE_NEWORDER, n->elevinfo.ip, ordummy, 0,0, gp);
-			printf("Sending command..\n");
 		}
 	}
 
