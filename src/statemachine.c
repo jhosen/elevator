@@ -17,9 +17,6 @@ pthread_mutex_t eventMutex;
 
 void statemachine_init(){
 	pthread_mutex_init(&eventMutex, NULL);
-
-	static enum state_t state = IDLE;
-	static enum event_t event = NOEVENT;
 	if(elev_get_floor_sensor_signal()==BETWEEN_FLOORS){
 		go_down();
 		while(elev_get_floor_sensor_signal()==BETWEEN_FLOORS)
@@ -40,47 +37,75 @@ struct state_action_pair_t{
 /*nextState, action, guard*/
 struct state_action_pair_t stateTable[N_STATES][N_EVENTS] = {
 /* state|event:	NOEVENT						 			STOP_BUTTON						OBSTRUCTION								FLOORSENSOR*/
-/*IDLE		*/ 	{{EXECUTE, set_direction,requests},		{EM_STOP,	em_stop,	NULL},	{EM_OBSTR,	em_obstr,	obstr_on},		{DOOROPEN ,	opendoor,	atfloor		}	},
+/*IDLE		*/ 	{{EXECUTE, set_direction,requests},		{EM_STOP,	em_stop,	NULL},	{EM_OBSTR,	em_obstr,	obstr_on},		{IDLE ,	NULL,	NULL}					},
 /*EXECUTE	*/	{{DOOROPEN, opendoor,	should_stop},	{EM_STOP,	em_stop,	NULL},	{EM_OBSTR,	em_obstr,	obstr_on}, 		{DOOROPEN , opendoor, 	should_stop} 	},
 /*EM_STOP	*/	{{EM_STOP, NULL,	NULL},				{IDLE,		em_cancel,	NULL},	{EM_STOP,	NULL,		NULL}, 			{EM_STOP, NULL,	NULL} 					},
 /*EM_OBSTR	*/	{{EM_OBSTR, NULL,NULL},					{EM_OBSTR,	NULL,		NULL},	{IDLE,		closedoor,	obstr_off}, 	{EM_OBSTR, NULL, NULL} 					},
 /*DOOROPEN	*/ 	{{IDLE, closedoor,timeoutdoor},			{EM_STOP, 	em_stop, 	NULL},	{EM_OBSTR, 	em_obstr, 	obstr_on}, 		{IDLE, closedoor, betweenfloors}		},
 };
 
-//table
-void statemachine_handleEvent(enum event_t event){
-//	if(event != get_event()){
-//		printf("State: %i, event: %i\n", state, event);
-//		system("clear");
-//	}
-	struct state_action_pair_t sap = stateTable[state][event];
+
+void statemachine_handleEvent(){
+	enum event_t evcpy = get_event();
+	struct state_action_pair_t sap = stateTable[state][evcpy];
 	set_event(NOEVENT);
+//	print_state_event(evcpy);
 	if(sap.guard == NULL || sap.guard()){
-
-		if(sap.action != NULL)
+		//print_state_event(evcpy);
+		if(sap.action != NULL){
 			sap.action();
-
+		}
 		state = sap.nextState;
+
 	}
 
 }
 
 void statemachine(){
 	statemachine_init();
-	int i = 0;
 	while(1){
-		/*if(event != 0){
-				printf("State: %i, event: %i\n", state, event);
-				i = 0;
-			}
-			i++;*/
-		statemachine_handleEvent(event);
+//		system("clear");
+		statemachine_handleEvent();
 
 	}
 
 }
 
-
+void print_state_event(evcpy) {
+	printf("State is: ");
+	switch(state){
+		case IDLE:
+			printf("IDLE.\n");
+			break;
+		case EXECUTE:
+			printf("EXECUTE.\n");
+			break;
+		case DOOROPEN:
+			printf("DOOROPEN.\n");
+			break;
+		case EM_STOP:
+			printf("EM_STOP.\n");
+			break;
+		case EM_OBSTR:
+			printf("EM_OBSTR.\n");
+			break;
+	}
+	printf("Event is: ");
+	switch(evcpy){
+		case NOEVENT:
+			printf("NOEVENT.\n");
+			break;
+		case STOP_BUTTON:
+			printf("STOP_BUTTON.\n");
+			break;
+		case OBSTRUCTION:
+			printf("OBSTRUCTION.\n");
+			break;
+		case FLOORSENSOR:
+			printf("FLOORSENSOR.\n");
+			break;
+	}
+}
 
 void set_event(enum event_t evnt){
 	pthread_mutex_lock(&eventMutex);
@@ -89,7 +114,11 @@ void set_event(enum event_t evnt){
 }
 
 enum event_t get_event(){
-	return event;
+	enum event_t evcopy;
+	pthread_mutex_lock(&eventMutex);
+	evcopy = event;
+	pthread_mutex_unlock(&eventMutex);
+	return evcopy;
 }
 
 
@@ -240,7 +269,7 @@ enum event_t get_event(){
 //						close_door();
 //       					printf("Door is closed \n");
 //					    state = IDLE;
-//					}
+//					}statement
 //					break;
 //				case NEW_FLOOR:
 //					set_last_floor(get_position());
@@ -404,29 +433,6 @@ enum event_t get_event(){
 //}
 ///******************************************************************************/
 //
-//void statemachine_print_state(void){
-//	printf("State is ");
-//	switch(get_state()){
-//		case IDLE:
-//			printf("IDLE\n");
-//			break;
-//		case PASSENGER_ON_OFF:
-//			printf("PASSENGER_ON_OFF\n");
-//			break;
-//		case GOING_UP:
-//			printf("GOING_UP\n");
-//			break;
-//		case GOING_DOWN:
-//			printf("GOING_DOWN\n");
-//			break;
-//		case EMERGENCY:
-//			printf("EMERGENCY\n");
-//			break;
-//		case SERVICE:
-//			printf("SERVICE\n");
-//			break;
-//	}
-//}
 //
 
 /*******************Set/get-functions******************/

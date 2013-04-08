@@ -6,44 +6,6 @@
 #define N_PANELS 3
 #define BETWEEN_FLOORS -1
 
-
-//Creating different panel types: "ALL" is not a panel-type, but is used if user wants to check all panels.
-enum panel_type {CALL_UP, CALL_DOWN, COMMAND, ALL};
-enum direction_t {UP, DOWN};
-
-/*********************************************** GET/SET FUNCTIONS ***********************************************/
-int get_last_floor();
-void set_last_floor(int floor);
-void set_last_pass_floor_dir(enum direction_t dir);
-
-/*************************************************** Functions ***********************************************/
-
-// Checks if there are orders at, above or below elevator. When argument is, all panels are checked.
-int order_check_request_current_floor(enum panel_type panel);
-int order_check_request_above(enum panel_type panel);
-int order_check_request_below(enum panel_type panel);
-                                            		   
-void order_empty(enum panel_type panel);
-                                                        
-void order_reset_current_floor();
-                     
-void order_add();
-
-int orders_above(int current_floor);
-int orders_below(int current_floor);
-
-int should_stop();
-
-//Handle_button_lamps control all panel lights. 									
-void *order_handle_button_lamps();
-
-// Function available for service engineers for testing.
-void order_print(void);
-
-void order_print_list(int orders[][N_PANELS]);
-
-void ordertablemerge(int ordto[][N_PANELS], int ordfrom[][N_PANELS], enum panel_type panel);
-
 /* Linked list for keeping track of all elevators online */
 #define FLOORS 4
 #define N_PANELS 3
@@ -71,6 +33,64 @@ static struct node {
 	struct node *next, *prev;
 	struct elevator elevinfo;
 };
+
+//Creating different panel types: "ALL" is not a panel-type, but is used if user wants to check all panels.
+enum panel_type {CALL_UP, CALL_DOWN, COMMAND, ALL};
+enum direction_t {UP, DOWN};
+
+/*********************************************** GET/SET FUNCTIONS ***********************************************/
+int get_last_floor();
+void set_last_floor(int floor);
+void set_last_pass_floor_dir(enum direction_t dir);
+
+/*************************************************** Functions ***********************************************/
+
+// Checks if there are orders at, above or below elevator. When argument is, all panels are checked.
+int order_check_request_current_floor(enum panel_type panel);
+int order_check_request_above(enum panel_type panel);
+int order_check_request_below(enum panel_type panel);
+                                            		   
+void order_empty(enum panel_type panel);
+
+/* !\brief Register an new order both local and by broadcasting over network.
+ *
+ * \param elevator is the elevator you have decided should get the order
+ * \param floor is the floor of where the order was made
+ * \param panel is the type of order to be executed
+ *
+ * This function is run when some button is hit
+ */
+void order_register_new_order(struct node * elevator, int floor, int panel);
+
+void order_reset_current_floor();
+
+void order_flush_panel(struct node * elevator, enum panel_type panel);
+
+/* !\brief Registers an order as done both local and by broadcasting over network.
+ *
+ * \param floor is the floor of where the order was done
+ * \param panel is the type of order executed
+ *
+ * This function is run when current elevator is done executing an order.
+ */
+void order_register_as_done(int floor, int panel);
+                     
+void order_add();
+
+int orders_above(int current_floor);
+int orders_below(int current_floor);
+
+
+//Handle_button_lamps control all panel lights. 									
+void *order_handle_button_lamps();
+
+// Function available for service engineers for testing.
+void order_print(void);
+
+void order_print_list(int orders[][N_PANELS]);
+
+void ordertablemerge(int ordto[][N_PANELS], int ordfrom[][N_PANELS], enum panel_type panel);
+
 
 
 /* List functions for keeping track of elevators */

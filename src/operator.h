@@ -52,6 +52,9 @@ int request_here();
 int requests();
 void em_stop();
 
+int should_stop();
+
+
 void em_cancel();
 
 void em_obstr();
@@ -60,7 +63,6 @@ void closedoor();
 
 int timeoutdoor();
 
-int atfloor();
 int betweenfloors();
 int getcurrentpos();
 

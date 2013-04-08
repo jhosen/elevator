@@ -30,6 +30,7 @@
 #define OPCODE_CORRUPT		9
 #define OPCODE_PEERLOST		10
 #define OPCODE_ORDERDONE	11
+#define OPCODE_RECOVER_CMD 12
 // @}
 
 

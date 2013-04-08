@@ -24,6 +24,7 @@ void handle_msg(struct msg package, struct timeval *ttime){
 	struct node *nfrom=getelevnode(elevfrom);
 //	elevfrom.current_state.floor = package.floor;
 //	elevfrom.current_state.direction = package.direction;
+	int floor;
 
 #warning "Add a test for whether nto and nfrom is 0??";
 
@@ -47,7 +48,8 @@ void handle_msg(struct msg package, struct timeval *ttime){
 		printf("Got new order for ip: %i\n", nto->elevinfo.ip);
 		break;
 	case OPCODE_ORDERDONE:
-		nto->elevinfo.current_orders[package.gpdata[0]][package.gpdata[1]] = 0;
+		printf("Order at floor: %i, panel: %i was done by %i\n", package.gpdata[0], package.gpdata[1], nfrom->elevinfo.ip);
+		nfrom->elevinfo.current_orders[package.gpdata[0]][package.gpdata[1]] = 0;
 		//elev_set_button_lamp(package.gpdata[1], package.gpdata[0], 0); // <--- This is handled by light monitor thread
 		break;
 	case OPCODE_BUTTONHIT:
@@ -75,7 +77,8 @@ void handle_msg(struct msg package, struct timeval *ttime){
 		order_print_list(nfrom->elevinfo.current_orders);
 		ordertablemerge(nto->elevinfo.current_orders, nfrom->elevinfo.current_orders, CALL_UP);
 		ordertablemerge(nto->elevinfo.current_orders, nfrom->elevinfo.current_orders, CALL_DOWN);
-
+		order_flush_panel(nfrom, CALL_UP);
+		order_flush_panel(nfrom, CALL_DOWN);
 		//rmelev(elevfrom);
 		deactivate(gethead(), *nfrom);
         printf("This elev after merge: \n");
@@ -84,7 +87,17 @@ void handle_msg(struct msg package, struct timeval *ttime){
 		break;
 	case OPCODE_PEERLOST:
 	//	rmelev(elevfrom);
+//		cleartable(nfrom->elevinfo.current_orders, CALL_UP);
+//		cleartable(nfrom->elevinfo.current_orders, CALL_DOWN);
+		order_flush_panel(nfrom, CALL_UP);
+		order_flush_panel(nfrom, CALL_DOWN);
 		deactivate(gethead(), *nfrom);
+		break;
+	case OPCODE_RECOVER_CMD:
+//		int floor;
+		for(floor = 0; floor<FLOORS; floor++){
+			gethead()->elevinfo.current_orders[floor][COMMAND] = package.gpdata[floor];
+		}
 		break;
 	}
 }
@@ -96,15 +109,16 @@ void handle_msg(struct msg package, struct timeval *ttime){
 void recover_elev(struct node * n, int orderlist[][N_PANELS]){
 	int floor;
 	int ordummy[] = {0};
-	int gp[2] = {0,0};
+	int cmdorders[FLOORS];
 	order_print_list(orderlist);
 	for(floor = 0; floor < FLOORS; floor ++){
 		if(orderlist[floor][COMMAND]){
-			gp[0] = floor;
-			gp[1] = COMMAND;
-			send_msg(OPCODE_NEWORDER, n->elevinfo.ip, ordummy, 0,0, gp);
+			cmdorders[floor] = 1; // {floor, COMMAND};
+			printf("Recover: Sending command floor %i\n", floor);
 		}
+
 	}
+	send_msg(OPCODE_RECOVER_CMD, n->elevinfo.ip, ordummy, 0,0, cmdorders);
 
 }
 void send_msg(int msgtype, int to, int orders[][N_PANELS], int direction, int floor, int gpdata[]){

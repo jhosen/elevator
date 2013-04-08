@@ -8,11 +8,12 @@ typedef enum state_t {IDLE, EXECUTE, EM_STOP, EM_OBSTR, DOOROPEN};
 
 
 
+void print_state_event(evcpy);
 
 
 void statemachine_init();
 
-void statemachine_handleEvent(enum event_t event);
+void statemachine_handleEvent();
 
 void statemachine();
 
