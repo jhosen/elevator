@@ -111,9 +111,9 @@ static struct peer peer_object(int socket, in_addr_t ip);
 
 static int nw_add(struct peer new);
 
-static int activate(struct peer p);
+static int nw_activate(struct peer p);
 
-static int deactivate(struct peer p);
+static int nw_deactivate(struct peer p);
 
 static int nw_rm(struct peer p);
 

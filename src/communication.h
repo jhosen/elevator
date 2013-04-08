@@ -37,14 +37,7 @@
 
 #define FLOORS 4
 
-/*
-struct orders{
 
-	int panel_cmd[FLOORS];
-	int panel_up[FLOORS];
-	int panel_down[FLOORS];
-};
-*/
 struct msg {
 	int msgtype;
 	in_addr_t from;
@@ -60,16 +53,7 @@ struct state{
 	int direction;
 	int internal_state;
 };
-/*
-struct information{
-	// Add the info you would like to have present.
-	// *  :information about the others on network
-	// * This is used by network.c
-	//
-	int active;
-	struct state current_state;
-	struct orders current_orders;
-};*/
+
 
 void handle_msg(struct msg package, struct timeval *ttime);
 void send_msg(int msgtype, int to,  int orders[][N_PANELS], int direction, int floor, int gpdata[]);

@@ -31,63 +31,64 @@ void stop_elevator(){
 	elev_set_speed(0);
 }
 
-void stop_lamp_on(){
-	elev_set_stop_lamp(1);
-}
-
-void stop_lamp_off(){
-	elev_set_stop_lamp(0);
-}
-
-void set_floor_light(){
-	elev_set_floor_indicator(elev_get_floor_sensor_signal());
-}
-
-int check_stop(){
-	return elev_get_stop_signal();
-}
-
-int check_obstruction(){
-	return elev_get_obstruction_signal();
-}
-
-int get_position(){
-	return elev_get_floor_sensor_signal();
-}
-
-void close_door(){
-	elev_set_door_open_lamp(0);     
-}
-
-int init_test() {
-	return elev_init();
-}
+//void stop_lamp_on(){
+//	elev_set_stop_lamp(1);
+//}
+//
+//void stop_lamp_off(){
+//	elev_set_stop_lamp(0);
+//}
+//
+//void set_floor_light(){
+//	elev_set_floor_indicator(elev_get_floor_sensor_signal());
+//}
+//
+//int check_stop(){
+//	return elev_get_stop_signal();
+//}
+//
+//int check_obstruction(){
+//	return elev_get_obstruction_signal();
+//}
+//
+//int get_position(){
+//	return elev_get_floor_sensor_signal();
+//}
+//
+//void close_door(){
+//	elev_set_door_open_lamp(0);
+//}
+//
+//int init_test() {
+//	return elev_init();
+//}
 
 /*********************************** Functions ***********************************************/
 
-int control_new_floor(){
-	int new_floor=get_position();
-	if(new_floor!=BETWEEN_FLOORS){      						//If being at a defined floor
-	    set_last_pass_floor_dir(last_dir);						//last_pass_floor_dir is updated.
-	    if(new_floor!=get_last_floor() || newly_emergency ||dragged_out){        //If the elevator has reached new floor or someone has recently pushed the STOP_BUTTON,
-			set_last_floor(new_floor);							//and last_floor is updated.
-            set_newly_emergency(0);				                //If elevator is stopped at floor, there is no need for newly_emergency flag for detecting new floors, because floor is defined.
-			set_dragged_out(0);
+//int control_new_floor(){
+//	int new_floor=get_position();
+//	if(new_floor!=BETWEEN_FLOORS){      						//If being at a defined floor
+//	    set_last_pass_floor_dir(last_dir);						//last_pass_floor_dir is updated.
+//	    if(new_floor!=get_last_floor() || newly_emergency ||dragged_out){        //If the elevator has reached new floor or someone has recently pushed the STOP_BUTTON,
+//			set_last_floor(new_floor);							//and last_floor is updated.
+//            set_newly_emergency(0);				                //If elevator is stopped at floor, there is no need for newly_emergency flag for detecting new floors, because floor is defined.
+//			set_dragged_out(0);
+//
+//			//void send_msg(int msgtype, in_addr_t to, int orders[][N_PANELS], int direction, int floor, int gpdata[]);
+//			int orders[FLOORS][N_PANELS];
+//			int gp[1];
+//
+//			send_msg(OPCODE_ELEVSTATE, 0, orders, last_dir, new_floor, gp );//<---
+//            return 1;
+//	    }
+//	}
+//
+//	return 0;
+//}
 
-			//void send_msg(int msgtype, in_addr_t to, int orders[][N_PANELS], int direction, int floor, int gpdata[]);
-			int orders[FLOORS][N_PANELS];
-			int gp[1];
-
-			send_msg(OPCODE_ELEVSTATE, 0, orders, last_dir, new_floor, gp );//<---
-            return 1;
-	    }
-	}
-
-	return 0;
-}
-
-void control_slow_down(int current_speed) {
-	elev_set_speed(-current_speed);	
+void control_slow_down() {
+	int current_speed = io_read_analog(0);
+	elev_set_speed(2048-current_speed);
 	usleep(SLOW_DOWN_TIME);
 	stop_elevator();
 }

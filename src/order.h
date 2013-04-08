@@ -32,6 +32,8 @@ void order_add();
 int orders_above(int current_floor);
 int orders_below(int current_floor);
 
+int should_stop();
+
 //Handle_button_lamps control all panel lights. 									
 void order_handle_button_lamps();
 
@@ -39,6 +41,8 @@ void order_handle_button_lamps();
 void order_print(void);
 
 void order_print_list(int orders[][N_PANELS]);
+
+void ordertablemerge(int ordto[][N_PANELS], int ordfrom[][N_PANELS], enum panel_type panel);
 
 /* Linked list for keeping track of all elevators online */
 #define FLOORS 4
@@ -83,15 +87,26 @@ static int rm(struct node* root, struct node n);
 
 static int find(struct node * root, struct node n);
 
+struct node * get(struct node * root, struct node n);
+
+void activate(struct node * root, struct node n);
+
+void deactivate(struct node * root, struct node n);
+
+void activateelev(struct elevator elev);
+
+void deactivateelev(struct elevator elev);
 
 void order_add_order(struct order ord);
 
-
+void cleartable(int table[][N_PANELS]);
 
 
 #define PANEL_CMD 2
 #define PANEL_UP 0
 #define PANEL_DOWN 1
+
+struct node * gethead();
 
 struct node * getelevnode(struct elevator elev);
 

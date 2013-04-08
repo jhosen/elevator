@@ -9,22 +9,25 @@ int main (int argc, const char * argv[]) {
 
     // insert code here...
     printf("Hello, World!\n");
-
+    elev_init();
+    elev_reset_all_lamps();
     network_init();
 	init_order(inet_addr(getlocalip()));
 
-	if(!statemachine_initialize()) {
-			printf("Unable to initialize elevator hardware\n");
-			return(0);
-	}
-	while (1) {
-		//system("clear");
-		//statemachine_print_state();
-		//order_print();
-		order_add();
-		order_handle_button_lamps();
-		statemachine(statemachine_get_event());
-	}
+	operator_init();
+	statemachine();
+//	if(!statemachine_init()) {
+//			printf("Unable to initialize elevator hardware\n");
+//			return(0);
+//	}
+//	while (1) {
+//		//system("clear");
+//		//statemachine_print_state();
+//		//order_print();
+//		order_add();
+//		order_handle_button_lamps();
+//		statemachine(statemachine_get_event());
+//	}
 
 
 

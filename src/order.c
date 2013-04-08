@@ -7,9 +7,13 @@
 
 static struct node head;
 
+struct node * gethead(){
+	return &head;
+}
 
 void init_order(in_addr_t this_ip){
 	head.elevinfo.ip = this_ip;
+	head.elevinfo.active = 1;
 	initlist(&head);
 }
 
@@ -66,9 +70,21 @@ int add(struct node * root, struct node * new){
 	}
 	iter->next  	= 0;
 	iter->prev		= prev;
+	iter->elevinfo.active = 1;
+	cleartable(iter->elevinfo.current_orders);
 	return 1; // success
     
 }
+
+void cleartable(int table[][N_PANELS]){
+	int floor, panel;
+	for(floor = 0; floor < N_FLOORS; floor ++){
+		for(panel = 0; panel<N_PANELS; panel ++){
+			table[floor][panel] = 0;
+		}
+	}
+}
+
 
 int rm(struct node* root, struct node n){
 	struct node * iter, *prev, *tmp;
@@ -105,7 +121,24 @@ int find(struct node * root, struct node n){
 	}
 	return 0;
 }
+void activate(struct node * root, struct node n){
+	struct node * np = get(root, n);
+	np->elevinfo.active = 1;
+}
 
+void deactivate(struct node * root, struct node n){
+	struct node * np = get(root, n);
+	np->elevinfo.active = 0;
+}
+
+void activateelev(struct elevator elev){
+	struct node * n = getelevnode(elev);
+	n->elevinfo.active = 1;
+}
+void deactivateelev(struct elevator elev){
+	struct node * n = getelevnode(elev);
+	n->elevinfo.active = 0;
+}
 struct node * get(struct node * root, struct node n){
 	struct node * iter;
 	iter = root;
@@ -141,6 +174,22 @@ void addorder(struct node * elevnode, struct order ordr){
 }
 
 
+void ordertablemerge(int ordto[][N_PANELS], int ordfrom[][N_PANELS], enum panel_type panel){
+	int floor;
+	if(panel == ALL){
+		for(floor=0; floor < N_FLOORS; floor++){
+			for(panel = CALL_UP; panel <=COMMAND; panel++){
+				ordto[floor][panel] |= ordfrom[floor][panel];
+			}
+		}
+	}
+	else{
+		for(floor=0; floor < N_FLOORS; floor++){
+			ordto[floor][panel] |= ordfrom[floor][panel];
+		}
+	}
+}
+
 /*****************************          Variables:      **********************************/
 
 
@@ -169,11 +218,37 @@ void set_last_floor(int floor){
 
 /******************************* Check table functions ******************************************/
 
-int order_check_request_current_floor(enum panel_type panel){
-	int current_floor = elev_get_floor_sensor_signal();
+int should_stop(){
+	enum panel_type panel = ALL;
+	int current_floor = getcurrentpos();
 	if(current_floor==BETWEEN_FLOORS) 
 	    return 0;
 	
+	/* Wants to check all panels: */
+	if(panel==ALL && last_pass_floor_dir==UP){
+		if(head.elevinfo.current_orders[current_floor][COMMAND] || head.elevinfo.current_orders[current_floor][CALL_UP]) {
+			return 1;
+		}
+		else if(!order_check_request_above(ALL))
+			return 1;
+	}
+	else if(panel==ALL && last_pass_floor_dir==DOWN) {
+		if(head.elevinfo.current_orders[current_floor][COMMAND] || head.elevinfo.current_orders[current_floor][CALL_DOWN]) {
+						return 1;
+		}
+		else if(!order_check_request_below(ALL))
+			return 1;
+	}
+	else
+		return(head.elevinfo.current_orders[current_floor][panel]);
+	return 0;
+}
+
+int order_check_request_current_floor(enum panel_type panel){
+	int current_floor = getcurrentpos();
+	if(current_floor==BETWEEN_FLOORS)
+	    return 0;
+
 	/* Wants to check all panels: */
 	if(panel==ALL && last_pass_floor_dir==UP){
 		if(head.elevinfo.current_orders[current_floor][COMMAND] || head.elevinfo.current_orders[current_floor][CALL_UP]) {
@@ -191,7 +266,7 @@ int order_check_request_current_floor(enum panel_type panel){
 }
 
 int order_check_request_above(enum panel_type panel){
-	int current_floor = elev_get_floor_sensor_signal();
+	int current_floor = getcurrentpos();
 	if(current_floor==BETWEEN_FLOORS){			        //This would be of interest if elevator is stopped between two floors due to emergency.
 	    if(last_pass_floor_dir==UP){                    //Means elevator is between last_floor and last_floor+1
 	        current_floor = last_floor;					//Then the checks are to be done relative to floor recently passed.
@@ -218,7 +293,7 @@ int order_check_request_above(enum panel_type panel){
 }
 
 int order_check_request_below(enum panel_type panel){
-	int current_floor = elev_get_floor_sensor_signal();
+	int current_floor = getcurrentpos();
 	if(current_floor==BETWEEN_FLOORS){					//This would be of interest if elevator is stopped between two floors due to emergency.
 	    if(last_pass_floor_dir==UP){					
 	        current_floor = last_floor+1;   			//Then the checks are to be done relative to floor above elevator.
@@ -248,44 +323,44 @@ int order_check_request_below(enum panel_type panel){
 void order_add_order(struct order ord){
 	head.elevinfo.current_orders[ord.floor][ord.paneltype] = 1;
 }
-void order_add() {
-	int floor = 0;
-	for(floor=0; floor<N_FLOORS; floor++) {
-		if(elev_get_button_signal(BUTTON_COMMAND, floor)) {	
-			head.elevinfo.current_orders[floor][PANEL_CMD] = 1;
-			//head.elevinfo.current_orders[floor][COMMAND]=1;
-			int or[FLOORS][N_PANELS];// = {0};
-			int gp[] = {floor, PANEL_CMD};
-			send_msg(OPCODE_NEWORDER, head.elevinfo.ip, or, 0, 0, gp);
-			// <----- SEND ORDERS
-		}
-		if(floor!=N_FLOORS-1 && elev_get_button_signal(BUTTON_CALL_UP, floor)) {	//There are no BUTTON_CALL_UP in the highest floor.	
-			//head.elevinfo.current_orders[floor][CALL_UP] = 1;
-			int or[FLOORS][N_PANELS];// = {0};
-			struct order neworder = {
-					.floor = floor,
-					.paneltype = PANEL_UP,
-			};
-			struct node * n = weightfunction(&head, neworder);
-			n->elevinfo.current_orders[neworder.floor][neworder.paneltype] = 1;
-			int gp[] = {floor, PANEL_UP};
-			send_msg(OPCODE_NEWORDER, n->elevinfo.ip, or, 0, 0, gp);
-		}
-		if(floor!=0 && elev_get_button_signal(BUTTON_CALL_DOWN, floor)) {			//There are no BUTTON_CALL_DOWN in the lowest floor.	
-			int or[FLOORS][N_PANELS];// = {0};
-			struct order neworder = {
-					.floor = floor,
-					.paneltype = PANEL_DOWN,
-			};
-			struct node * n = weightfunction(&head, neworder);
-			n->elevinfo.current_orders[neworder.floor][neworder.paneltype] = 1;
-			//head.elevinfo.current_orders[floor][CALL_DOWN] = 1;
-			int gp[] = {floor, PANEL_DOWN};
-			send_msg(OPCODE_NEWORDER, n->elevinfo.ip, or, 0, 0, gp);
-		}		
-	}
-}
-
+//void order_add() {
+//	int floor = 0;
+//	for(floor=0; floor<N_FLOORS; floor++) {
+//		if(elev_get_button_signal(BUTTON_COMMAND, floor)) {
+//			head.elevinfo.current_orders[floor][PANEL_CMD] = 1;
+//			//head.elevinfo.current_orders[floor][COMMAND]=1;
+//			int or[FLOORS][N_PANELS];// = {0};
+//			int gp[] = {floor, PANEL_CMD};
+//			send_msg(OPCODE_NEWORDER, head.elevinfo.ip, or, 0, 0, gp);
+//			// <----- SEND ORDERS
+//		}
+//		if(floor!=N_FLOORS-1 && elev_get_button_signal(BUTTON_CALL_UP, floor)) {	//There are no BUTTON_CALL_UP in the highest floor.
+//			//head.elevinfo.current_orders[floor][CALL_UP] = 1;
+//			int or[FLOORS][N_PANELS];// = {0};
+//			struct order neworder = {
+//					.floor = floor,
+//					.paneltype = PANEL_UP,
+//			};
+//			struct node * n = weightfunction(&head, neworder);
+//			n->elevinfo.current_orders[neworder.floor][neworder.paneltype] = 1;
+//			int gp[] = {floor, PANEL_UP};
+//			send_msg(OPCODE_NEWORDER, n->elevinfo.ip, or, 0, 0, gp);
+//		}
+//		if(floor!=0 && elev_get_button_signal(BUTTON_CALL_DOWN, floor)) {			//There are no BUTTON_CALL_DOWN in the lowest floor.
+//			int or[FLOORS][N_PANELS];// = {0};
+//			struct order neworder = {
+//					.floor = floor,
+//					.paneltype = PANEL_DOWN,
+//			};
+//			struct node * n = weightfunction(&head, neworder);
+//			n->elevinfo.current_orders[neworder.floor][neworder.paneltype] = 1;
+//			//head.elevinfo.current_orders[floor][CALL_DOWN] = 1;
+//			int gp[] = {floor, PANEL_DOWN};
+//			send_msg(OPCODE_NEWORDER, n->elevinfo.ip, or, 0, 0, gp);
+//		}
+//	}
+//}
+//
 
 void order_empty(enum panel_type panel){
 	int floor = 0;
@@ -306,20 +381,22 @@ void order_empty(enum panel_type panel){
 
 
 void order_reset_current_floor(){
-	int floor = elev_get_floor_sensor_signal();
+	int floor = getcurrentpos();
 	if(floor!=BETWEEN_FLOORS){
 		head.elevinfo.current_orders[floor][COMMAND]=0;
 		// SEND COMMAND DONE
 		int gp[] = {floor, PANEL_CMD};
 		int or[FLOORS][N_PANELS];
 		send_msg(OPCODE_ORDERDONE, head.elevinfo.ip, or, 0, 0, gp);
-
+		elev_set_button_lamp(ELEV_DIR_COMMAND, floor, 0);
 	    if(last_pass_floor_dir == UP) {
 		    head.elevinfo.current_orders[floor][CALL_UP]=0;
 		    // SEND CALLUP
 			int gp[] = {floor, PANEL_UP};
 			int or[FLOORS][N_PANELS];
 			send_msg(OPCODE_ORDERDONE, head.elevinfo.ip, or, 0, 0, gp);
+			elev_set_button_lamp(ELEV_DIR_UP, floor, 0);
+
 
 		    if(!(orders_above(floor))) {
 		    	head.elevinfo.current_orders[floor][CALL_DOWN]=0;
@@ -327,6 +404,7 @@ void order_reset_current_floor(){
 				int gp[] = {floor, PANEL_DOWN};
 				int or[FLOORS][N_PANELS];
 				send_msg(OPCODE_ORDERDONE, head.elevinfo.ip, or, 0, 0, gp);
+				elev_set_button_lamp(ELEV_DIR_DOWN, floor, 0);
 
 		    }
 	    }
@@ -336,17 +414,18 @@ void order_reset_current_floor(){
 			int gp[] = {floor, PANEL_DOWN};
 			int or[FLOORS][N_PANELS];
 			send_msg(OPCODE_ORDERDONE, head.elevinfo.ip, or, 0, 0, gp);
-
+			elev_set_button_lamp(ELEV_DIR_DOWN, floor, 0);
 	    	if(!(orders_below(floor))) {
 	    		head.elevinfo.current_orders[floor][CALL_UP]=0;
 	    		//SENDCALLUP
 	    		int gp[] = {floor, PANEL_UP};
 	    		int or[FLOORS][N_PANELS];
 	    		send_msg(OPCODE_ORDERDONE, head.elevinfo.ip, or, 0, 0, gp);
-
+	    		elev_set_button_lamp(ELEV_DIR_UP, floor, 0);
 	    	}
 	    }
 	}
+
 }
 
 int orders_above(int c_floor) {
@@ -383,20 +462,20 @@ int orders_below(int c_floor) {
 
 /***************************** Other functions *******************************************/
 
-void order_handle_button_lamps(){
-    int floor = 0;
-    int button = 0;
-	for(floor = 0; floor < N_FLOORS; floor++){
-	    for(button = BUTTON_CALL_UP; button<=BUTTON_COMMAND; button++){
-			if(!((floor==0 && button==BUTTON_CALL_DOWN) || (floor==N_FLOORS-1 && button==BUTTON_CALL_UP))){ 	//Not considering invalid buttons.
-			    if(head.elevinfo.current_orders[floor][button]==0)																//Button and panel is represented by corresponding numbers", so we can take button as input for head.elevinfo.current_orders[][]
-			       elev_set_button_lamp(button,floor,0);
-			    else    
-			       elev_set_button_lamp(button, floor, 1);
-		    }		
-	    }
-    }
-}
+//void order_handle_button_lamps(){
+//    int floor = 0;
+//    int button = 0;
+//	for(floor = 0; floor < N_FLOORS; floor++){
+//	    for(button = BUTTON_CALL_UP; button<=BUTTON_COMMAND; button++){
+//			if(!((floor==0 && button==BUTTON_CALL_DOWN) || (floor==N_FLOORS-1 && button==BUTTON_CALL_UP))){ 	//Not considering invalid buttons.
+//			    if(head.elevinfo.current_orders[floor][button]==0)																//Button and panel is represented by corresponding numbers", so we can take button as input for head.elevinfo.current_orders[][]
+//			       elev_set_button_lamp(button,floor,0);
+//			    else
+//			       elev_set_button_lamp(button, floor, 1);
+//		    }
+//	    }
+//    }
+//}
 
 void order_print(void){							
 	printf("|	C_UP	|C_DOWN	|COMMAND|\n");	
@@ -445,63 +524,69 @@ struct node * weightfunction(struct node* root, struct order new_order) {
 	int ordered_floor = new_order.floor;
 	int current_floor, current_dir;
 	while(iter!=0) {
-		weight[current] = 0;
-		printf("elev %i -weight:%i\n", iter->elevinfo.ip, weight[current]);
-		//Add weight if elevator has order to floors (different weighting for different floors)
-		for(floor_counter=0;floor_counter<N_FLOORS; floor_counter++) {
-			if(iter->elevinfo.current_orders[floor_counter][PANEL_CMD]) {
-				if(floor_counter == ordered_floor) {
-					weight[current]-=10;
+		if(iter->elevinfo.active){
+			weight[current] = 0;
+			printf("elev %i -weight:%i\n", iter->elevinfo.ip, weight[current]);
+			//Add weight if elevator has order to floors (different weighting for different floors)
+			for(floor_counter=0;floor_counter<N_FLOORS; floor_counter++) {
+				if(iter->elevinfo.current_orders[floor_counter][PANEL_CMD]) {
+					if(floor_counter == ordered_floor) {
+						weight[current]-=10;
+					}
+					else {
+						weight[current]+=3;
+					}
 				}
-				else {
-					weight[current]+=3;
+				if(floor_counter<N_FLOORS-1 && iter->elevinfo.current_orders[floor_counter][PANEL_UP]) {
+					if(floor_counter == ordered_floor) {
+						weight[current]-=5;
+					}
+					else {
+						weight[current]+=3;
+					}
+				}
+				if(floor_counter>0 && iter->elevinfo.current_orders[floor_counter][PANEL_DOWN]) {
+					if(floor_counter == ordered_floor) {
+						weight[current]-=5;
+					}
+					else {
+						weight[current]+=3;
+					}
 				}
 			}
-			if(floor_counter<N_FLOORS-1 && iter->elevinfo.current_orders[floor_counter][PANEL_UP]) {
-				if(floor_counter == ordered_floor) {
-					weight[current]-=5;
+			printf("elev %i -weight:%i\n", iter->elevinfo.ip, weight[current]);
+			//Add weight based on the number of floors the elevator will pass before reaching the ordered floor
+			current_floor = iter->elevinfo.current_state.floor;
+			current_dir = iter->elevinfo.current_state.direction;
+			if(current_dir==DOWN) {
+				if(ordered_floor>current_floor) {
+					weight[current]+=(3*(current_floor*2+(ordered_floor-current_floor)));
 				}
-				else {
-					weight[current]+=3;
+				else if(ordered_floor<current_floor) {
+					weight[current]+=(3*(current_floor-ordered_floor));
+				}
+				printf("elev %i -weight:%i\n", iter->elevinfo.ip, weight[current]);
+			}
+			else if(current_dir==UP) {
+				if(ordered_floor>current_floor) {
+					weight[current]+=(3*(ordered_floor-current_floor));
+				}
+				else if(ordered_floor<current_floor) {
+					weight[current]+=(3*(2*(N_FLOORS-current_floor)+(current_floor-ordered_floor)));
 				}
 			}
-			if(floor_counter>0 && iter->elevinfo.current_orders[floor_counter][PANEL_DOWN]) {
-				if(floor_counter == ordered_floor) {
-					weight[current]-=5;
-				}
-				else {
-					weight[current]+=3;
-				}
-			}
-		}
-		printf("elev %i -weight:%i\n", iter->elevinfo.ip, weight[current]);
-		//Add weight based on the number of floors the elevator will pass before reaching the ordered floor
-		current_floor = iter->elevinfo.current_state.floor;
-		current_dir = iter->elevinfo.current_state.direction;
-		if(current_dir==DOWN) {
-			if(ordered_floor>current_floor) {
-				weight[current]+=(3*(current_floor*2+(ordered_floor-current_floor)));
-			}
-			else if(ordered_floor<current_floor) {
-				weight[current]+=(3*(current_floor-ordered_floor));
+			printf("elev %i - weight: %i\n", iter->elevinfo.ip, weight[current]);
+			if(weight[current]<lowest_weight){
+				lowest_weight = weight[current];
+				best_elev = iter;
+				printf("NEW BESTelev %i -weight:%i\n", iter->elevinfo.ip, weight[current]);
 			}
 			printf("elev %i -weight:%i\n", iter->elevinfo.ip, weight[current]);
 		}
-		else if(current_dir==UP) {
-			if(ordered_floor>current_floor) {
-				weight[current]+=(3*(ordered_floor-current_floor));
-			}
-			else if(ordered_floor<current_floor) {
-				weight[current]+=(3*(2*(N_FLOORS-current_floor)+(current_floor-ordered_floor)));
-			}
+		else{
+			printf("Elev not active.\n");
+
 		}
-		printf("elev %i - weight: %i\n", iter->elevinfo.ip, weight[current]);
-		if(weight[current]<lowest_weight){
-			lowest_weight = weight[current];
-			best_elev = iter;
-			printf("NEW BESTelev %i -weight:%i\n", iter->elevinfo.ip, weight[current]);
-		}
-		printf("elev %i -weight:%i\n", iter->elevinfo.ip, weight[current]);
 		current++;
 		iter = iter->next;
 	}

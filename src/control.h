@@ -11,7 +11,7 @@
 int control_new_floor(void);
 
 /* Ensures a smooth stop in new floors. Slow down time might vary from elevator to elevator. */
-void control_slow_down(int current_speed); 	
+void control_slow_down();
 
 int control_time_is_out();
 

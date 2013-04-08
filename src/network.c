@@ -539,7 +539,7 @@ in_addr_t highest_ip(){
 	return highest;
 }
 
-int activate(struct peer p){
+int nw_activate(struct peer p){
 	struct peer * pp = nw_get(p);
 	if(pp!=0){
 		pp->active = TRUE;
@@ -549,7 +549,7 @@ int activate(struct peer p){
 
 }
 
-int deactivate(struct peer p){
+int nw_deactivate(struct peer p){
 	struct peer * pp = nw_get(p);
 	if(pp!=0){
 		pp->active = FALSE;

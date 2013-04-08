@@ -16,12 +16,8 @@
 void handle_msg(struct msg package, struct timeval *ttime){
 	if(ttime!=0)
 		gettimeofday(ttime,0);
-
-	//in_addr_t ip = package.from;
-	//struct peer *pp = get(peer_object(0, ip));
 	struct elevator elevto;
 	struct elevator elevfrom;
-	//struct order ordr;
 
 	elevto.ip = package.to;
 	elevfrom.ip = package.from;
@@ -31,38 +27,31 @@ void handle_msg(struct msg package, struct timeval *ttime){
 	elevfrom.current_state.direction = package.direction;
 
 #warning "Add a test for whether nto and nfrom is 0??";
-	/*int floor;
-	for(floor = 0; floor < FLOORS; floor ++){
-		elevto.current_orders[floor][PANEL_CMD] = package.orders[floor][PANEL_CMD];
-		elevto.current_orders[floor][PANEL_UP] = package.orders[floor][PANEL_UP];
-		elevto.current_orders[floor][PANEL_DOWN] = package.orders[floor][PANEL_DOWN];
-	}*/
+
 
 
 
 	switch (package.msgtype){
 	case OPCODE_NEWPEER:
-		elevto.ip = package.from;
-		addelev(elevto);
+		if(!getelevnode(elevfrom))
+			addelev(elevfrom);
+		else{
+			activateelev(elevfrom);
+			sendcommands(nfrom, nfrom->elevinfo.current_orders);
+			// Send commands!
+		}
 		break;
 	case OPCODE_IMALIVE:
 
 		break;
 	case OPCODE_NEWORDER:
-		/*ordr.floor 		= package.gpdata[0];
-		ordr.paneltype	= package.gpdata[1];*/
 		nto->elevinfo.current_orders[package.gpdata[0]][package.gpdata[1]] = 1;
+		elev_set_button_lamp(package.gpdata[1], package.gpdata[0], 1);
 		printf("Got new order for ip: %i\n", nto->elevinfo.ip);
-//		order_add_order(neworder);
-		//n.elevinfo = elev;
-
-		//addorder(getelevnode(n), neworder);
 		break;
 	case OPCODE_ORDERDONE:
-/*		neworder.floor 		= package.gpdata[0];
-		neworder.paneltype	= package.gpdata[1];*/
 		nto->elevinfo.current_orders[package.gpdata[0]][package.gpdata[1]] = 0;
-		//printf("Order was executed by ip: %i\n", nto->elevinfo.ip);
+		elev_set_button_lamp(package.gpdata[1], package.gpdata[0], 0);
 		break;
 	case OPCODE_BUTTONHIT:
 
@@ -80,21 +69,39 @@ void handle_msg(struct msg package, struct timeval *ttime){
 		break;
 	case OPCODE_NOOP:
 
-		//printf("Noop received.\n");
-
 		break;
 	case OPCODE_PEERLOSTTAKEOVER:
 		printf("Redirect tasks of the lost peer(ip:%i)\n", package.from);
-		//elev.ip = package.from;
-		rmelev(elevfrom);
+		order_print_list(nto->elevinfo.current_orders);
+		order_print_list(nfrom->elevinfo.current_orders);
+		ordertablemerge(nto->elevinfo.current_orders, nfrom->elevinfo.current_orders, CALL_UP);
+		ordertablemerge(nto->elevinfo.current_orders, nfrom->elevinfo.current_orders, CALL_DOWN);
+
+		//rmelev(elevfrom);
+		deactivateelev(elevfrom);
+		order_print_list(nto->elevinfo.current_orders);
 		break;
 	case OPCODE_PEERLOST:
-		//elev.ip = package.from;
-		rmelev(elevfrom);
+	//	rmelev(elevfrom);
+		deactivateelev(elevfrom);
 		break;
 	}
 }
+void sendcommands(struct node * n, int orderlist[][N_PANELS]){
+	int floor;
+	int ordummy[] = {0};
+	int gp[2] = {0,0};
+	order_print_list(orderlist);
+	for(floor = 0; floor < FLOORS; floor ++){
+		if(orderlist[floor][COMMAND]){
+			gp[0] = floor;
+			gp[1] = COMMAND;
+			send_msg(OPCODE_NEWORDER, n->elevinfo.ip, ordummy, 0,0, gp);
+			printf("Sending command..\n");
+		}
+	}
 
+}
 void send_msg(int msgtype, int to, int orders[][N_PANELS], int direction, int floor, int gpdata[]){
 	struct msg packet = {
 			.msgtype = msgtype,
