@@ -12,6 +12,7 @@
 #include "elev.h"
 #include "communication.h"
 #include "statemachine.h"
+#include "control.h"
 
 static int activeobstr = 0;
 int current_pos;
@@ -57,7 +58,7 @@ void operator_callback_button(int floor, int value){
 	int or[FLOORS][N_PANELS];
 	// Broadcast updated new order to all elev on network
 	send_msg(OPCODE_NEWORDER, n->elevinfo.ip, or, 0, 0, gp);
-	elev_set_button_lamp(value, floor, 1);
+	//elev_set_button_lamp(value, floor, 1);
 }
 
 
@@ -66,6 +67,11 @@ void operator_callback_sensor(int floor, int value){
 		// Entering floor
 		elev_set_floor_indicator(floor);
 		set_last_floor(floor);
+		if(floor == FLOORS-1)
+			set_last_dir(DOWN);
+		else if(floor == 0)
+			set_last_dir(UP);
+
 		current_pos = floor;
 		set_event(FLOORSENSOR);
 		printf("FLOORSENSOR\n");
@@ -108,25 +114,36 @@ void operator_callback_obstr(int floor, int value){
 /* execute orders based on priority
  *
  */
-void handle_request(){
+int prioritized_dir(){
 	//Check if there is a request at current floor in right direction.
 	if(order_check_request_current_floor(ALL)) {
-		//do nothing, this is handled in EXECUTE-state.
-		;
+		return 0;
 	}
-	//Check if there is a prioritized request above
-	else if( order_check_request_above(ALL) && (get_last_dir()==UP || !order_check_request_below(ALL)  )){
-		go_up();
-	}
-	//Check if there is a request in the current direction in current floor
-	else if( (get_last_dir()==DOWN && order_check_request_current_floor(CALL_DOWN) ) || (get_last_dir()==UP && order_check_request_current_floor(CALL_UP)) ){
-		;
-		//do nothing, this is handled in EXECUTE-state.
+	//Check if there is a request above
+	else if(order_check_request_above(ALL) && (get_last_dir()==UP)){
+		return 1;
 	}
 	//Check if there is an request below
-	else if(order_check_request_below(ALL)) {
-		go_down();
+	else if(order_check_request_below(ALL) && (get_last_dir()==DOWN)) {
+		return -1;
 	}
+	else if(order_check_request_above(ALL) && !(order_check_request_below(ALL))) {
+		return 1;
+	}
+	else if(order_check_request_below(ALL) && !(order_check_request_above(ALL))) {
+		return -1;
+	}
+	else{
+		return 0;
+	}
+}
+
+void set_direction() {
+	int pridir = prioritized_dir();
+	if(pridir==1) go_up();
+	else if(pridir==0);
+	else if(pridir==-1) go_down();
+	else;
 }
 
 int request_here(){
@@ -138,8 +155,8 @@ int request_here(){
 	else if( (order_check_request_above(ALL) && get_last_dir()==UP ) || (!order_check_request_below(ALL)) ){
 		return 0;
 	}
-	//Check if there is a request in the current direction in current floor
-	else if( (get_last_dir()==DOWN && order_check_request_current_floor(CALL_DOWN)) || (get_last_dir()==UP && order_check_request_current_floor(CALL_UP)) ){
+	//Check if there is a request in the opposite direction in current floor
+	else if( (get_last_dir()==DOWN && order_check_request_current_floor(CALL_UP)) || (get_last_dir()==UP && order_check_request_current_floor(CALL_DOWN)) ){
 		return 1;
 		//do nothing, this is handled in EXECUTE-state.
 	}

@@ -7,8 +7,6 @@
 int main (int argc, const char * argv[]) {
 
 
-    // insert code here...
-    printf("Hello, World!\n");
     elev_init();
     elev_reset_all_lamps();
     network_init();

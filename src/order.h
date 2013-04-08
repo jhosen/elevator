@@ -35,7 +35,7 @@ int orders_below(int current_floor);
 int should_stop();
 
 //Handle_button_lamps control all panel lights. 									
-void order_handle_button_lamps();
+void *order_handle_button_lamps();
 
 // Function available for service engineers for testing.
 void order_print(void);

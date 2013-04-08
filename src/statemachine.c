@@ -17,6 +17,9 @@ pthread_mutex_t eventMutex;
 
 void statemachine_init(){
 	pthread_mutex_init(&eventMutex, NULL);
+
+	static enum state_t state = IDLE;
+	static enum event_t event = NOEVENT;
 	if(elev_get_floor_sensor_signal()==BETWEEN_FLOORS){
 		go_down();
 		while(elev_get_floor_sensor_signal()==BETWEEN_FLOORS)
@@ -37,8 +40,8 @@ struct state_action_pair_t{
 /*nextState, action, guard*/
 struct state_action_pair_t stateTable[N_STATES][N_EVENTS] = {
 /* state|event:	NOEVENT						 			STOP_BUTTON						OBSTRUCTION								FLOORSENSOR*/
-/*IDLE		*/ 	{{EXECUTE, handle_request,requests},	{EM_STOP,	em_stop,	NULL},	{EM_OBSTR,	em_obstr,	obstr_on},		{DOOROPEN ,	opendoor,	atfloor		}	},
-/*EXECUTE	*/	{{DOOROPEN, opendoor,	request_here},	{EM_STOP,	em_stop,	NULL},	{EM_OBSTR,	em_obstr,	obstr_on}, 		{DOOROPEN , opendoor, 	should_stop} 	},
+/*IDLE		*/ 	{{EXECUTE, set_direction,requests},		{EM_STOP,	em_stop,	NULL},	{EM_OBSTR,	em_obstr,	obstr_on},		{DOOROPEN ,	opendoor,	atfloor		}	},
+/*EXECUTE	*/	{{DOOROPEN, opendoor,	should_stop},	{EM_STOP,	em_stop,	NULL},	{EM_OBSTR,	em_obstr,	obstr_on}, 		{DOOROPEN , opendoor, 	should_stop} 	},
 /*EM_STOP	*/	{{EM_STOP, NULL,	NULL},				{IDLE,		em_cancel,	NULL},	{EM_STOP,	NULL,		NULL}, 			{EM_STOP, NULL,	NULL} 					},
 /*EM_OBSTR	*/	{{EM_OBSTR, NULL,NULL},					{EM_OBSTR,	NULL,		NULL},	{IDLE,		closedoor,	obstr_off}, 	{EM_OBSTR, NULL, NULL} 					},
 /*DOOROPEN	*/ 	{{IDLE, closedoor,timeoutdoor},			{EM_STOP, 	em_stop, 	NULL},	{EM_OBSTR, 	em_obstr, 	obstr_on}, 		{IDLE, closedoor, betweenfloors}		},
@@ -46,6 +49,10 @@ struct state_action_pair_t stateTable[N_STATES][N_EVENTS] = {
 
 //table
 void statemachine_handleEvent(enum event_t event){
+//	if(event != get_event()){
+//		printf("State: %i, event: %i\n", state, event);
+//		system("clear");
+//	}
 	struct state_action_pair_t sap = stateTable[state][event];
 	set_event(NOEVENT);
 	if(sap.guard == NULL || sap.guard()){
@@ -62,11 +69,11 @@ void statemachine(){
 	statemachine_init();
 	int i = 0;
 	while(1){
-		if(event != 0){
+		/*if(event != 0){
 				printf("State: %i, event: %i\n", state, event);
 				i = 0;
 			}
-			i++;
+			i++;*/
 		statemachine_handleEvent(event);
 
 	}
@@ -228,7 +235,7 @@ enum event_t get_event(){
 //					order_reset_current_floor();
 //					break;
 //				case NOEVENT:
-//					order_reset_current_floor();
+//					order_reset_current_floor();last_pass_floor_dir
 //				    if(control_time_is_out() || get_position()==BETWEEN_FLOORS) {
 //						close_door();
 //       					printf("Door is closed \n");

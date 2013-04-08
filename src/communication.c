@@ -19,7 +19,7 @@ void handle_msg(struct msg package, struct timeval *ttime){
 	struct elevator elevto, elevfrom;
 	elevto.ip = package.to;
 	elevfrom.ip = package.from;
-    
+
 	struct node *nto = getelevnode(elevto);
 	struct node *nfrom=getelevnode(elevfrom);
 //	elevfrom.current_state.floor = package.floor;
@@ -34,8 +34,8 @@ void handle_msg(struct msg package, struct timeval *ttime){
                 addelev(elevfrom);
         }
 		else{    // Elevator has been connected earlier
-			activate(gethead(), nfrom);
-			recover_elev(nfrom, nfrom->elevinfo.current_orders); // Recover 
+			activate(gethead(), *nfrom);
+			recover_elev(nfrom, nfrom->elevinfo.current_orders); // Recover
 		}
 		break;
 	case OPCODE_IMALIVE:
@@ -77,19 +77,19 @@ void handle_msg(struct msg package, struct timeval *ttime){
 		ordertablemerge(nto->elevinfo.current_orders, nfrom->elevinfo.current_orders, CALL_DOWN);
 
 		//rmelev(elevfrom);
-		deactivate(gethead(), nfrom);
+		deactivate(gethead(), *nfrom);
         printf("This elev after merge: \n");
-            
+
         order_print_list(nto->elevinfo.current_orders);
 		break;
 	case OPCODE_PEERLOST:
 	//	rmelev(elevfrom);
-		deactivate(gethead(), nfrom);
+		deactivate(gethead(), *nfrom);
 		break;
 	}
 }
 
-/* !\brief Function containing recovery routine for elevator reconnected to network. 
+/* !\brief Function containing recovery routine for elevator reconnected to network.
  *
  *
  */
@@ -174,6 +174,7 @@ char * struct_to_byte(struct msg msg_struct){
 	}
 
 	char * msg = cJSON_Print(root);
+	cJSON_Delete(root);
 	return(msg);
 }
 
@@ -219,9 +220,11 @@ struct msg byte_to_struct(char *mesg){
 				msg_struct.gpdata[i] = dataiter->valueint;
 				dataiter = dataiter->next;
 			}
+			cJSON_Delete(root);
 			return(msg_struct);
 		}
 	}
 	msg_struct.msgtype = OPCODE_CORRUPT;
+	cJSON_Delete(root);
 	return msg_struct;
 }

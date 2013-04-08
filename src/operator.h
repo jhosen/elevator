@@ -44,7 +44,8 @@ int obstr_on();
 
 int obstr_off();
 
-void handle_request();
+int prioritized_dir();
+void set_direction();
 
 int request_here();
 

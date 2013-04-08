@@ -16,7 +16,7 @@ void init_order(in_addr_t this_ip){
 	head.elevinfo.active = 1;
     head.next 		= 0;
     head.prev		= 0;
-    
+
     /* Start thread for monitoring ordered floors and set lamps */
     pthread_t lamp_monitor;
     if ( (pthread_create(&lamp_monitor, NULL, order_handle_button_lamps, (void *) NULL)) < 0){
@@ -216,14 +216,14 @@ int should_stop(){
 	    return 0;
 	
 	/* Wants to check all panels: */
-	if(panel==ALL && last_pass_floor_dir==UP){
+	if(panel==ALL && get_last_dir()==UP){
 		if(head.elevinfo.current_orders[current_floor][COMMAND] || head.elevinfo.current_orders[current_floor][CALL_UP]) {
 			return 1;
 		}
 		else if(!order_check_request_above(ALL))
 			return 1;
 	}
-	else if(panel==ALL && last_pass_floor_dir==DOWN) {
+	else if(panel==ALL && get_last_dir()==DOWN) {
 		if(head.elevinfo.current_orders[current_floor][COMMAND] || head.elevinfo.current_orders[current_floor][CALL_DOWN]) {
 						return 1;
 		}
@@ -241,12 +241,12 @@ int order_check_request_current_floor(enum panel_type panel){
 	    return 0;
 
 	/* Wants to check all panels: */
-	if(panel==ALL && last_pass_floor_dir==UP){
+	if(panel==ALL && get_last_dir()==UP){
 		if(head.elevinfo.current_orders[current_floor][COMMAND] || head.elevinfo.current_orders[current_floor][CALL_UP]) {
 			return 1;
 		}
 	}
-	else if(panel==ALL && last_pass_floor_dir==DOWN) {
+	else if(panel==ALL && get_last_dir()==DOWN) {
 		if(head.elevinfo.current_orders[current_floor][COMMAND] || head.elevinfo.current_orders[current_floor][CALL_DOWN]) {
 						return 1;
 		}
@@ -342,25 +342,40 @@ void order_reset_current_floor(){
 		int gp[] = {floor, PANEL_CMD};
 		int or[FLOORS][N_PANELS];
 		send_msg(OPCODE_ORDERDONE, head.elevinfo.ip, or, 0, 0, gp);
-		elev_set_button_lamp(ELEV_DIR_COMMAND, floor, 0);
-	    if(last_pass_floor_dir == UP) {
+		//elev_set_button_lamp(ELEV_DIR_COMMAND, floor, 0);
+
+		if(head.elevinfo.current_orders[floor][CALL_UP]!=head.elevinfo.current_orders[floor][CALL_DOWN] ){
+			if(head.elevinfo.current_orders[floor][CALL_UP] ){
+				head.elevinfo.current_orders[floor][CALL_UP] = 0;
+				int gp[] = {floor, CALL_UP};
+				int or[FLOORS][N_PANELS];
+				send_msg(OPCODE_ORDERDONE, head.elevinfo.ip, or, 0, 0, gp);
+			}
+			else{
+				head.elevinfo.current_orders[floor][CALL_DOWN] = 0;
+				int gp[] = {floor, CALL_DOWN};
+				int or[FLOORS][N_PANELS];
+				send_msg(OPCODE_ORDERDONE, head.elevinfo.ip, or, 0, 0, gp);
+			}
+		}
+		else if(get_last_dir() == UP) {
 		    head.elevinfo.current_orders[floor][CALL_UP]=0;
 		    // SEND CALLUP
 			int gp[] = {floor, PANEL_UP};
 			int or[FLOORS][N_PANELS];
 			send_msg(OPCODE_ORDERDONE, head.elevinfo.ip, or, 0, 0, gp);
-			elev_set_button_lamp(ELEV_DIR_UP, floor, 0);
+			//elev_set_button_lamp(ELEV_DIR_UP, floor, 0);
 
 
-		    if(!(orders_above(floor))) {
-		    	head.elevinfo.current_orders[floor][CALL_DOWN]=0;
-		    	// SEND CALLDWN
-				int gp[] = {floor, PANEL_DOWN};
-				int or[FLOORS][N_PANELS];
-				send_msg(OPCODE_ORDERDONE, head.elevinfo.ip, or, 0, 0, gp);
-				elev_set_button_lamp(ELEV_DIR_DOWN, floor, 0);
-
-		    }
+//		    if(!(orders_above(floor))) {
+//		    	head.elevinfo.current_orders[floor][CALL_DOWN]=0;
+//		    	// SEND CALLDWN
+//				int gp[] = {floor, PANEL_DOWN};
+//				int or[FLOORS][N_PANELS];
+//				send_msg(OPCODE_ORDERDONE, head.elevinfo.ip, or, 0, 0, gp);
+//				elev_set_button_lamp(ELEV_DIR_DOWN, floor, 0);
+//
+//		    }
 	    }
 	    else {
 	    	head.elevinfo.current_orders[floor][CALL_DOWN] =0;
@@ -368,15 +383,15 @@ void order_reset_current_floor(){
 			int gp[] = {floor, PANEL_DOWN};
 			int or[FLOORS][N_PANELS];
 			send_msg(OPCODE_ORDERDONE, head.elevinfo.ip, or, 0, 0, gp);
-			elev_set_button_lamp(ELEV_DIR_DOWN, floor, 0);
-	    	if(!(orders_below(floor))) {
-	    		head.elevinfo.current_orders[floor][CALL_UP]=0;
-	    		//SENDCALLUP
-	    		int gp[] = {floor, PANEL_UP};
-	    		int or[FLOORS][N_PANELS];
-	    		send_msg(OPCODE_ORDERDONE, head.elevinfo.ip, or, 0, 0, gp);
-	    		elev_set_button_lamp(ELEV_DIR_UP, floor, 0);
-	    	}
+			//elev_set_button_lamp(ELEV_DIR_DOWN, floor, 0);
+//	    	if(!(orders_below(floor))) {
+//	    		head.elevinfo.current_orders[floor][CALL_UP]=0;
+//	    		//SENDCALLUP
+//	    		int gp[] = {floor, PANEL_UP};
+//	    		int or[FLOORS][N_PANELS];
+//	    		send_msg(OPCODE_ORDERDONE, head.elevinfo.ip, or, 0, 0, gp);
+//	    		elev_set_button_lamp(ELEV_DIR_UP, floor, 0);
+//	    	}
 	    }
 	}
 
@@ -417,31 +432,32 @@ int orders_below(int c_floor) {
 /***************************** Other functions *******************************************/
 
 
-/* !\brief Routine for monitoring ordered floors for setting button lamps. 
+/* !\brief Routine for monitoring ordered floors for setting button lamps.
  *
  */
 void *order_handle_button_lamps(){
-    int floor, panel
+    int floor, panel;
     struct node * iter = &head;
-    
+
     while(1){
-        
+
         /* Loop command orders on local elevator */
-        panel = COMMAND; 
+        panel = COMMAND;
         for(floor = 0; floor < FLOORS; floor++){
             if(iter->elevinfo.current_orders[floor][panel]==1)
                 elev_set_button_lamp(panel,floor,1);
             else
                 elev_set_button_lamp(panel, floor, 0);
         }
-        
+
         /* Loop call up and call down */
         while(iter!=0){
             for(floor = 0; floor < FLOORS; floor++){
-                for(panel = CALL_UP; panel<COMMAND; panel++){ 
+                for(panel = CALL_UP; panel<COMMAND; panel++){
                     if(!((floor==0 && panel==CALL_DOWN) || (floor==N_FLOORS-1 && panel==CALL_UP))){ 	//Not considering invalid buttons.
-                        if(iter->elevinfo.current_orders[floor][panel]==1)
+                        if(iter->elevinfo.current_orders[floor][panel]==1){
                             elev_set_button_lamp(panel,floor,1);
+                        }
                         else
                             elev_set_button_lamp(panel, floor, 0);
                     }
@@ -451,7 +467,7 @@ void *order_handle_button_lamps(){
         }
 
         /* Restart scan */
-        iter = &head; 
+        iter = &head;
     }
 }
 
