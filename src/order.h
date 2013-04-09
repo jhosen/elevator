@@ -46,9 +46,9 @@ void set_last_pass_floor_dir(enum direction_t dir);
 /*************************************************** Functions ***********************************************/
 
 // Checks if there are orders at, above or below elevator. When argument is, all panels are checked.
-int order_check_request_current_floor(enum panel_type panel);
-int order_check_request_above(enum panel_type panel);
-int order_check_request_below(enum panel_type panel);
+int order_check_request_current_floor();
+int order_check_request_above();
+int order_check_request_below();
                                             		   
 void order_empty(enum panel_type panel);
 
@@ -77,10 +77,6 @@ void order_register_as_done(int floor, int panel);
                      
 void order_add();
 
-int orders_above(int current_floor);
-int orders_below(int current_floor);
-
-
 //Handle_button_lamps control all panel lights. 									
 void *order_handle_button_lamps();
 
@@ -99,13 +95,13 @@ static void initlist(struct node * root);
 
 static int printlist(struct node * root);
 
-static int count(struct node * root);
-
 static int add(struct node * root, struct node * new);
 
 static int rm(struct node* root, struct node n);
 
 static int find(struct node * root, struct node n);
+
+int count(struct node * root);
 
 struct node * get(struct node * root, struct node n);
 
@@ -121,6 +117,7 @@ void order_add_order(struct order ord);
 
 void cleartable(int table[][N_PANELS]);
 
+void clear_order_all_elev(int floor, int panel);
 
 #define PANEL_CMD 2
 #define PANEL_UP 0

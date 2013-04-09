@@ -10,14 +10,13 @@
 #define _buffer_elev_h
 
 
-/* This defines determines the size of the two local buffers */
 
 #define OVERWRITE_BUFFER_ON_OVERFLOW	1 //When overflow on internal buffer/queue occurs this determines whether you should overwrite existing data or not.
 
 
 
 /*! \brief Type-defining a CircularBuffer type for internal buffering
- * when receiving and transmitting data by USB. CircularBuffer is FIFO.
+ * when receiving and transmitting data by network. CircularBuffer is FIFO.
  */
 typedef struct {
 	int				size;   /* maximum number of elements           */
@@ -49,7 +48,7 @@ int cbIsFull(CircularBuffer *cb);
  */
 int cbIsEmpty(CircularBuffer *cb);
 
-/*! \brief loads buffer with a usb-packet.
+/*! \brief loads buffer with a msg packet type.
  * \param cb is the buffer/queue we want to write to.
  * \param elem is the element we want to put on the queue.
  */

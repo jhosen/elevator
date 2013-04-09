@@ -28,7 +28,10 @@ void handle_msg(struct msg package, struct timeval *ttime){
 
 #warning "Add a test for whether nto and nfrom is 0??";
 
-
+//	if(nfrom!=0){
+//		if(package.msgtype!=0)
+//			printf("Received (id _%i_, from: %i)\n", package.msgtype, nfrom->elevinfo.ip);
+//	}
 	switch (package.msgtype){
 	case OPCODE_NEWPEER:
         if(!getelevnode(elevfrom)){ // Elevator hasn't been connected earlier
@@ -45,11 +48,12 @@ void handle_msg(struct msg package, struct timeval *ttime){
 	case OPCODE_NEWORDER:
 		nto->elevinfo.current_orders[package.gpdata[0]][package.gpdata[1]] = 1;
 		//elev_set_button_lamp(package.gpdata[1], package.gpdata[0], 1);
-		printf("Got new order for ip: %i\n", nto->elevinfo.ip);
+//		printf("Got new order for ip: %i\n", nto->elevinfo.ip);
 		break;
 	case OPCODE_ORDERDONE:
-		printf("Order at floor: %i, panel: %i was done by %i\n", package.gpdata[0], package.gpdata[1], nfrom->elevinfo.ip);
+//		printf("Order at floor: %i, panel: %i was done by %i\n", package.gpdata[0], package.gpdata[1], nfrom->elevinfo.ip);
 		nfrom->elevinfo.current_orders[package.gpdata[0]][package.gpdata[1]] = 0;
+		clear_order_all_elev(package.gpdata[0], package.gpdata[1]);
 		//elev_set_button_lamp(package.gpdata[1], package.gpdata[0], 0); // <--- This is handled by light monitor thread
 		break;
 	case OPCODE_BUTTONHIT:
@@ -64,26 +68,26 @@ void handle_msg(struct msg package, struct timeval *ttime){
 	case OPCODE_ELEVSTATE:
 		nfrom->elevinfo.current_state.direction = package.direction;
 		nfrom->elevinfo.current_state.floor = package.floor;
-		printf("elev: %i: \n\tfloor:%i,\n\tdir:%i\n", nfrom->elevinfo.ip, nfrom->elevinfo.current_state.floor, nfrom->elevinfo.current_state.direction);
+//		printf("elev: %i: \n\tfloor:%i,\n\tdir:%i\n", nfrom->elevinfo.ip, nfrom->elevinfo.current_state.floor, nfrom->elevinfo.current_state.direction);
 		break;
 	case OPCODE_NOOP:
 
 		break;
 	case OPCODE_PEERLOSTTAKEOVER:
-		printf("Redirect tasks of the lost peer(ip:%i)\n", package.from);
-        printf("This elev: \n");
-        order_print_list(nto->elevinfo.current_orders);
-        printf("Lost elev: \n");
-		order_print_list(nfrom->elevinfo.current_orders);
+//		printf("Redirect tasks of the lost peer(ip:%i)\n", package.from);
+//        printf("This elev: \n");
+//        order_print_list(nto->elevinfo.current_orders);
+//        printf("Lost elev: \n");
+//		order_print_list(nfrom->elevinfo.current_orders);
 		ordertablemerge(nto->elevinfo.current_orders, nfrom->elevinfo.current_orders, CALL_UP);
 		ordertablemerge(nto->elevinfo.current_orders, nfrom->elevinfo.current_orders, CALL_DOWN);
 		order_flush_panel(nfrom, CALL_UP);
 		order_flush_panel(nfrom, CALL_DOWN);
 		//rmelev(elevfrom);
 		deactivate(gethead(), *nfrom);
-        printf("This elev after merge: \n");
+//        printf("This elev after merge: \n");
 
-        order_print_list(nto->elevinfo.current_orders);
+//        order_print_list(nto->elevinfo.current_orders);
 		break;
 	case OPCODE_PEERLOST:
 	//	rmelev(elevfrom);
@@ -98,6 +102,13 @@ void handle_msg(struct msg package, struct timeval *ttime){
 		for(floor = 0; floor<FLOORS; floor++){
 			gethead()->elevinfo.current_orders[floor][COMMAND] = package.gpdata[floor];
 		}
+		break;
+	case OPCODE_ELEVINEMERGENCY:
+		ordertablemerge(nto->elevinfo.current_orders, nfrom->elevinfo.current_orders, CALL_UP);
+		ordertablemerge(nto->elevinfo.current_orders, nfrom->elevinfo.current_orders, CALL_DOWN);
+		order_flush_panel(nfrom, CALL_UP);
+		order_flush_panel(nfrom, CALL_DOWN);
+		deactivate(gethead(), *nfrom);
 		break;
 	}
 }
@@ -195,6 +206,7 @@ char * struct_to_byte(struct msg msg_struct){
 struct msg byte_to_struct(char *mesg){
 	struct msg msg_struct;
 	//if(strlen(mesg)>256){
+
 	cJSON *root = cJSON_Parse(mesg);
 	if(root!=0){
 		cJSON * msgtype = cJSON_GetObjectItem(root, "msgtype");
@@ -241,4 +253,46 @@ struct msg byte_to_struct(char *mesg){
 	msg_struct.msgtype = OPCODE_CORRUPT;
 	cJSON_Delete(root);
 	return msg_struct;
+}
+
+//char * getcjsonstr(char *string, int start_i){
+//	int end_i = cjsonendindex(string, start_i);
+//	while(end_i<(strlen(string)-1)){
+//		copy string from start to end
+//		start_i = end_i+1;
+//		end_i = cjsonendindex(string, start_i);
+//
+//	}
+//	copy string from start to end
+////
+////	int end_i 	= cjsonendindex(string, start_i);
+////
+////	char * p = string[start -- end]
+////
+////	start_i = end_i+1;
+////	end_i = cjsonendindex(string, start_i)
+//
+//
+//}
+
+/* Returns the index of the last curly bracket.
+ * Returns -1 if packet is incomplete
+ */
+int cjsonendindex(char * cjson_string, int start_i){
+	int i, counter, started;
+	started = 0;
+	counter = 0;
+	for(i = start_i; i < strlen(cjson_string); i++){
+		if(cjson_string[i]=='{'){
+			counter+=1;
+			started=1;
+		}
+		else if(cjson_string[i]=='}'){
+			counter-=1;
+		}
+		if(started && counter==0){
+			return i;
+		}
+	}
+	return -1;
 }

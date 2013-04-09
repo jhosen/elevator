@@ -31,6 +31,7 @@
 #define OPCODE_PEERLOST		10
 #define OPCODE_ORDERDONE	11
 #define OPCODE_RECOVER_CMD 12
+#define OPCODE_ELEVINEMERGENCY 13
 // @}
 
 
@@ -61,6 +62,6 @@ void send_msg(int msgtype, int to,  int orders[][N_PANELS], int direction, int f
 /* Parser functions */
 char* 	struct_to_byte(	struct msg msg_struct);
 struct msg byte_to_struct(char *msg);
-
+int cjsonendindex(char * cjson_string, int start_i);
 
 #endif /* COMMUNICATION_H_ */

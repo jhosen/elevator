@@ -7,15 +7,13 @@ typedef enum event_t {NOEVENT, STOP_BUTTON, OBSTRUCTION, FLOORSENSOR};
 typedef enum state_t {IDLE, EXECUTE, EM_STOP, EM_OBSTR, DOOROPEN};
 
 
-
-void print_state_event(evcpy);
-
-
 void statemachine_init();
 
 void statemachine_handleEvent();
 
 void statemachine();
+
+void print_state_event(evcpy);
 
 void set_event(enum event_t evnt);
 

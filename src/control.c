@@ -9,10 +9,11 @@
 
 static time_t timer, t_now, timer_stop;
 static enum direction_t last_dir;                       //Keeps information about last direction.
-static int newly_emergency=0;                           /*Flag that keeps information about if elevator just came from emergency state.
-									                    Flag is used in control_new_floor when coming from emergency state between two floors to detect a new
-									                    floor even though it might be the same as the last one passed.*/
-static int dragged_out =0;
+//static int newly_emergency=0;
+/*Flag that keeps information about if elevator just came from emergency state.
+//									                    Flag is used in control_new_floor when coming from emergency state between two floors to detect a new
+//									                    floor even though it might be the same as the last one passed.*/
+//static int dragged_out =0;
 
 /************************************ ELEV FUNCTIONS *****************************************************/
 /*Functions that are closely connected to the functions from elev.c:*/
@@ -110,13 +111,13 @@ int control_time_is_out(){
 
 /************************************* Get/set functions *********************************************/
 
-void set_newly_emergency(int flag){
-	newly_emergency = flag;
-}
-
-void set_dragged_out(int flag) {
-	dragged_out = flag;
-}
+//void set_newly_emergency(int flag){
+//	newly_emergency = flag;
+//}
+//
+//void set_dragged_out(int flag) {
+//	dragged_out = flag;
+//}
 
 enum direction_t get_last_dir(){
 	return last_dir;

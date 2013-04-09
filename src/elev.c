@@ -83,7 +83,17 @@ void elev_set_speed(int speed)
 	//printf(__FILE__ ": Speed set to %d\n", speed);
 }
 
+int elev_if_emergency() {
+	return io_read_bit(LIGHT_STOP);
 
+}
+
+void elev_toggle_stop_lamp() {
+	if(io_read_bit(LIGHT_STOP))
+			io_clear_bit(LIGHT_STOP);
+	else
+		io_set_bit(LIGHT_STOP);
+}
 
 void elev_set_door_open_lamp(int value)
 {

@@ -20,7 +20,7 @@ void control_open_door();
 
 void control_set_stop_timer();
 
-void set_dragged_out(flag);
+//void set_dragged_out(flag);
 
 /************************************************ ELEV FUNCTIONS *****************************************************/
 
@@ -50,7 +50,7 @@ int init_test();
 
 /******************************************** GET/SET FUNCTIONS *******************************************************/
 
-void set_newly_emergency(int flag);
+//void set_newly_emergency(int flag);
 enum direction_t get_last_dir();
 void set_last_dir(enum direction_t dir);
 

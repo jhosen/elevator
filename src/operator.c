@@ -49,6 +49,7 @@ void operator_callback_button(int floor, int value){
 void operator_callback_sensor(int floor, int value){
 	if(value == 1){ // Entering floor
 		elev_set_floor_indicator(floor);
+		printf("entering floor\n");
 		set_last_floor(floor);
 		if(floor == FLOORS-1){
 			set_last_dir(DOWN);
@@ -65,21 +66,22 @@ void operator_callback_sensor(int floor, int value){
 	}
 	else if (value == 0){ // Leaving floor
 		current_pos = BETWEEN_FLOORS;
+		printf("leaving floor\n");
 		set_event(FLOORSENSOR);
 	}
 	else{
 		// Corrupt call
 	}
 }
-#include "statemachine.h"
+
 void operator_callback_stop(int floor, int value){
+	//elev_toggle_stop_lamp();
 	set_event(STOP_BUTTON);
-	printf("Stop button was pushed\n");
-	// Push stop event to statemachine
 }
 
 void operator_callback_obstr(int floor, int value){
 	activeobstr = value;
+
 	set_event(OBSTRUCTION);
 }
 
@@ -112,7 +114,7 @@ int should_stop(){
 		if(head->elevinfo.current_orders[current_floor][COMMAND] || head->elevinfo.current_orders[current_floor][CALL_UP]) {
 			return 1;
 		}
-		else if(!order_check_request_above(ALL)){
+		else if(!order_check_request_above()){
 			return 1;
 		}
 	}
@@ -120,7 +122,7 @@ int should_stop(){
 		if(head->elevinfo.current_orders[current_floor][COMMAND] || head->elevinfo.current_orders[current_floor][CALL_DOWN]) {
 			return 1;
 		}
-		else if(!order_check_request_below(ALL)){
+		else if(!order_check_request_below()){
 			return 1;
 		}
 	}
@@ -152,30 +154,30 @@ int betweenfloors(){
 void set_direction() {
 	int pridir = prioritized_dir();
 	if(pridir==1) go_up();
-	else if(pridir==0);
 	else if(pridir==-1) go_down();
 	else;
 }
 
 int prioritized_dir(){
 	//Check if there is a request at current floor in right direction.
-	if(order_check_request_current_floor(ALL)) {
+	if(order_check_request_current_floor()) {
 		return 0;
 	}
+
 	//Check if there is a request above
-	else if(order_check_request_above(ALL) && (get_last_dir()==UP)){
+	else if(order_check_request_above() && (get_last_dir()==UP)){
 		return 1;
 	}
 	//Check if there is a request below
-	else if(order_check_request_below(ALL) && (get_last_dir()==DOWN)) {
+	else if(order_check_request_below() && (get_last_dir()==DOWN)) {
 		return -1;
 	}
 	//Check if there is a request above when the direction is DOWN. This is served if there are no requests below.
-	else if(order_check_request_above(ALL) && !(order_check_request_below(ALL))) {
+	else if(order_check_request_above() && !(order_check_request_below())) {
 		return 1;
 	}
 	//Check if there is a request below when the direction is UP. This is served if there are no requests above.
-	else if(order_check_request_below(ALL) && !(order_check_request_above(ALL))) {
+	else if(order_check_request_below() && !(order_check_request_above())) {
 		return -1;
 	}
 	else{
@@ -188,33 +190,47 @@ void opendoor(){
     gettimeofday(&dooropentime, 0);
     order_reset_current_floor();
 	elev_set_door_open_lamp(1);
-	printf("Door is open \n");
+//	printf("Door is open \n");
 }
 
 void closedoor(){
 	elev_set_door_open_lamp(0);
-	printf("Door is closed \n");
+	if(elev_if_emergency()) {
+		em_restart();
+		printf("em_restart\n");
+	}
+//	printf("Door is closed \n");
 }
 
 void em_stop(){
 	elev_set_stop_lamp(1);
-	printf("Stop lamp on\n");
 	control_slow_down();
-}
-
-void em_cancel(){
-	elev_set_stop_lamp(0);
-	printf("Stop lamp off\n");
-
-}
-
-void em_obstr(){
-	elev_set_speed(0);
-	if(getcurrentpos()!=-1){
-		opendoor();
+	struct node * elevlistroot = gethead();
+	if(count(elevlistroot)>1){
+		int ordummy[FLOORS][N_PANELS];
+		int gpdummy[]={0};
+		send_msg(OPCODE_ELEVINEMERGENCY, elevlistroot->next->elevinfo.ip, ordummy, 0, 0, gpdummy);
+		ordertablemerge(elevlistroot->next->elevinfo.current_orders, elevlistroot->elevinfo.current_orders, CALL_UP);
+		ordertablemerge(elevlistroot->next->elevinfo.current_orders, elevlistroot->elevinfo.current_orders, CALL_DOWN);
+		order_flush_panel(elevlistroot, CALL_UP);
+		order_flush_panel(elevlistroot, CALL_DOWN);
+		deactivate(elevlistroot, *elevlistroot);
 	}
-	// Stop elev if moving
-	// Open door - keep it open
+}
+
+void em_restart(){
+	struct node * elevlistroot = gethead();
+	activate(elevlistroot, *elevlistroot);
+	elev_set_stop_lamp(0);
+//	printf("Stop lamp off\n");
+
+}
+
+void obstruction() {
+	elev_set_speed(0);
+		if(getcurrentpos()!=-1){
+			opendoor();
+		}
 }
 
 

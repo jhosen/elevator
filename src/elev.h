@@ -29,6 +29,13 @@ void elev_set_speed(int speed);
 void elev_set_door_open_lamp(int value);
 
 
+/**
+ * Toggle the stop light to turn on and off every other time.
+ */
+void elev_toggle_stop_lamp();
+
+int elev_if_emergency();
+
 
 /**
 	Turn stop lamp on or off.

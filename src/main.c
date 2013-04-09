@@ -4,16 +4,21 @@
 #include <arpa/inet.h>
 
 
+
 int main (int argc, const char * argv[]) {
 
 
     elev_init();
     elev_reset_all_lamps();
-    network_init();
+    network();
+//    network_init();
 	init_order(inet_addr(getlocalip()));
 
 	operator_init();
 	statemachine();
+
+//	weightfunction_sim();
+
 //	if(!statemachine_init()) {
 //			printf("Unable to initialize elevator hardware\n");
 //			return(0);

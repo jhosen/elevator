@@ -55,9 +55,8 @@ void em_stop();
 int should_stop();
 
 
-void em_cancel();
+void em_restart();
 
-void em_obstr();
 void opendoor();
 void closedoor();
 
@@ -66,6 +65,7 @@ int timeoutdoor();
 int betweenfloors();
 int getcurrentpos();
 
+void obstruction();
 
 
 
