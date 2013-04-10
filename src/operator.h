@@ -15,6 +15,8 @@
  *      Author: student
  */
 
+int should_stop();
+
 
 void operator_init();
 
@@ -52,7 +54,7 @@ int request_here();
 int requests();
 void em_stop();
 
-int should_stop();
+int should_stay();
 
 
 void em_restart();

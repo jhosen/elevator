@@ -163,8 +163,9 @@ static void *polling_thread(void *p)
 	memset(prev_values, 0, sizeof(prev_values));
 	
 	while (1) {
-		for (int type = 0; type < N_SIGNALS; type++){
-			for (int floor = 0; floor < N_FLOORS; floor++){
+		int type, floor;
+		for (type = 0; type < N_SIGNALS; type++){
+			for (floor = 0; floor < N_FLOORS; floor++){
 				int value = io_read_bit(signal_channel_matrix[floor][type]);
 
 				// If no associated callback: ignore.
@@ -228,7 +229,8 @@ void elev_reset_all_lamps(void) {
 	elev_set_stop_lamp(0);
 	elev_set_door_open_lamp(0);
 
-	for (int floor = 0; floor < N_FLOORS; ++floor) {
+	int floor;
+	for (floor = 0; floor < N_FLOORS; ++floor) {
 		elev_set_button_lamp(ELEV_DIR_DOWN, floor, 0);
 		elev_set_button_lamp(ELEV_DIR_UP, floor, 0);
 		elev_set_button_lamp(ELEV_DIR_COMMAND, floor, 0);

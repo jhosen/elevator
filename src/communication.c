@@ -110,6 +110,9 @@ void handle_msg(struct msg package, struct timeval *ttime){
 		order_flush_panel(nfrom, CALL_DOWN);
 		deactivate(gethead(), *nfrom);
 		break;
+	case OPCODE_ELEV_NOT_EMERGENCY:
+		activate(gethead(), *nfrom);
+		break;
 	}
 }
 

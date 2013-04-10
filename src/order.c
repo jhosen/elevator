@@ -116,7 +116,7 @@ void deactivate(struct node * root, struct node n){
 	np->elevinfo.active = 0;
 }
 
-/* ¤%%¤¤%¤%¤%¤%¤%¤%¤%¤%¤%¤%¤%¤%¤%
+/*
 struct node * gethighestactiveelevnode(){
 	struct node * iter = root;
 	while(iter!=0){
@@ -236,7 +236,6 @@ int order_check_request_current_floor(){
 
 int order_check_request_above(){
 	int current_floor = getcurrentpos();
-	printf("current floor %i\n", current_floor);
 	if(current_floor==BETWEEN_FLOORS){
 	    if(get_last_dir()==UP){                    		//Means elevator is probably between last_floor and last_floor+1
 	        current_floor = last_floor;					//Then checks are to be done relative to floor recently passed.
@@ -247,6 +246,10 @@ int order_check_request_above(){
 	} 
 
 	int floor = 0;
+	if(current_floor == 3) {
+		printf("Current floor is 3\n");
+		return 1;
+	}
 	int panel_counter = 0;
 	for(panel_counter = CALL_UP; panel_counter<=COMMAND; panel_counter++){
 		for(floor = current_floor+1; floor<N_FLOORS; floor ++){

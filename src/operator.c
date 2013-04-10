@@ -104,10 +104,38 @@ int requests(){
 	return 0;
 }
 
+int should_stay(){
+	int current_floor = getcurrentpos();
+	if(current_floor==BETWEEN_FLOORS){
+		return 0;
+	}
+	struct node * head = gethead();
+	if(get_last_dir()==UP){
+		if(head->elevinfo.current_orders[current_floor][COMMAND] || head->elevinfo.current_orders[current_floor][CALL_UP]) {
+			return 1;
+		}
+		else if(!order_check_request_above()){
+			return 1;
+		}
+	}
+	else if(get_last_dir()==DOWN) {
+		if(head->elevinfo.current_orders[current_floor][COMMAND] || head->elevinfo.current_orders[current_floor][CALL_DOWN]) {
+			return 1;
+		}
+		else if(!order_check_request_below()){
+			return 1;
+		}
+	}
+	return 0;
+}
+
 int should_stop(){
 	int current_floor = getcurrentpos();
 	if(current_floor==BETWEEN_FLOORS){
 		return 0;
+	}
+	if(current_floor==N_FLOORS-1 || current_floor==0) {
+		return 1;
 	}
 	struct node * head = gethead();
 	if(get_last_dir()==UP){
@@ -220,17 +248,34 @@ void em_stop(){
 
 void em_restart(){
 	struct node * elevlistroot = gethead();
+	if(count(elevlistroot)>1){
+		int ordummy[FLOORS][N_PANELS];
+		int gpdummy[]={0};
+		send_msg(OPCODE_ELEV_NOT_EMERGENCY, elevlistroot->next->elevinfo.ip, ordummy, 0, 0, gpdummy);
+	}
 	activate(elevlistroot, *elevlistroot);
 	elev_set_stop_lamp(0);
 //	printf("Stop lamp off\n");
 
 }
 
+
 void obstruction() {
-	elev_set_speed(0);
-		if(getcurrentpos()!=-1){
-			opendoor();
-		}
+	control_slow_down();
+	struct node * elevlistroot = gethead();
+	if(count(elevlistroot)>1){
+		int ordummy[FLOORS][N_PANELS];
+		int gpdummy[]={0};
+		send_msg(OPCODE_ELEVINEMERGENCY, elevlistroot->next->elevinfo.ip, ordummy, 0, 0, gpdummy);
+		ordertablemerge(elevlistroot->next->elevinfo.current_orders, elevlistroot->elevinfo.current_orders, CALL_UP);
+		ordertablemerge(elevlistroot->next->elevinfo.current_orders, elevlistroot->elevinfo.current_orders, CALL_DOWN);
+		order_flush_panel(elevlistroot, CALL_UP);
+		order_flush_panel(elevlistroot, CALL_DOWN);
+		deactivate(elevlistroot, *elevlistroot);
+	}
+	if(getcurrentpos()!=-1){
+		opendoor();
+	}
 }
 
 
