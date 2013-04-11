@@ -16,6 +16,11 @@ struct order{
 	int paneltype;
 };
 
+typedef struct {
+	int 	active;
+	time_t 	timestamp;
+} order_t;
+
 struct elevstate{
 	int floor;
 	int direction;
@@ -26,7 +31,7 @@ struct elevator{
 	in_addr_t ip;
 	int active;
 	struct elevstate current_state;
-	int current_orders[FLOORS][N_PANELS];
+	order_t current_orders[FLOORS][N_PANELS];
 };
 
 static struct node {
@@ -83,10 +88,10 @@ void *order_handle_button_lamps();
 // Function available for service engineers for testing.
 void order_print(void);
 
-void order_print_list(int orders[][N_PANELS]);
+void order_print_list(order_t orders[][N_PANELS]);
 
-void ordertablemerge(int ordto[][N_PANELS], int ordfrom[][N_PANELS], enum panel_type panel);
-
+//void ordertablemerge(int ordto[][N_PANELS], int ordfrom[][N_PANELS], enum panel_type panel);
+void ordertablemerge(struct node * elevto, struct node * elevfrom, enum panel_type panel);
 
 
 /* List functions for keeping track of elevators */

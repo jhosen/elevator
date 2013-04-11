@@ -24,7 +24,7 @@ void handle_msg(struct msg package, struct timeval *ttime){
 	struct node *nfrom=getelevnode(elevfrom);
 //	elevfrom.current_state.floor = package.floor;
 //	elevfrom.current_state.direction = package.direction;
-	int floor;
+	int floor, panel;
 
 #warning "Add a test for whether nto and nfrom is 0??";
 
@@ -41,19 +41,23 @@ void handle_msg(struct msg package, struct timeval *ttime){
 			activate(gethead(), *nfrom);
 			recover_elev(nfrom) ;//, nfrom->elevinfo.current_orders); // Recover
 		}
+        nfrom=getelevnode(elevfrom);
+        order_print_list(nfrom->elevinfo.current_orders);
 		break;
 	case OPCODE_IMALIVE:
 
 		break;
 	case OPCODE_NEWORDER:
-		nto->elevinfo.current_orders[package.gpdata[0]][package.gpdata[1]] = 1;
+		nto->elevinfo.current_orders[package.gpdata[0]][package.gpdata[1]].active = 1;
 		//elev_set_button_lamp(package.gpdata[1], package.gpdata[0], 1);
 //		printf("Got new order for ip: %i\n", nto->elevinfo.ip);
 		break;
 	case OPCODE_ORDERDONE:
+		floor = package.gpdata[0];
+		panel = package.gpdata[1];
 //		printf("Order at floor: %i, panel: %i was done by %i\n", package.gpdata[0], package.gpdata[1], nfrom->elevinfo.ip);
-		nfrom->elevinfo.current_orders[package.gpdata[0]][package.gpdata[1]] = 0;
-		clear_order_all_elev(package.gpdata[0], package.gpdata[1]);
+		nfrom->elevinfo.current_orders[floor][panel].active = 0;
+//		clear_order_all_elev(floor, panel);
 		//elev_set_button_lamp(package.gpdata[1], package.gpdata[0], 0); // <--- This is handled by light monitor thread
 		break;
 	case OPCODE_BUTTONHIT:
@@ -79,8 +83,10 @@ void handle_msg(struct msg package, struct timeval *ttime){
 //        order_print_list(nto->elevinfo.current_orders);
 //        printf("Lost elev: \n");
 //		order_print_list(nfrom->elevinfo.current_orders);
-		ordertablemerge(nto->elevinfo.current_orders, nfrom->elevinfo.current_orders, CALL_UP);
-		ordertablemerge(nto->elevinfo.current_orders, nfrom->elevinfo.current_orders, CALL_DOWN);
+		ordertablemerge(nto, nfrom, CALL_UP);
+		ordertablemerge(nto, nfrom, CALL_DOWN);
+//		ordertablemerge(nto->elevinfo.current_orders, nfrom->elevinfo.current_orders, CALL_UP);
+//		ordertablemerge(nto->elevinfo.current_orders, nfrom->elevinfo.current_orders, CALL_DOWN);
 		order_flush_panel(nfrom, CALL_UP);
 		order_flush_panel(nfrom, CALL_DOWN);
 		//rmelev(elevfrom);
@@ -93,6 +99,8 @@ void handle_msg(struct msg package, struct timeval *ttime){
 	//	rmelev(elevfrom);
 //		cleartable(nfrom->elevinfo.current_orders, CALL_UP);
 //		cleartable(nfrom->elevinfo.current_orders, CALL_DOWN);
+		ordertablemerge(nto, nfrom, CALL_UP);
+		ordertablemerge(nto, nfrom, CALL_DOWN);
 		order_flush_panel(nfrom, CALL_UP);
 		order_flush_panel(nfrom, CALL_DOWN);
 		deactivate(gethead(), *nfrom);
@@ -101,13 +109,15 @@ void handle_msg(struct msg package, struct timeval *ttime){
 //		int floor;
 		if(nto->elevinfo.ip == gethead()->elevinfo.ip){
 			for(floor = 0; floor<FLOORS; floor++){
-				gethead()->elevinfo.current_orders[floor][COMMAND] |= package.gpdata[floor];
+				gethead()->elevinfo.current_orders[floor][COMMAND].active |= package.gpdata[floor];
 			}
 		}
 		break;
 	case OPCODE_ELEVINEMERGENCY:
-		ordertablemerge(nto->elevinfo.current_orders, nfrom->elevinfo.current_orders, CALL_UP);
-		ordertablemerge(nto->elevinfo.current_orders, nfrom->elevinfo.current_orders, CALL_DOWN);
+		ordertablemerge(nto, nfrom, CALL_UP);
+		ordertablemerge(nto, nfrom, CALL_DOWN);
+//		ordertablemerge(nto->elevinfo.current_orders, nfrom->elevinfo.current_orders, CALL_UP);
+//		ordertablemerge(nto->elevinfo.current_orders, nfrom->elevinfo.current_orders, CALL_DOWN);
 		order_flush_panel(nfrom, CALL_UP);
 		order_flush_panel(nfrom, CALL_DOWN);
 		deactivate(gethead(), *nfrom);
@@ -128,7 +138,7 @@ void recover_elev(struct node * n){//, int orderlist[][N_PANELS]){
 	int cmdorders[FLOORS];
 	order_print_list(n->elevinfo.current_orders);
 	for(floor = 0; floor < FLOORS; floor ++){
-		if(n->elevinfo.current_orders[floor][COMMAND]){
+		if(n->elevinfo.current_orders[floor][COMMAND].active){
 			cmdorders[floor] = 1; // {floor, COMMAND};
 			printf("Recover: Sending command floor %i\n", floor);
 		}

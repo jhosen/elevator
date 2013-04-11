@@ -437,10 +437,12 @@ void *com_handler(void * peer){
 	struct msg recovermsg = {
 		//.msgtype	= OPCODE_PEERLOSTTAKEOVER,
 		.from 		= p.ip,
-		.to			= root->p.ip
+		.to			= highest_ip() //root->p.ip
 	};
+//	struct node ppair = peer_object(0, highest_ip());
+//	nto =
 
-	if(highest_ip() == root->p.ip){ // I have the highest ip on the network
+	if(recovermsg.to == root->p.ip){ // I have the highest ip on the network
 		printf("I have the highest ip (ip:%i), and will take over for lost peer (ip:%i)\n", root->p.ip, pinf->ip);
 		// Tell com.module that it should be the lost peers process pair
 		recovermsg.msgtype = OPCODE_PEERLOSTTAKEOVER;

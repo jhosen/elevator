@@ -100,8 +100,8 @@ int requests(){
 	struct node * head = gethead();
 	for (panel = CALL_UP; panel<=COMMAND; panel++){
 		for(floor = 0; floor< FLOORS; floor ++){
-			if(head->elevinfo.current_orders[floor][panel]){
-				printf("There are request at floor %i, panel %i, order[][] = %i\n", floor, panel, head->elevinfo.current_orders[floor][panel]);
+			if(head->elevinfo.current_orders[floor][panel].active){
+				printf("There are request at floor %i, panel %i, order[][] = %i\n", floor, panel, head->elevinfo.current_orders[floor][panel].active);
 				return 1;
 			}
 		}
@@ -116,7 +116,7 @@ int should_stay(){
 	}
 	struct node * head = gethead();
 	if(get_last_dir()==UP){
-		if((head->elevinfo.current_orders[current_floor][COMMAND]==1) || (head->elevinfo.current_orders[current_floor][CALL_UP]==1)) {
+		if((head->elevinfo.current_orders[current_floor][COMMAND].active==1) || (head->elevinfo.current_orders[current_floor][CALL_UP].active==1)) {
 			return 1;
 		}
 		else if(!order_check_request_above()){
@@ -124,7 +124,7 @@ int should_stay(){
 		}
 	}
 	else if(get_last_dir()==DOWN) {
-		if((head->elevinfo.current_orders[current_floor][COMMAND]==1) || (head->elevinfo.current_orders[current_floor][CALL_DOWN]==1)) {
+		if((head->elevinfo.current_orders[current_floor][COMMAND].active==1) || (head->elevinfo.current_orders[current_floor][CALL_DOWN].active==1)) {
 			return 1;
 		}
 		else if(!order_check_request_below()){
@@ -144,7 +144,7 @@ int should_stop(){
 	}
 	struct node * head = gethead();
 	if(get_last_dir()==UP){
-		if((head->elevinfo.current_orders[current_floor][COMMAND]==1) || (head->elevinfo.current_orders[current_floor][CALL_UP]==1)) {
+		if((head->elevinfo.current_orders[current_floor][COMMAND].active==1) || (head->elevinfo.current_orders[current_floor][CALL_UP].active==1)) {
 			return 1;
 		}
 		else if(!order_check_request_above()){
@@ -152,7 +152,7 @@ int should_stop(){
 		}
 	}
 	else if(get_last_dir()==DOWN) {
-		if((head->elevinfo.current_orders[current_floor][COMMAND]==1) || (head->elevinfo.current_orders[current_floor][CALL_DOWN]==1)) {
+		if((head->elevinfo.current_orders[current_floor][COMMAND].active==1) || (head->elevinfo.current_orders[current_floor][CALL_DOWN].active==1)) {
 			return 1;
 		}
 		else if(!order_check_request_below()){

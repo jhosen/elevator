@@ -16,7 +16,11 @@ void init_order(in_addr_t this_ip){
 	head.elevinfo.active = 1;
     head.next 		= 0;
     head.prev		= 0;
-
+	order_flush_panel(&head, CALL_UP);
+	order_flush_panel(&head, CALL_DOWN);
+	order_flush_panel(&head, COMMAND);
+	printf("Root\n");
+	order_print_list(head.elevinfo.current_orders);
     /* Start thread for monitoring ordered floors and set lamps */
     pthread_t lamp_monitor;
     if ( (pthread_create(&lamp_monitor, NULL, order_handle_button_lamps, (void *) NULL)) < 0){
@@ -71,8 +75,12 @@ int add(struct node * root, struct node * new){
 	//Used in simulation of weightfunction
 //	iter->elevinfo.current_state.floor=0;
 //	iter->elevinfo.current_state.direction=UP;
-
-	cleartable(&(iter->elevinfo.current_orders), N_FLOORS, N_PANELS);
+	order_flush_panel(new, CALL_UP);
+	order_flush_panel(new, CALL_DOWN);
+	order_flush_panel(new, COMMAND);
+	printf("Elev %i\n", new->elevinfo.ip);
+	order_print_list(new->elevinfo.current_orders);
+//	(&(iter->elevinfo.current_orders), N_FLOORS, N_PANELS);
 	return 1; // success
     
 }
@@ -182,26 +190,43 @@ void addelev(struct elevator elev){
 }
 
 
-void addorder(struct node * elevnode, struct order ordr){
-		elevnode->elevinfo.current_orders[ordr.floor][ordr.paneltype] = 1;
-}
-
-
-void ordertablemerge(int ordto[][N_PANELS], int ordfrom[][N_PANELS], enum panel_type panel){
+//void addorder(struct node * elevnode, struct order ordr){
+//		elevnode->elevinfo.current_orders[ordr.floor][ordr.paneltype] = 1;
+//}
+void ordertablemerge(struct node * elevto, struct node * elevfrom, enum panel_type panel){
 	int floor;
 	if(panel == ALL){
 		for(floor=0; floor < N_FLOORS; floor++){
 			for(panel = CALL_UP; panel <=COMMAND; panel++){
-				ordto[floor][panel] |= ordfrom[floor][panel];
+				elevto->elevinfo.current_orders[floor][panel].active |= elevfrom->elevinfo.current_orders[floor][panel].active;
 			}
 		}
 	}
 	else{
 		for(floor=0; floor < N_FLOORS; floor++){
-			ordto[floor][panel] |= ordfrom[floor][panel];
+			elevto->elevinfo.current_orders[floor][panel].active |= elevfrom->elevinfo.current_orders[floor][panel].active;
 		}
 	}
+//	order_print_list(elevfrom->elevinfo.current_orders);
+//	order_print_list(elevto->elevinfo.current_orders);
+
 }
+
+//void ordertablemerge(int ordto[][N_PANELS], int ordfrom[][N_PANELS], enum panel_type panel){
+//	int floor;
+//	if(panel == ALL){
+//		for(floor=0; floor < N_FLOORS; floor++){
+//			for(panel = CALL_UP; panel <=COMMAND; panel++){
+//				ordto[floor][panel] |= ordfrom[floor][panel];
+//			}
+//		}
+//	}
+//	else{
+//		for(floor=0; floor < N_FLOORS; floor++){
+//			ordto[floor][panel] |= ordfrom[floor][panel];
+//		}
+//	}
+//}
 
 /*****************************          Variables:      **********************************/
 
@@ -235,10 +260,10 @@ int order_check_request_current_floor(){
 	    return 0;
 
 	if(get_last_dir()==UP){
-		return(head.elevinfo.current_orders[current_floor][COMMAND] || head.elevinfo.current_orders[current_floor][CALL_UP]);
+		return(head.elevinfo.current_orders[current_floor][COMMAND].active || head.elevinfo.current_orders[current_floor][CALL_UP].active);
 	}
 	else if(get_last_dir()==DOWN) {
-		return(head.elevinfo.current_orders[current_floor][COMMAND] || head.elevinfo.current_orders[current_floor][CALL_DOWN]);
+		return(head.elevinfo.current_orders[current_floor][COMMAND].active || head.elevinfo.current_orders[current_floor][CALL_DOWN].active);
 	}
 	return 0;
 }
@@ -264,7 +289,7 @@ int order_check_request_above(){
 	int panel_counter = 0;
 	for(panel_counter = CALL_UP; panel_counter<=COMMAND; panel_counter++){
 		for(floor = current_floor+1; floor<N_FLOORS; floor ++){
-			if(head.elevinfo.current_orders[floor][panel_counter]==1) return 1;
+			if(head.elevinfo.current_orders[floor][panel_counter].active==1) return 1;
 		}
 	}
 	return 0;
@@ -287,16 +312,16 @@ int order_check_request_below(){
 	int panel_counter = 0;
 	for(panel_counter = CALL_UP; panel_counter<=COMMAND; panel_counter++){
 		for(floor = current_floor-1; floor>=0; floor--){
-			if(head.elevinfo.current_orders[floor][panel_counter]==1) return 1;
+			if(head.elevinfo.current_orders[floor][panel_counter].active==1) return 1;
 		}	
 	}
 	return 0;
 }
 
 /************************* Actions made on order table: **************************************/
-void order_add_order(struct order ord){
-	head.elevinfo.current_orders[ord.floor][ord.paneltype] = 1;
-}
+//void order_add_order(struct order ord){
+//	head.elevinfo.current_orders[ord.floor][ord.paneltype] = 1;
+//}
 
 /*
 void order_empty(enum panel_type panel){
@@ -318,25 +343,25 @@ void order_empty(enum panel_type panel){
 void order_flush_panel(struct node * elevator, enum panel_type panel){
 	int floor;
 	for(floor = 0; floor < FLOORS; floor++) {
-		elevator->elevinfo.current_orders[floor][panel] = 0;
+		elevator->elevinfo.current_orders[floor][panel].active = 0;
 	}
 }
 
 void order_reset_current_floor(){
 	int floor = getcurrentpos();
 	if(floor!=BETWEEN_FLOORS){
-		if ((floor == 0) && head.elevinfo.current_orders[floor][CALL_UP]){
+		if ((floor == 0) && head.elevinfo.current_orders[floor][CALL_UP].active){
 					order_register_as_done(floor, CALL_UP);
 		}
-		if ((floor == N_FLOORS-1) && head.elevinfo.current_orders[floor][CALL_DOWN]){
+		if ((floor == N_FLOORS-1) && head.elevinfo.current_orders[floor][CALL_DOWN].active){
 					order_register_as_done(floor, CALL_DOWN);
 		}
-		if(head.elevinfo.current_orders[floor][COMMAND]){
+		if(head.elevinfo.current_orders[floor][COMMAND].active){
 			order_register_as_done(floor, COMMAND);
 		}
 		else{
-			if(head.elevinfo.current_orders[floor][CALL_UP]!=head.elevinfo.current_orders[floor][CALL_DOWN] ){
-				if(head.elevinfo.current_orders[floor][CALL_UP] ){
+			if(head.elevinfo.current_orders[floor][CALL_UP].active!=head.elevinfo.current_orders[floor][CALL_DOWN].active ){
+				if(head.elevinfo.current_orders[floor][CALL_UP].active ){
 					order_register_as_done(floor, CALL_UP);
 					set_last_dir(UP);
 				}
@@ -356,10 +381,10 @@ void order_reset_current_floor(){
 //                set_last_dir(DOWN);
 //			}
 //		}
-		if((get_last_dir() == UP) && head.elevinfo.current_orders[floor][CALL_UP] ) {
+		if((get_last_dir() == UP) && head.elevinfo.current_orders[floor][CALL_UP].active ) {
 		    order_register_as_done(floor, CALL_UP);
 	    }
-		else if((get_last_dir() == DOWN) && head.elevinfo.current_orders[floor][CALL_DOWN] ){
+		else if((get_last_dir() == DOWN) && head.elevinfo.current_orders[floor][CALL_DOWN].active ){
             order_register_as_done( floor, CALL_DOWN);
 	    }
 	}
@@ -370,16 +395,21 @@ void order_register_new_order(struct node * elevator, int floor, int panel){
 	int order[] = {floor, panel};
 	int ordummy[FLOORS][N_PANELS];
 	send_msg(OPCODE_NEWORDER, elevator->elevinfo.ip, ordummy, 0, 0, order);
-    elevator->elevinfo.current_orders[floor][panel] = 1;
+    elevator->elevinfo.current_orders[floor][panel].active = 1;
 }
+//void set_timestamp(struct node* elevator, int floor, int panel){
+//	elevator->elevinfo.current_orders[floor][panel].timestamp
+//}
 
 
 void order_register_as_done(int floor, int panel){
     int gp[] = {floor, panel};
     int ordummy[FLOORS][N_PANELS];
     send_msg(OPCODE_ORDERDONE, head.elevinfo.ip, ordummy, 0, 0, gp);
-    head.elevinfo.current_orders[floor][panel] = 0;
+    head.elevinfo.current_orders[floor][panel].active = 0;
     clear_order_all_elev(floor, panel);
+    printf("Order done\n");
+    order_print_list(head.elevinfo.current_orders);
 //    printf("Order done for floor %i\n and panel %i\n", floor, panel);
 }
 
@@ -387,7 +417,7 @@ void order_register_as_done(int floor, int panel){
 void clear_order_all_elev(int floor, int panel){
 	struct node * iter = gethead();
 	while(iter!=0){
-			iter->elevinfo.current_orders[floor][panel] = 0;
+			iter->elevinfo.current_orders[floor][panel].active = 0;
 			iter = iter->next;
 	}
 }
@@ -404,7 +434,7 @@ void *order_handle_button_lamps(){
         /* Loop command orders on local elevator */
         panel = COMMAND;
         for(floor = 0; floor < FLOORS; floor++){
-            if(iter->elevinfo.current_orders[floor][panel]==1)
+            if(iter->elevinfo.current_orders[floor][panel].active)
                 elev_set_button_lamp(panel,floor,1);
             else
                 elev_set_button_lamp(panel, floor, 0);
@@ -417,7 +447,7 @@ void *order_handle_button_lamps(){
 				if(!((floor==0 && panel==CALL_DOWN) || (floor==N_FLOORS-1 && panel==CALL_UP))){ 	//Not considering invalid buttons.
 					while(iter!=0){
 						if(iter->elevinfo.active){
-							if(iter->elevinfo.current_orders[floor][panel]){
+							if(iter->elevinfo.current_orders[floor][panel].active){
 								anyorder = 1;
 								break;
 							}
@@ -447,7 +477,7 @@ void order_print(void){
 		printf("Floor %d ", floor+1);		
 		for(panel=CALL_UP; panel<=COMMAND; panel++){
 			if(!((floor==0 && panel==CALL_DOWN) || (floor==N_FLOORS-1 && panel==CALL_UP)))
-			printf("|%d	", head.elevinfo.current_orders[floor][panel]);
+			printf("|%d	", head.elevinfo.current_orders[floor][panel].active);
 			else 
 			printf("|	");
 		}
@@ -456,7 +486,7 @@ void order_print(void){
 	printf("\n");
 }
 
-void order_print_list(int orders[][N_PANELS]){
+void order_print_list(order_t orders[][N_PANELS]){
 	printf("|	C_UP	|C_DOWN	|COMMAND|\n");
 	int floor = 0;
 	int panel = 0;
@@ -464,7 +494,7 @@ void order_print_list(int orders[][N_PANELS]){
 		printf("Floor %d ", floor+1);
 		for(panel=CALL_UP; panel<=COMMAND; panel++){
 			if(!((floor==0 && panel==CALL_DOWN) || (floor==N_FLOORS-1 && panel==CALL_UP)))
-			printf("|%d	", orders[floor][panel]);
+			printf("|%d	", orders[floor][panel].active);
 			else
 			printf("|	");
 		}
@@ -473,7 +503,6 @@ void order_print_list(int orders[][N_PANELS]){
 	printf("\n");
 }
 /*********************************************************************/
-
 struct node * weightfunction(struct node* root, struct order new_order) {
 	int n_elevs = count(root);
 	int weight[n_elevs];
@@ -492,7 +521,7 @@ struct node * weightfunction(struct node* root, struct order new_order) {
 			weight[current] = 0;
 			//Add weight if elevator has order to floors (different weighting for different floors)
 			for(floor_counter=0;floor_counter<N_FLOORS; floor_counter++) {
-				if(iter->elevinfo.current_orders[floor_counter][PANEL_CMD]) {
+				if(iter->elevinfo.current_orders[floor_counter][PANEL_CMD].active) {
 					if(floor_counter == ordered_floor) {
 						weight[current]-=10;
 					}
@@ -500,7 +529,7 @@ struct node * weightfunction(struct node* root, struct order new_order) {
 						weight[current]+=3;
 					}
 				}
-				if(floor_counter<N_FLOORS-1 && iter->elevinfo.current_orders[floor_counter][PANEL_UP]) {
+				if(floor_counter<N_FLOORS-1 && iter->elevinfo.current_orders[floor_counter][PANEL_UP].active) {
 					if(floor_counter == ordered_floor && current_dir == UP && current_floor>ordered_floor) {
 						weight[current]-=10;
 					}
@@ -511,7 +540,7 @@ struct node * weightfunction(struct node* root, struct order new_order) {
 						weight[current]+=3;
 					}
 				}
-				if(floor_counter>0 && iter->elevinfo.current_orders[floor_counter][PANEL_DOWN]) {
+				if(floor_counter>0 && iter->elevinfo.current_orders[floor_counter][PANEL_DOWN].active) {
 					if(floor_counter == ordered_floor && current_dir == DOWN && current_floor<ordered_floor) {
 						weight[current]-=10;
 					}
@@ -601,7 +630,7 @@ void weightfunction_sim() {
 			n = weightfunction(gethead(), orders[i]);
 		}
 		int order[] = {orders[i].floor, orders[i].paneltype};
-		n->elevinfo.current_orders[orders[i].floor][orders[i].paneltype] = 1;
+		n->elevinfo.current_orders[orders[i].floor][orders[i].paneltype].active = 1;
 	}
 
 	printlist(gethead());
