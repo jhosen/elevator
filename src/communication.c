@@ -39,7 +39,7 @@ void handle_msg(struct msg package, struct timeval *ttime){
         }
 		else{    // Elevator has been connected earlier
 			activate(gethead(), *nfrom);
-			recover_elev(nfrom, nfrom->elevinfo.current_orders); // Recover
+			recover_elev(nfrom) ;//, nfrom->elevinfo.current_orders); // Recover
 		}
 		break;
 	case OPCODE_IMALIVE:
@@ -99,8 +99,10 @@ void handle_msg(struct msg package, struct timeval *ttime){
 		break;
 	case OPCODE_RECOVER_CMD:
 //		int floor;
-		for(floor = 0; floor<FLOORS; floor++){
-			gethead()->elevinfo.current_orders[floor][COMMAND] |= package.gpdata[floor];
+		if(nto->elevinfo.ip == gethead()->elevinfo.ip){
+			for(floor = 0; floor<FLOORS; floor++){
+				gethead()->elevinfo.current_orders[floor][COMMAND] |= package.gpdata[floor];
+			}
 		}
 		break;
 	case OPCODE_ELEVINEMERGENCY:
@@ -120,15 +122,18 @@ void handle_msg(struct msg package, struct timeval *ttime){
  *
  *
  */
-void recover_elev(struct node * n, int orderlist[][N_PANELS]){
+void recover_elev(struct node * n){//, int orderlist[][N_PANELS]){
 	int floor;
 	int ordummy[] = {0};
 	int cmdorders[FLOORS];
-	order_print_list(orderlist);
+	order_print_list(n->elevinfo.current_orders);
 	for(floor = 0; floor < FLOORS; floor ++){
-		if(orderlist[floor][COMMAND]){
+		if(n->elevinfo.current_orders[floor][COMMAND]){
 			cmdorders[floor] = 1; // {floor, COMMAND};
 			printf("Recover: Sending command floor %i\n", floor);
+		}
+		else{
+			cmdorders[floor] = 0;
 		}
 
 	}

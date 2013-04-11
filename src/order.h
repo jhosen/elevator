@@ -115,7 +115,8 @@ void deactivateelev(struct elevator elev);
 
 void order_add_order(struct order ord);
 
-void cleartable(int table[][N_PANELS]);
+//void cleartable(int table[][N_PANELS]);
+void cleartable(int * table, int nrows, int ncols);
 
 void clear_order_all_elev(int floor, int panel);
 

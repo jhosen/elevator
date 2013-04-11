@@ -72,19 +72,28 @@ int add(struct node * root, struct node * new){
 //	iter->elevinfo.current_state.floor=0;
 //	iter->elevinfo.current_state.direction=UP;
 
-	cleartable(iter->elevinfo.current_orders);
+	cleartable(&(iter->elevinfo.current_orders), N_FLOORS, N_PANELS);
 	return 1; // success
     
 }
 
-void cleartable(int table[][N_PANELS]){
-	int floor, panel;
-	for(floor = 0; floor < N_FLOORS; floor ++){
-		for(panel = 0; panel<N_PANELS; panel ++){
-			table[floor][panel] = 0;
+void cleartable(int * table, int nrows, int ncols){
+	int row, col;
+	for(row = 0; row<nrows; row++){
+		for(col = 0; col<ncols; col++){
+			table[row*ncols + col] = 0 ;
 		}
 	}
 }
+
+//void cleartable(int table[][N_PANELS]){
+//	int floor, panel;
+//	for(floor = 0; floor < N_FLOORS; floor ++){
+//		for(panel = 0; panel<N_PANELS; panel ++){
+//			table[floor][panel] = 0;
+//		}
+//	}
+//}
 
 
 int rm(struct node* root, struct node n){
@@ -533,7 +542,7 @@ struct node * weightfunction(struct node* root, struct order new_order) {
 					weight[current]+=(3*((N_FLOORS-current_floor)*2+(current_floor-ordered_floor)));
 				}
 			}
-			printf("Elevator %i has weight: %i\n", iter->elevinfo.ip, weight[current]);
+//			printf("Elevator %i has weight: %i\n", iter->elevinfo.ip, weight[current]);
 			if(weight[current]<lowest_weight){
 				lowest_weight = weight[current];
 				best_elev = iter;
@@ -546,7 +555,7 @@ struct node * weightfunction(struct node* root, struct order new_order) {
 		current++;
 		iter = iter->next;
 	}
-	printf("Best elevator : %i\n", best_elev->elevinfo.ip);
+	printf("Order at floor %i, panel %i, Best elevator : %i\n", ordered_floor, new_order.paneltype,  best_elev->elevinfo.ip);
 	//order_print();
 	return best_elev;
 }

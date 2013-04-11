@@ -100,8 +100,10 @@ int requests(){
 	struct node * head = gethead();
 	for (panel = CALL_UP; panel<=COMMAND; panel++){
 		for(floor = 0; floor< FLOORS; floor ++){
-			if(head->elevinfo.current_orders[floor][panel])
+			if(head->elevinfo.current_orders[floor][panel]){
+				printf("There are request at floor %i, panel %i, order[][] = %i\n", floor, panel, head->elevinfo.current_orders[floor][panel]);
 				return 1;
+			}
 		}
 	}
 	return 0;
@@ -114,7 +116,7 @@ int should_stay(){
 	}
 	struct node * head = gethead();
 	if(get_last_dir()==UP){
-		if(head->elevinfo.current_orders[current_floor][COMMAND] || head->elevinfo.current_orders[current_floor][CALL_UP]) {
+		if((head->elevinfo.current_orders[current_floor][COMMAND]==1) || (head->elevinfo.current_orders[current_floor][CALL_UP]==1)) {
 			return 1;
 		}
 		else if(!order_check_request_above()){
@@ -122,7 +124,7 @@ int should_stay(){
 		}
 	}
 	else if(get_last_dir()==DOWN) {
-		if(head->elevinfo.current_orders[current_floor][COMMAND] || head->elevinfo.current_orders[current_floor][CALL_DOWN]) {
+		if((head->elevinfo.current_orders[current_floor][COMMAND]==1) || (head->elevinfo.current_orders[current_floor][CALL_DOWN]==1)) {
 			return 1;
 		}
 		else if(!order_check_request_below()){
@@ -142,7 +144,7 @@ int should_stop(){
 	}
 	struct node * head = gethead();
 	if(get_last_dir()==UP){
-		if(head->elevinfo.current_orders[current_floor][COMMAND] || head->elevinfo.current_orders[current_floor][CALL_UP]) {
+		if((head->elevinfo.current_orders[current_floor][COMMAND]==1) || (head->elevinfo.current_orders[current_floor][CALL_UP]==1)) {
 			return 1;
 		}
 		else if(!order_check_request_above()){
@@ -150,7 +152,7 @@ int should_stop(){
 		}
 	}
 	else if(get_last_dir()==DOWN) {
-		if(head->elevinfo.current_orders[current_floor][COMMAND] || head->elevinfo.current_orders[current_floor][CALL_DOWN]) {
+		if((head->elevinfo.current_orders[current_floor][COMMAND]==1) || (head->elevinfo.current_orders[current_floor][CALL_DOWN]==1)) {
 			return 1;
 		}
 		else if(!order_check_request_below()){
@@ -217,6 +219,7 @@ int prioritized_dir(){
 }
 
 void opendoor(){
+	printf("Open door \n");
 	control_slow_down();
     gettimeofday(&dooropentime, 0);
     order_reset_current_floor();
@@ -226,10 +229,11 @@ void opendoor(){
 
 void closedoor(){
 	elev_set_door_open_lamp(0);
-	if(elev_if_emergency()) {
-		em_restart();
-		printf("em_restart\n");
-	}
+	printf("close door\n");
+//	if(elev_if_emergency()) {
+//		em_restart();
+//		printf("em_restart\n");
+//	}
 //	printf("Door is closed \n");
 }
 

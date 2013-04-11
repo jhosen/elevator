@@ -31,6 +31,8 @@ void elevator(){
 	statemachine_init(&state, &ev);
 	while(1){
 		statemachine_handleEvent(&stateTable, elevconf, &state, &ev);
+//		if(state!=4)
+//			printf("State: %i, event: %i\n", state, ev);
 	}
 }
 
