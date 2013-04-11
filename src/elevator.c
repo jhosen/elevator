@@ -21,7 +21,7 @@ struct state_action_pair_t stateTable[N_STATES][N_EVENTS] = {
 /*IDLE		*/ 	{{EXECUTE, set_direction,requests},		{EM_STOP,	em_stop,	NULL},		{EM_OBSTR,	em_stop,	obstr_on},		{IDLE ,	NULL,	NULL}					},
 /*EXECUTE	*/	{{DOOROPEN, opendoor,	should_stay},	{EM_STOP,	em_stop,	NULL},		{EM_OBSTR,	em_stop,	obstr_on}, 		{DOOROPEN , opendoor, 	should_stop} 	},
 /*EM_STOP	*/	{{EM_STOP, NULL,	NULL},				{IDLE,		em_restart,	obstr_off},	{EM_STOP,	NULL,		NULL},			{EM_STOP, NULL,	NULL} 					},
-/*EM_OBSTR	*/	{{EM_OBSTR, NULL,NULL},					{EM_OBSTR,	NULL,		NULL},		{IDLE,		closedoor,	obstr_off}, 	{EM_OBSTR, closedoor, NULL}				},
+/*EM_OBSTR	*/	{{EM_OBSTR, NULL,NULL},					{EM_OBSTR,	NULL,		NULL},		{IDLE,		em_restart,	obstr_off}, 	{EM_OBSTR, closedoor, NULL}				},
 /*DOOROPEN	*/ 	{{IDLE, closedoor,timeoutdoor},			{EM_STOP, 	em_stop, 	NULL},		{EM_OBSTR, 	obstruction, obstr_on}, 	{IDLE, closedoor, betweenfloors}		},
 };
 

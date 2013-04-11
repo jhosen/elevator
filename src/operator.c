@@ -250,6 +250,7 @@ void em_stop(){
 }
 
 void em_restart(){
+	elev_set_door_open_lamp(0);
 	struct node * elevlistroot = gethead();
 	if(count(elevlistroot)>1){
 		int ordummy[FLOORS][N_PANELS];
