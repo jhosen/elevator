@@ -244,11 +244,13 @@ int order_check_request_above(){
 	        current_floor = last_floor-1;				//Else check relative to the floor below elevator.
 	    }
 	} 
+	else
+		last_floor = current_floor;
 
 	int floor = 0;
-	if(current_floor == 3) {
+	if(current_floor == N_FLOORS-1) {
 		printf("Current floor is 3\n");
-		return 1;
+		return 0;
 	}
 	int panel_counter = 0;
 	for(panel_counter = CALL_UP; panel_counter<=COMMAND; panel_counter++){

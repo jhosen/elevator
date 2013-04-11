@@ -163,6 +163,7 @@
 #include <pthread.h>
 #include "buffer_elev.h"
 #include "communication.h"
+#include "statemachine.h"
 
 
 #define MAXRECVSIZE 		4096
@@ -177,12 +178,18 @@
 
 #define TIMEOUT 			3 			//1		// [seconds]
 #define PINGPERIOD 			0.1 				// [seconds]
-#define UPPERIOD 			100000 	// [microseconds]
+#define IMALIVE_UPPERIOD 			100000 	// [microseconds]
 #define BROADCAST_PERIOD	1					// [seconds]
 
 #define CBUFSIZE 128
 
-typedef enum nw_event_t {NOEVENT, TIMEOUT_BC, CONNECTION, DISCONNECTION};
+#define N_NW_STATES 3
+#define N_NW_EVENTS 4
+#define NW_BC_TIME  3
+
+
+
+typedef enum nw_event_t {TIMEOUT_BC = 1, CONNECTION, DISCONNECTION};
 typedef enum nw_state_t {INIT, ALONE, ONLINE};
 
 
@@ -206,6 +213,7 @@ struct peer {
 	int active;
 	in_addr_t ip;
 	CircularBuffer bufout;
+	pthread_t com_thread;
 	//struct information info;
 };
 
@@ -240,7 +248,7 @@ int connect_to_peer(in_addr_t peer_ip);
 /* \!brief Assigning a communication handler thread to a connection
  *
  */
-void assign_com_thread(struct peer p);//int peer_socket, char* peer_ip);
+void assign_com_thread(struct peer p);
 
 
 /*
@@ -292,19 +300,20 @@ struct nw_node {
 	struct nw_node *next, *prev;
 };
 
-
 //void network_init();
-void nw_setevent(enum nw_event_t evnt);
-enum nw_event_t nw_getevent();
-void *start_timer();
-int isalone();
-void startlisten_tcp();
-void stoplisten_tcp();
-void startlisten_udp();
-void stoplisten_udp();
-void startbroadcast_udp();
-void stopbroadcast_udp();
-void nw_statemachine_handleEvent();
+void nw_setevent(events_t evnt);
+events_t nw_getevent();
+static void *start_timer();
+static int isalone();
+static void startlisten_tcp();
+static void stoplisten_tcp();
+static void startlisten_udp();
+static void stoplisten_udp();
+static void startbroadcast_udp();
+static void stopbroadcast_udp();
+//void nw_statemachine_handleEvent();
+
+
 void *nw_statemachine();
 void network();
 

@@ -100,7 +100,7 @@ void handle_msg(struct msg package, struct timeval *ttime){
 	case OPCODE_RECOVER_CMD:
 //		int floor;
 		for(floor = 0; floor<FLOORS; floor++){
-			gethead()->elevinfo.current_orders[floor][COMMAND] = package.gpdata[floor];
+			gethead()->elevinfo.current_orders[floor][COMMAND] |= package.gpdata[floor];
 		}
 		break;
 	case OPCODE_ELEVINEMERGENCY:

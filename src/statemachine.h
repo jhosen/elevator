@@ -1,42 +1,48 @@
 #ifndef _STATEMACHINE_H
 #define _STATEMACHINE_H
 
-/********************************************* DECLARATIONS ****************************************************/
-
-typedef enum event_t {NOEVENT, STOP_BUTTON, OBSTRUCTION, FLOORSENSOR};
-typedef enum state_t {IDLE, EXECUTE, EM_STOP, EM_OBSTR, DOOROPEN};
+#include "pthread.h"
 
 
-void statemachine_init();
+#define NOEVENT 0
 
-void statemachine_handleEvent();
 
-void statemachine();
+typedef int events_t ;
+typedef int state_t ;
 
-void print_state_event(evcpy);
+typedef struct {
+	events_t event;
+	pthread_mutex_t eventMutex;
+} event_t;
 
-void set_event(enum event_t evnt);
+typedef struct {
+	int nstates;
+	int nevents;
+} sm_config_t;
 
-enum event_t get_event();
+struct state_action_pair_t{
+	state_t nextState;
+	void (*action)(void);
+	int (*guard)(void);
+};
 
-///*************************************************FUNCTIONS *****************************************************/
-//
-///* Runs elevator to defined position. No orders are added while initialize is running.
-//Initialize returns !=0 if hardware-initializing(elev_init()) went ok. Initialize is used at start-up, and if an obstruction
-//occurs when elevator is running. */
-//int statemachine_initialize(void);
-//
-///*Returns an event based on inputs from hardware in prioritized order*/
-//enum event_t statemachine_get_event(void);
-//
-///*State machine with event as input*/
-//void statemachine(enum event_t event);
-//
-///*Prints current state for supervising reasons*/
-//void statemachine_print_state(void);
-//
-///*Get/set functions*/
-//enum state_t get_state();
-//void set_state(enum state_t new_state);
+/* !\brief Init statemachine - set event to NOEVENT and state to IDLE
+ *
+ * \param eventvar A pointer to the event variable
+ * \param statevar A pointer to the state variable
+ *
+ */
+void statemachine_init(event_t * eventvar, state_t *statevar);
+
+/* !\brief Performs an action based on state, event and guard.
+ *
+ * \param stateTable A pointer to the start of the state machine table
+ * \param config holds the number of events and states
+ * \param eventvar A pointer to the event variable
+ * \param statevar A pointer to the state variable
+ *
+ */
+void statemachine_handleEvent(struct state_action_pair_t * stateTable, sm_config_t config, state_t *statevar, event_t * eventvar);
+
 
 #endif

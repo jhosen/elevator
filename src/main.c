@@ -2,7 +2,8 @@
 #include "network.h"
 #include "communication.h"
 #include <arpa/inet.h>
-
+#include "elevator.h"
+//#include "operator.h"
 
 
 int main (int argc, const char * argv[]) {
@@ -14,8 +15,7 @@ int main (int argc, const char * argv[]) {
 //    network_init();
 	init_order(inet_addr(getlocalip()));
 
-	operator_init();
-	statemachine();
+	elevator();
 
 //	weightfunction_sim();
 

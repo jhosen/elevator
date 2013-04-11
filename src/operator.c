@@ -12,6 +12,7 @@
 #include "statemachine.h"
 #include "control.h"
 
+#include "elevator.h"
 static int activeobstr = 0;
 static int current_pos;
 
@@ -47,6 +48,8 @@ void operator_callback_button(int floor, int value){
 }
 
 void operator_callback_sensor(int floor, int value){
+	if((floor == 0 || floor == N_FLOORS-1) && value == 1)
+		elev_set_speed(0);
 	if(value == 1){ // Entering floor
 		elev_set_floor_indicator(floor);
 		printf("entering floor\n");
@@ -58,7 +61,7 @@ void operator_callback_sensor(int floor, int value){
 			set_last_dir(UP);
         }
         current_pos = floor;
-		set_event(FLOORSENSOR);
+        set_elev_event(FLOORSENSOR);
         int gpdummy[]={};
         int ordummy[]={};
         send_msg(OPCODE_ELEVSTATE, 0, ordummy, get_last_dir(), floor, gpdummy);
@@ -67,7 +70,7 @@ void operator_callback_sensor(int floor, int value){
 	else if (value == 0){ // Leaving floor
 		current_pos = BETWEEN_FLOORS;
 		printf("leaving floor\n");
-		set_event(FLOORSENSOR);
+		set_elev_event(FLOORSENSOR);
 	}
 	else{
 		// Corrupt call
@@ -76,13 +79,13 @@ void operator_callback_sensor(int floor, int value){
 
 void operator_callback_stop(int floor, int value){
 	//elev_toggle_stop_lamp();
-	set_event(STOP_BUTTON);
+	set_elev_event(STOP_BUTTON);
 }
 
 void operator_callback_obstr(int floor, int value){
 	activeobstr = value;
 
-	set_event(OBSTRUCTION);
+	set_elev_event(OBSTRUCTION);
 }
 
 //Get functions
