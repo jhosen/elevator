@@ -22,8 +22,9 @@ void handle_msg(struct msg package, struct timeval *ttime){
 
 	struct node *nto = getelevnode(elevto);
 	struct node *nfrom=getelevnode(elevfrom);
-//	elevfrom.current_state.floor = package.floor;
-//	elevfrom.current_state.direction = package.direction;
+
+	struct node * lostpeer;
+	struct node * processpair;
 	int floor, panel;
 
 #warning "Add a test for whether nto and nfrom is 0??";
@@ -34,21 +35,33 @@ void handle_msg(struct msg package, struct timeval *ttime){
 //	}
 	switch (package.msgtype){
 	case OPCODE_NEWPEER:
-        if(!getelevnode(elevfrom)){ // Elevator hasn't been connected earlier
+        if(nfrom==0){ // Elevator hasn't been connected earlier
                 addelev(elevfrom);
         }
 		else{    // Elevator has been connected earlier
 			activate(gethead(), *nfrom);
-			recover_elev(nfrom) ;//, nfrom->elevinfo.current_orders); // Recover
+			// Test if i am process pair : if i am, then
+			if(nfrom->elevinfo.processpair == gethead()->elevinfo.ip){
+
+				recover_elev(nfrom) ;//, nfrom->elevinfo.current_orders); // Recover
+				printf("sending recover cmd\n");
+			}
+
 		}
         nfrom=getelevnode(elevfrom);
-        order_print_list(nfrom->elevinfo.current_orders);
+//        order_print_list(nfrom->elevinfo.current_orders);
 		break;
 	case OPCODE_IMALIVE:
 
 		break;
 	case OPCODE_NEWORDER:
-		nto->elevinfo.current_orders[package.gpdata[0]][package.gpdata[1]].active = 1;
+		floor = package.gpdata[0];
+		panel = package.gpdata[1];
+		printf("Neworder: floor %i, panel %i\n\tto: %i\n\tfrom: %i\n", floor, panel, nto->elevinfo.ip, nfrom->elevinfo.ip);
+
+//		nto->elevinfo.current_orders[package.gpdata[0]][package.gpdata[1]].active = 1;
+		if(nto!=0)
+			order_add_order(nto, floor, panel);
 		//elev_set_button_lamp(package.gpdata[1], package.gpdata[0], 1);
 //		printf("Got new order for ip: %i\n", nto->elevinfo.ip);
 		break;
@@ -56,7 +69,8 @@ void handle_msg(struct msg package, struct timeval *ttime){
 		floor = package.gpdata[0];
 		panel = package.gpdata[1];
 //		printf("Order at floor: %i, panel: %i was done by %i\n", package.gpdata[0], package.gpdata[1], nfrom->elevinfo.ip);
-		nfrom->elevinfo.current_orders[floor][panel].active = 0;
+//		nfrom->elevinfo.current_orders[floor][panel].active = 0; // <<<<<
+		clear_order_all_elev(floor, panel);
 //		clear_order_all_elev(floor, panel);
 		//elev_set_button_lamp(package.gpdata[1], package.gpdata[0], 0); // <--- This is handled by light monitor thread
 		break;
@@ -70,46 +84,66 @@ void handle_msg(struct msg package, struct timeval *ttime){
 
 		break;
 	case OPCODE_ELEVSTATE:
-		nfrom->elevinfo.current_state.direction = package.direction;
-		nfrom->elevinfo.current_state.floor = package.floor;
+		if(nfrom!=0){
+			nfrom->elevinfo.current_state.direction = package.direction;
+			nfrom->elevinfo.current_state.floor = package.floor;
+		}
 //		printf("elev: %i: \n\tfloor:%i,\n\tdir:%i\n", nfrom->elevinfo.ip, nfrom->elevinfo.current_state.floor, nfrom->elevinfo.current_state.direction);
 		break;
 	case OPCODE_NOOP:
 
 		break;
 	case OPCODE_PEERLOSTTAKEOVER:
-//		printf("Redirect tasks of the lost peer(ip:%i)\n", package.from);
-//        printf("This elev: \n");
-//        order_print_list(nto->elevinfo.current_orders);
-//        printf("Lost elev: \n");
-//		order_print_list(nfrom->elevinfo.current_orders);
-		ordertablemerge(nto, nfrom, CALL_UP);
-		ordertablemerge(nto, nfrom, CALL_DOWN);
-//		ordertablemerge(nto->elevinfo.current_orders, nfrom->elevinfo.current_orders, CALL_UP);
-//		ordertablemerge(nto->elevinfo.current_orders, nfrom->elevinfo.current_orders, CALL_DOWN);
-		order_flush_panel(nfrom, CALL_UP);
-		order_flush_panel(nfrom, CALL_DOWN);
-		//rmelev(elevfrom);
-		deactivate(gethead(), *nfrom);
-//        printf("This elev after merge: \n");
-
-//        order_print_list(nto->elevinfo.current_orders);
-		break;
+////		printf("Redirect tasks of the lost peer(ip:%i)\n", package.from);
+////        printf("This elev: \n");
+////        order_print_list(nto->elevinfo.current_orders);
+////        printf("Lost elev: \n");
+////		order_print_list(nfrom->elevinfo.current_orders);
+//		lostpeer = nfrom;
+//		processpair = nto;
+//		ordertablemerge(processpair, lostpeer, CALL_UP);
+//		ordertablemerge(processpair, lostpeer, CALL_DOWN);
+////		ordertablemerge(nto->elevinfo.current_orders, nfrom->elevinfo.current_orders, CALL_UP);
+////		ordertablemerge(nto->elevinfo.current_orders, nfrom->elevinfo.current_orders, CALL_DOWN);
+//		order_flush_panel(lostpeer, CALL_UP);
+//		order_flush_panel(lostpeer, CALL_DOWN);
+//		//rmelev(elevfrom);
+//		deactivate(gethead(), *lostpeer);
+////        printf("This elev after merge: \n");
+//
+////        order_print_list(nto->elevinfo.current_orders);
+//		break;
 	case OPCODE_PEERLOST:
+		lostpeer = nfrom;
+		processpair = nto;
+		lostpeer->elevinfo.processpair = processpair->elevinfo.ip;
+		ordertablemerge(processpair, lostpeer, CALL_UP);
+		ordertablemerge(processpair, lostpeer, CALL_DOWN);
+		order_flush_panel(lostpeer, CALL_UP);
+		order_flush_panel(lostpeer, CALL_DOWN);
+		deactivate(gethead(), *lostpeer);
 	//	rmelev(elevfrom);
 //		cleartable(nfrom->elevinfo.current_orders, CALL_UP);
 //		cleartable(nfrom->elevinfo.current_orders, CALL_DOWN);
-		ordertablemerge(nto, nfrom, CALL_UP);
-		ordertablemerge(nto, nfrom, CALL_DOWN);
-		order_flush_panel(nfrom, CALL_UP);
-		order_flush_panel(nfrom, CALL_DOWN);
-		deactivate(gethead(), *nfrom);
+//		ordertablemerge(nto, nfrom, CALL_UP);
+//		ordertablemerge(nto, nfrom, CALL_DOWN);
+//		order_flush_panel(nfrom, CALL_UP);
+//		order_flush_panel(nfrom, CALL_DOWN);
+//		deactivate(gethead(), *nfrom);
 		break;
 	case OPCODE_RECOVER_CMD:
 //		int floor;
-		if(nto->elevinfo.ip == gethead()->elevinfo.ip){
-			for(floor = 0; floor<FLOORS; floor++){
-				gethead()->elevinfo.current_orders[floor][COMMAND].active |= package.gpdata[floor];
+		printf("WHYYY DID YOU GO TO UNUSED COMMAND?\n");
+		if(nto!=0){
+			if(nto->elevinfo.ip == gethead()->elevinfo.ip){
+				printf("Got a recover cmd\n");
+				for(floor = 0; floor<FLOORS; floor++){
+					if(package.gpdata[floor]){
+						order_register_new_order(gethead(), floor, COMMAND);
+//						order_add_order(gethead(), floor, COMMAND);
+					}
+	//				gethead()->elevinfo.current_orders[floor][COMMAND].active |= package.gpdata[floor];
+				}
 			}
 		}
 		break;
@@ -134,20 +168,26 @@ void handle_msg(struct msg package, struct timeval *ttime){
  */
 void recover_elev(struct node * n){//, int orderlist[][N_PANELS]){
 	int floor;
-	int ordummy[] = {0};
-	int cmdorders[FLOORS];
-	order_print_list(n->elevinfo.current_orders);
+//	int ordummy[] = {0};
+//	int cmdorders[FLOORS];
+//	order_print_list(n->elevinfo.current_orders);
+//	for(floor = 0; floor < FLOORS; floor ++){
+//		if(n->elevinfo.current_orders[floor][COMMAND].active){
+//			cmdorders[floor] = 1; // {floor, COMMAND};
+//			printf("Recover: Sending command floor %i\n", floor);
+//		}
+//		else{
+//			cmdorders[floor] = 0;
+//		}
+//
+//	}
+//	send_msg(OPCODE_RECOVER_CMD, n->elevinfo.ip, ordummy, 0,0, cmdorders);
 	for(floor = 0; floor < FLOORS; floor ++){
 		if(n->elevinfo.current_orders[floor][COMMAND].active){
-			cmdorders[floor] = 1; // {floor, COMMAND};
-			printf("Recover: Sending command floor %i\n", floor);
+			order_register_new_order(n, floor, COMMAND);
 		}
-		else{
-			cmdorders[floor] = 0;
-		}
-
 	}
-	send_msg(OPCODE_RECOVER_CMD, n->elevinfo.ip, ordummy, 0,0, cmdorders);
+
 
 }
 void send_msg(int msgtype, int to, int orders[][N_PANELS], int direction, int floor, int gpdata[]){

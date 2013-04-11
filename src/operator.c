@@ -52,7 +52,7 @@ void operator_callback_sensor(int floor, int value){
 		elev_set_speed(0);
 	if(value == 1){ // Entering floor
 		elev_set_floor_indicator(floor);
-		printf("entering floor\n");
+//		printf("entering floor\n");
 		set_last_floor(floor);
 		if(floor == FLOORS-1){
 			set_last_dir(DOWN);
@@ -69,7 +69,7 @@ void operator_callback_sensor(int floor, int value){
 	}
 	else if (value == 0){ // Leaving floor
 		current_pos = BETWEEN_FLOORS;
-		printf("leaving floor\n");
+//		printf("leaving floor\n");
 		set_elev_event(FLOORSENSOR);
 	}
 	else{
@@ -101,7 +101,7 @@ int requests(){
 	for (panel = CALL_UP; panel<=COMMAND; panel++){
 		for(floor = 0; floor< FLOORS; floor ++){
 			if(head->elevinfo.current_orders[floor][panel].active){
-				printf("There are request at floor %i, panel %i, order[][] = %i\n", floor, panel, head->elevinfo.current_orders[floor][panel].active);
+//				printf("There are request at floor %i, panel %i, order[][] = %i\n", floor, panel, head->elevinfo.current_orders[floor][panel].active);
 				return 1;
 			}
 		}
@@ -219,7 +219,7 @@ int prioritized_dir(){
 }
 
 void opendoor(){
-	printf("Open door \n");
+//	printf("Open door \n");
 	control_slow_down();
     gettimeofday(&dooropentime, 0);
     order_reset_current_floor();
@@ -229,7 +229,7 @@ void opendoor(){
 
 void closedoor(){
 	elev_set_door_open_lamp(0);
-	printf("close door\n");
+//	printf("close door\n");
 //	if(elev_if_emergency()) {
 //		em_restart();
 //		printf("em_restart\n");
@@ -245,8 +245,8 @@ void em_stop(){
 		int ordummy[FLOORS][N_PANELS];
 		int gpdummy[]={0};
 		send_msg(OPCODE_ELEVINEMERGENCY, elevlistroot->next->elevinfo.ip, ordummy, 0, 0, gpdummy);
-		ordertablemerge(elevlistroot->next->elevinfo.current_orders, elevlistroot->elevinfo.current_orders, CALL_UP);
-		ordertablemerge(elevlistroot->next->elevinfo.current_orders, elevlistroot->elevinfo.current_orders, CALL_DOWN);
+		ordertablemerge(elevlistroot->next, elevlistroot, CALL_UP);
+		ordertablemerge(elevlistroot->next, elevlistroot, CALL_DOWN);
 		order_flush_panel(elevlistroot, CALL_UP);
 		order_flush_panel(elevlistroot, CALL_DOWN);
 		deactivate(elevlistroot, *elevlistroot);
@@ -275,8 +275,8 @@ void obstruction() {
 		int ordummy[FLOORS][N_PANELS];
 		int gpdummy[]={0};
 		send_msg(OPCODE_ELEVINEMERGENCY, elevlistroot->next->elevinfo.ip, ordummy, 0, 0, gpdummy);
-		ordertablemerge(elevlistroot->next->elevinfo.current_orders, elevlistroot->elevinfo.current_orders, CALL_UP);
-		ordertablemerge(elevlistroot->next->elevinfo.current_orders, elevlistroot->elevinfo.current_orders, CALL_DOWN);
+		ordertablemerge(elevlistroot->next, elevlistroot, CALL_UP);
+		ordertablemerge(elevlistroot->next, elevlistroot, CALL_DOWN);
 		order_flush_panel(elevlistroot, CALL_UP);
 		order_flush_panel(elevlistroot, CALL_DOWN);
 		deactivate(elevlistroot, *elevlistroot);

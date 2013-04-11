@@ -29,6 +29,7 @@ struct elevstate{
 
 struct elevator{
 	in_addr_t ip;
+	in_addr_t processpair;
 	int active;
 	struct elevstate current_state;
 	order_t current_orders[FLOORS][N_PANELS];
@@ -80,7 +81,8 @@ void order_flush_panel(struct node * elevator, enum panel_type panel);
  */
 void order_register_as_done(int floor, int panel);
                      
-void order_add();
+//void order_add();
+void order_add_order(struct node * elevator, int floor, int panel);
 
 //Handle_button_lamps control all panel lights. 									
 void *order_handle_button_lamps();
@@ -118,7 +120,7 @@ void activateelev(struct elevator elev);
 
 void deactivateelev(struct elevator elev);
 
-void order_add_order(struct order ord);
+//void order_add_order(struct order ord);
 
 //void cleartable(int table[][N_PANELS]);
 void cleartable(int * table, int nrows, int ncols);

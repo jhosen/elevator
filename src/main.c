@@ -11,9 +11,10 @@ int main (int argc, const char * argv[]) {
 
     elev_init();
     elev_reset_all_lamps();
+	init_order(inet_addr(getlocalip()));
+
     network();
 //    network_init();
-	init_order(inet_addr(getlocalip()));
 
 	elevator();
 

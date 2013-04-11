@@ -302,7 +302,7 @@ static void stopbroadcast_udp(){
     pthread_kill(send_udp_broadcast_thread, 0);
 }
 
-
+#include <termios.h>
 /* \!brief Communication handler
  *
  */
@@ -317,11 +317,12 @@ void *com_handler(void * peer){
 
 
 	printf("New communication handler thread created for peer connected to socket %d \n", p.socket);
-	struct msg adder = {
+
+	struct msg newpeermsg = {
 			.msgtype = OPCODE_NEWPEER,
 			.from	 = p.ip,
 	};
-	handle_msg(adder, 0);
+	handle_msg(newpeermsg, 0);
 
 	char recv_msg[MAXRECVSIZE];//[2000];
 	char send_msg[MAXRECVSIZE];//[2000];
@@ -373,17 +374,17 @@ void *com_handler(void * peer){
 				}
 		}
 		else {
-/* Receive data */
+			/* Receive data */
 			/**
 			 * CHECK FOR FRAGMENTS
 			 * */
 //			printf("string copyyyyyyyyyy\n");
 			strcpy(string, recv_msg);
+			string[strlen(string)] = '\0';
 //			string = recv_msg;
 
 			int start_i = 0;
 			int end_i = cjsonendindex(string, start_i);
-
 //			printf("Whilestart\n");
 			while(end_i<(strlen(string)-1)){
 //				printf("Strncpy end:%i.. \n", end_i);
@@ -392,7 +393,10 @@ void *com_handler(void * peer){
 //				printf("cjsonstr: %s\n", cjsonstr);
 //				printf("..Strncpy done\n");
 				struct msg packetin = byte_to_struct(cjsonstr);
+//				if(packetin.msgtype!=OPCODE_IMALIVE)
+//						printf("rec: %s\n", string);
 				packetin.from = p.ip;
+//				printf("Starting handle msg\n");
 				handle_msg(packetin, &ttime);
 				start_i = end_i+1;
 				end_i = cjsonendindex(string, start_i);
@@ -404,9 +408,12 @@ void *com_handler(void * peer){
 				cjsonstr[end_i-start_i+1] = '\0';
 //				printf("cjsonstr: %s\n", cjsonstr);
 				struct msg packetin = byte_to_struct(cjsonstr);
+//				if(packetin.msgtype!=OPCODE_IMALIVE)
+//										printf("rec: %s\n", string);
 				packetin.from = p.ip;
 				handle_msg(packetin, &ttime);
 			}
+
 //			free(cjsonstr);
 //			free(string);
 		}
@@ -423,12 +430,16 @@ void *com_handler(void * peer){
 			 cbRead(&pp->bufout, &elem);
 			 if (elem.msgtype!=OPCODE_CORRUPT){
 				 char * cout  = struct_to_byte(elem);
+//				 if(elem.msgtype==OPCODE_RECOVER_CMD)
+//					 printf("Sending recover cmd from buffer\n");
 				 send(pinf->socket, cout, strlen(cout), 0);//MAXRECVSIZE
+				 tcflush(pinf->socket, TCOFLUSH);
 				 free(cout);
+
 			 }
 		}
 	}
-	// Recovery mode:
+	/* Recovery mode: */
 
 	nw_rm(p);
 
