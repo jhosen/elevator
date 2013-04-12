@@ -6,7 +6,6 @@
  *  Copyright 2013 __MyCompanyName__. All rights reserved.
  *
  */
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/socket.h>
@@ -15,14 +14,14 @@
 #include <sys/ioctl.h>
 #include <ifaddrs.h>
 #include <netdb.h>
-#include "network.h"
 #include <time.h>
 #include <errno.h>
 #include <fcntl.h>
-#include "cJSON.h"
-#include "buffer_elev.h"
+#include "utils/cb_buffer.h"
+#include "utils/cJSON.h"
+#include "utils/statemachine.h"
 #include "communication.h"
-#include "statemachine.h"
+#include "network.h"
 
 #define TRUE  1
 #define FALSE 0

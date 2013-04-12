@@ -4,11 +4,10 @@
  *  Created on: Apr 7, 2013
  *      Author: student
  */
-
+#include "drivers/elev.h"
 #include "communication.h"
 #include "control.h"
 #include "elevator.h"
-#include "elev.h"
 #include "order.h"
 #include "operator.h"
 

@@ -6,11 +6,11 @@
  */
 
 #include <stdlib.h>
-#include "communication.h"
-#include <arpa/inet.h>
-#include "network.h"
-#include "cJSON.h"
 #include <time.h>
+#include <arpa/inet.h>
+#include "utils/cJSON.h"
+#include "communication.h"
+#include "network.h"
 #include "order.h"
 
 void handle_msg(struct msg package, struct timeval *ttime){

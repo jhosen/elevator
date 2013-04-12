@@ -1,10 +1,11 @@
-#include <stdio.h>
-#include "network.h"
-#include "communication.h"
 #include <arpa/inet.h>
-#include "elevator.h"
-#include "elev.h"
+#include <stdio.h>
 #include <signal.h>
+#include "drivers/elev.h"
+#include "communication.h"
+#include "elevator.h"
+#include "network.h"
+
 
 
 void signal_callback_handler(int signum);

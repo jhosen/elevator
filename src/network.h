@@ -8,9 +8,9 @@
  */
 #include <arpa/inet.h>
 #include <pthread.h>
-#include "buffer_elev.h"
+#include "utils/cb_buffer.h"
+#include "utils/statemachine.h"
 #include "communication.h"
-#include "statemachine.h"
 
 #define LAN_BROADCAST_IP	"129.241.187.255"
 

@@ -7,9 +7,9 @@
 //
 
 #include <stdio.h>
-#include "buffer_elev.h"
-#include "network.h"
-#include "communication.h"
+#include "cb_buffer.h"
+#include "../network.h"
+#include "../communication.h"
 
 void cbInit(CircularBuffer *cb, int size) {
 	cb->size  = size;

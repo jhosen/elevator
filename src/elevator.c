@@ -4,12 +4,11 @@
  *  Created on: Apr 10, 2013
  *      Author: student
  */
-
-#include "statemachine.h"
+#include "elevator.h"
+#include "drivers/elev.h"
+#include "utils/statemachine.h"
 #include "control.h"
 #include "operator.h"
-#include "elevator.h"
-#include "elev.h"
 #include "order.h"
 
 
