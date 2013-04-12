@@ -3,9 +3,7 @@
 
 #include "pthread.h"
 
-
 #define NOEVENT 0
-
 
 typedef int events_t ;
 typedef int state_t ;

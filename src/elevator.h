@@ -25,9 +25,7 @@ typedef enum {IDLE, STOP_BUTTON, OBSTRUCTION, FLOORSENSOR} elev_event_t;
 
 // {@ Events
 typedef enum {EXECUTE=1, EM_STOP, EM_OBSTR, DOOROPEN} elev_state_t;
-
 // @}
-
 
 /* !\brief Runs elevator into place and starts state machine
  *

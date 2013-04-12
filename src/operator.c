@@ -13,7 +13,6 @@
 #include "operator.h"
 
 
-
 void operator_init(){
 	elev_register_callback(SIGNAL_TYPE_CALL_UP, 	operator_callback_button);
 	elev_register_callback(SIGNAL_TYPE_CALL_DOWN, 	operator_callback_button);
@@ -21,7 +20,6 @@ void operator_init(){
 	elev_register_callback(SIGNAL_TYPE_SENSOR, 		operator_callback_sensor);
 	elev_register_callback(SIGNAL_TYPE_STOP, 		operator_callback_stop);
 	elev_register_callback(SIGNAL_TYPE_OBSTR, 		operator_callback_obstr);
-
 	elev_enable_callbacks();
 }
 
@@ -54,8 +52,7 @@ void operator_callback_sensor(int floor, int value){
 		control_setcurpos(floor);
         set_elev_event(FLOORSENSOR);
         int gpdummy[]={};
-        int ordummy[]={};
-        send_msg(OPCODE_ELEVSTATE, 0, ordummy, get_last_dir(), floor, gpdummy);
+        send_msg(OPCODE_ELEVSTATE, 0, get_last_dir(), floor, gpdummy);
 
 	}
 	else if (value == 0){ // Leaving floor

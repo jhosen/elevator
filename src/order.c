@@ -44,15 +44,13 @@ void order_add_order(struct node * elevator, int floor, int panel){
 
 void order_register_new_order(struct node * elevator, int floor, int panel){
 	int order[] = {floor, panel};
-	int ordummy[N_FLOORS][N_PANELS];
-	send_msg(OPCODE_NEWORDER, elevator->elevinfo.ip, ordummy, 0, 0, order);
+	send_msg(OPCODE_NEWORDER, elevator->elevinfo.ip, 0, 0, order);
     order_add_order(elevator, floor, panel);
 }
 
 void order_register_as_done(int floor, int panel){
     int gp[] = {floor, panel};
-    int ordummy[N_FLOORS][N_PANELS];
-    send_msg(OPCODE_ORDERDONE, head.elevinfo.ip, ordummy, 0, 0, gp);
+    send_msg(OPCODE_ORDERDONE, head.elevinfo.ip , 0, 0, gp);
     head.elevinfo.current_orders[floor][panel].active = 0;
     clear_order_all_elev(floor, panel);
 }

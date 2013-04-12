@@ -70,25 +70,13 @@ int control_timeoutdoor(){
 	return 0;
 }
 
-void setactiveobstr(int value){
-	activeobstr = value;
-}
-
-int obstr_on(){
-	return activeobstr;
-}
-int obstr_off(){
-	return !activeobstr;
-}
-
 void control_emergency(){
 	elev_set_stop_lamp(1);
 	control_stop();
 	struct node * elevlistroot = gethead();
 	if(count(elevlistroot)>1){
-		int ordummy[N_FLOORS][N_PANELS];
 		int gpdummy[]={0};
-		send_msg(OPCODE_ELEVINEMERGENCY, elevlistroot->next->elevinfo.ip, ordummy, 0, 0, gpdummy);
+		send_msg(OPCODE_ELEVINEMERGENCY, elevlistroot->next->elevinfo.ip, 0, 0, gpdummy);
 		ordertablemerge(elevlistroot->next, elevlistroot, CALL_UP);
 		ordertablemerge(elevlistroot->next, elevlistroot, CALL_DOWN);
 		order_flush_panel(elevlistroot, CALL_UP);
@@ -101,9 +89,8 @@ void control_emrestart(){
 	elev_set_door_open_lamp(0);
 	struct node * elevlistroot = gethead();
 	if(count(elevlistroot)>1){
-		int ordummy[N_FLOORS][N_PANELS];
 		int gpdummy[]={0};
-		send_msg(OPCODE_ELEV_NOT_EMERGENCY, elevlistroot->next->elevinfo.ip, ordummy, 0, 0, gpdummy);
+		send_msg(OPCODE_ELEV_NOT_EMERGENCY, elevlistroot->next->elevinfo.ip, 0, 0, gpdummy);
 	}
 	activate(elevlistroot, *elevlistroot);
 	elev_set_stop_lamp(0);
@@ -114,9 +101,8 @@ void control_obstr() {
 	control_stop();
 	struct node * elevlistroot = gethead();
 	if(count(elevlistroot)>1){
-		int ordummy[N_FLOORS][N_PANELS];
 		int gpdummy[]={0};
-		send_msg(OPCODE_ELEVINEMERGENCY, elevlistroot->next->elevinfo.ip, ordummy, 0, 0, gpdummy);
+		send_msg(OPCODE_ELEVINEMERGENCY, elevlistroot->next->elevinfo.ip, 0, 0, gpdummy);
 		ordertablemerge(elevlistroot->next, elevlistroot, CALL_UP);
 		ordertablemerge(elevlistroot->next, elevlistroot, CALL_DOWN);
 		order_flush_panel(elevlistroot, CALL_UP);
@@ -136,3 +122,13 @@ void set_last_dir(enum direction_t dir){
 	last_dir = dir;
 }
 
+void setactiveobstr(int value){
+	activeobstr = value;
+}
+
+int obstr_on(){
+	return activeobstr;
+}
+int obstr_off(){
+	return !activeobstr;
+}

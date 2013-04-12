@@ -106,19 +106,13 @@ void recover_elev(struct node * n){
 	}
 }
 
-void send_msg(int msgtype, int to, int orders[][N_PANELS], int direction, int floor, int gpdata[]){
+void send_msg(int msgtype, int to, int direction, int floor, int gpdata[]){
 	struct msg packet = {
 			.msgtype = msgtype,
 			.to = to,
 			.direction = direction,
 			.floor = floor,
 	};
-	int flooriter;
-	for(flooriter = 0; flooriter<N_FLOORS; flooriter++){
-		packet.orders[flooriter][PANEL_CMD] = orders[flooriter][PANEL_CMD];
-		packet.orders[flooriter][PANEL_UP]  = orders[flooriter][PANEL_UP];
-		packet.orders[flooriter][PANEL_DOWN] = orders[flooriter][PANEL_DOWN];
-	}
 
 	int i;
 	for (i = 0; i < sizeof(gpdata); i ++){
@@ -127,21 +121,16 @@ void send_msg(int msgtype, int to, int orders[][N_PANELS], int direction, int fl
 	sendtoallpeer(packet);
 }
 
-
-
 /*
  * cJSON parser functions
  */
 char * pack(struct msg msg_struct){
-	cJSON *root, *msgtype, *from, *to, *gpdata, *panel_cmd, *panel_up, *panel_down, *direction, *floor;
+	cJSON *root, *msgtype, *from, *to, *gpdata, *direction, *floor;
 
 	root 		= cJSON_CreateObject();
 	msgtype 	= cJSON_CreateObject();
 	from 		= cJSON_CreateObject();
 	to 			= cJSON_CreateObject();
-	panel_cmd	= cJSON_CreateObject();
-	panel_up 	= cJSON_CreateObject();
-	panel_down	= cJSON_CreateObject();
 	gpdata 		= cJSON_CreateObject();
 	direction	= cJSON_CreateObject();
 	floor		= cJSON_CreateObject();
@@ -152,15 +141,6 @@ char * pack(struct msg msg_struct){
 	cJSON_AddNumberToObject(root, "direction",msg_struct.direction);
 	cJSON_AddNumberToObject(root, "floor"	, msg_struct.floor	);
 
-//	cJSON_AddItemToObject(root, "panel_cmd"	, panel_cmd);
-//	cJSON_AddItemToObject(root, "panel_up"	, panel_up);
-//	cJSON_AddItemToObject(root, "panel_down", panel_down);
-//	int flooriter;
-//	for(flooriter = 0; flooriter<N_FLOORS; flooriter++){
-//		cJSON_AddNumberToObject(panel_cmd, "order", msg_struct.orders[flooriter][PANEL_CMD]);
-//		cJSON_AddNumberToObject(panel_up, "order", msg_struct.orders[flooriter][PANEL_UP]);
-//		cJSON_AddNumberToObject(panel_down, "order", msg_struct.orders[flooriter][PANEL_DOWN]);
-//	}
 	cJSON_AddItemToObject(	root, "gpdata"		, gpdata);
 	int i;
 	for(i = 0; i < DATALENGTH; i++){
@@ -170,7 +150,6 @@ char * pack(struct msg msg_struct){
 	char * msg = cJSON_Print(root);
 	cJSON_Delete(root);
 	return(msg);
-
 }
 
 struct msg unpack(char *mesg){
@@ -190,22 +169,6 @@ struct msg unpack(char *mesg){
 			msg_struct.to		= to->valueint		;
 			msg_struct.direction= direction->valueint;
 			msg_struct.floor	= floor->valueint	;
-
-//			cJSON * panel_cmd	= cJSON_GetObjectItem(root, 	"panel_cmd");
-//			cJSON * panel_up	= cJSON_GetObjectItem(root, 	"panel_up");
-//			cJSON * panel_down	= cJSON_GetObjectItem(root, 	"panel_down");
-//			cJSON * cmditer		= cJSON_GetObjectItem(panel_cmd,"order");
-//			cJSON * upiter		= cJSON_GetObjectItem(panel_up, "order");
-//			cJSON * downiter	= cJSON_GetObjectItem(panel_down,"order");
-//			int flooriter;
-//			for (flooriter= 0; flooriter<N_FLOORS; flooriter++){
-//				msg_struct.orders[flooriter][PANEL_CMD] 	= cmditer->valueint;
-//				msg_struct.orders[flooriter][PANEL_UP] 	= upiter->valueint;
-//				msg_struct.orders[flooriter][PANEL_DOWN] 	= downiter->valueint;
-//				cmditer = cmditer->next;
-//				upiter = upiter->next;
-//				downiter = downiter->next;
-//			}
 
 			cJSON * gpdata 	= cJSON_GetObjectItem(root, "gpdata");
 			cJSON * dataiter= cJSON_GetObjectItem(gpdata, "int");

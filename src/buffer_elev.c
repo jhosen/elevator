@@ -2,7 +2,7 @@
 //  buffer_elev.c
 //  
 //
-//  Created by Jesper Hosen on 04.04.13.
+//  Created by Jesper Hosen and Dag Sletteboe on 04.04.13.
 //
 //
 
@@ -10,8 +10,6 @@
 #include "buffer_elev.h"
 #include "network.h"
 #include "communication.h"
-//static CircularBuffer buffer;
-
 
 void cbInit(CircularBuffer *cb, int size) {
 	cb->size  = size;

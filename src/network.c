@@ -22,7 +22,6 @@
 #include "cJSON.h"
 #include "buffer_elev.h"
 #include "communication.h"
-
 #include "statemachine.h"
 
 #define TRUE  1
@@ -195,7 +194,6 @@ void *com_handler(void * peer){
 }
 
 
-
 int sendtoallpeer(struct msg package){
 	struct peer p = {
 			.ip = TOALLIP
@@ -218,7 +216,6 @@ int sendtopeer(struct msg package, struct peer p){
 	}
 	return 1;
 }
-
 
 int connect_to_peer(in_addr_t peer_ip){
 	int peer_socket = socket(AF_INET, SOCK_STREAM, 0);
@@ -243,7 +240,7 @@ void assign_com_thread(struct peer p){
 	struct peer *pinf = malloc(sizeof(struct peer));
 	pinf->socket 	= p.socket;
 	pinf->ip		= p.ip;
-	if( pthread_create( &pinf->com_thread , NULL ,  com_handler , pinf)<0){// peer_socket_p) < 0){
+	if( pthread_create( &pinf->com_thread , NULL ,  com_handler , pinf)<0){
 		perror("err: pthread_create\n");
 		exit(1);
 	}
@@ -314,11 +311,8 @@ void* listen_udp_broadcast(){
 	int opt = 1;
 	setsockopt(sock,SOL_SOCKET,SO_REUSEADDR,(char*)&opt,sizeof(opt));
 
-	if (bind(sock, (struct sockaddr *) &saSocket, sizeof(saSocket)) == 0)
+	if (bind(sock, (struct sockaddr *) &saSocket, sizeof(saSocket)) != 0)
 	{
-		printf("Socket bound\n");
-	}
-	else {
 		perror("Bind");
 	}
 	struct sockaddr_in their_addr; // connector's address information
@@ -335,7 +329,7 @@ void* listen_udp_broadcast(){
 		struct peer newpeer = peer_object(0, their_addr.sin_addr.s_addr);
 		if(!nw_find(newpeer)){
 			if( connect_to_peer(their_addr.sin_addr.s_addr)==-1){
-				perror("err: connect_to_peer.\n Error when trying to initate a new connection to a peer by TCP\n");
+//				perror("err: connect_to_peer.");
 			}
 			else{
                 nw_setevent(CONNECTION);
@@ -392,8 +386,6 @@ static void *start_timer(){
         }
     }
 }
-
-
 
 void nw_setevent(events_t evnt){
 	pthread_mutex_lock(&event.eventMutex);

@@ -30,7 +30,6 @@ struct msg {
 	int msgtype;
 	in_addr_t from;
 	int to;
-	int orders[N_FLOORS][N_PANELS];
 	int direction;
 	int floor;
 	int gpdata[DATALENGTH];
@@ -60,7 +59,7 @@ void handle_msg(struct msg package, struct timeval *ttime);
  * \param gpdata General purpose array used to transfer data between peers.
  *
  */
-void send_msg(int msgtype, int to,  int orders[][N_PANELS], int direction, int floor, int gpdata[]);
+void send_msg(int msgtype, int to, int direction, int floor, int gpdata[]);
 
 
 /* Parser functions using cJSON */
