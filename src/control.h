@@ -1,57 +1,46 @@
 #ifndef _CONTROL_H
 #define _CONTROL_H
 						
-/********************************************* DECLARATIONS ****************************************************/
-#define ELEV_SPEED 300
-#define BETWEEN_FLOORS -1
-#define DOOR_OPEN_TIME 3
-#define SLOW_DOWN_TIME 8000
-/*************************************************FUNCTIONS *****************************************************/
+#define ELEV_SPEED 		300
+#define BETWEEN_FLOORS	-1
+#define DOOROPENTIME 3
+#define SLOW_DOWN_TIME 	8000
 
-int control_new_floor(void);
 
-/* Ensures a smooth stop in new floors. Slow down time might vary from elevator to elevator. */
-void control_slow_down();
+int control_getcurpos();
 
-int control_time_is_out();
+void control_up();
 
-/* Sets timer and opens door. */
-void control_open_door();
+void control_down();
 
-void control_set_stop_timer();
+void control_stop();
 
-//void set_dragged_out(flag);
+void control_setcurpos(int position);
 
-/************************************************ ELEV FUNCTIONS *****************************************************/
+void control_executeorder();
 
-/*Functions that are closely connected to the elev functions:*/
+void control_closedoor();
 
-void go_up();
+void control_emergency();
 
-void go_down();
+void control_emrestart();
 
-void stop_elevator();
+void control_obstr();
 
-void stop_lamp_on();
+void control_setdir();
 
-void stop_lamp_off();
+int control_betweenfloors();
 
-void set_floor_light();
+int control_timeoutdoor();
 
-int check_stop();
+int obstr_on();
 
-int get_position();
+int obstr_off();
 
-int check_obstruction();
+void setactiveobstr(int value);
 
-void close_door();
-
-int init_test(); 
-
-/******************************************** GET/SET FUNCTIONS *******************************************************/
-
-//void set_newly_emergency(int flag);
 enum direction_t get_last_dir();
+
 void set_last_dir(enum direction_t dir);
 
 

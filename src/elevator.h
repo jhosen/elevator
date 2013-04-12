@@ -12,25 +12,20 @@
 
 
 #define N_FLOORS 4
+#define N_PANELS 3
 #define N_STATES 5
 #define N_EVENTS 4
-
+#define BETWEEN_FLOORS -1
+#define MAXWAIT_ORDER_TIME 10
 
 
 // {@ States
 typedef enum {IDLE, STOP_BUTTON, OBSTRUCTION, FLOORSENSOR} elev_event_t;
-//#define IDLE 0
-//#define STOP_BUTTON 1
-//#define OBSTRUCTION 2
-//#define FLOORSENSOR 3
 // @}
+
 // {@ Events
 typedef enum {EXECUTE=1, EM_STOP, EM_OBSTR, DOOROPEN} elev_state_t;
-//#define NOEVENT 0
-//#define EXECUTE 1
-//#define EM_STOP 2
-//#define EM_OBSTR 3
-//#define DOOROPEN 4
+
 // @}
 
 
@@ -47,6 +42,6 @@ void set_elev_event(events_t event);
 /*	!\brief Runs elevator to floor below
  *
  */
-static void init_elev_position(void);
+static void init_elev_position();
 
 #endif /* ELEVATOR_H_ */

@@ -8,14 +8,6 @@
 #ifndef OPERATOR_H_
 #define OPERATOR_H_
 
-/*
- * operator.c
- *
- *  Created on: Apr 7, 2013
- *      Author: student
- */
-
-int should_stop();
 
 
 void operator_init();
@@ -41,33 +33,6 @@ void operator_callback_stop(int floor, int value);
 
 void operator_callback_obstr(int floor, int value);
 
-
-int obstr_on();
-
-int obstr_off();
-
-int prioritized_dir();
-void set_direction();
-
-int request_here();
-
-int requests();
-void em_stop();
-
-int should_stay();
-
-
-void em_restart();
-
-void opendoor();
-void closedoor();
-
-int timeoutdoor();
-
-int betweenfloors();
-int getcurrentpos();
-
-void obstruction();
 
 
 

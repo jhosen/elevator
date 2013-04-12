@@ -16,23 +16,14 @@
 void handle_msg(struct msg package, struct timeval *ttime){
 	if(ttime!=0)
 		gettimeofday(ttime,0);
-	struct elevator elevto, elevfrom;
-	elevto.ip = package.to;
-	elevfrom.ip = package.from;
-
+	struct elevator elevto = {.ip = package.to};
+	struct elevator elevfrom = {.ip = package.from};
 	struct node *nto = getelevnode(elevto);
 	struct node *nfrom=getelevnode(elevfrom);
-
 	struct node * lostpeer;
 	struct node * processpair;
 	int floor, panel;
 
-#warning "Add a test for whether nto and nfrom is 0??";
-
-//	if(nfrom!=0){
-//		if(package.msgtype!=0)
-//			printf("Received (id _%i_, from: %i)\n", package.msgtype, nfrom->elevinfo.ip);
-//	}
 	switch (package.msgtype){
 	case OPCODE_NEWPEER:
         if(nfrom==0){ // Elevator hasn't been connected earlier
@@ -40,16 +31,11 @@ void handle_msg(struct msg package, struct timeval *ttime){
         }
 		else{    // Elevator has been connected earlier
 			activate(gethead(), *nfrom);
-			// Test if i am process pair : if i am, then
-			if(nfrom->elevinfo.processpair == gethead()->elevinfo.ip){
-
-				recover_elev(nfrom) ;//, nfrom->elevinfo.current_orders); // Recover
-				printf("sending recover cmd\n");
+			if(nfrom->elevinfo.processpair == gethead()->elevinfo.ip){ // Check if this elevator is the peers process pair
+				recover_elev(nfrom);
 			}
-
 		}
         nfrom=getelevnode(elevfrom);
-//        order_print_list(nfrom->elevinfo.current_orders);
 		break;
 	case OPCODE_IMALIVE:
 
@@ -57,62 +43,25 @@ void handle_msg(struct msg package, struct timeval *ttime){
 	case OPCODE_NEWORDER:
 		floor = package.gpdata[0];
 		panel = package.gpdata[1];
-		printf("Neworder: floor %i, panel %i\n\tto: %i\n\tfrom: %i\n", floor, panel, nto->elevinfo.ip, nfrom->elevinfo.ip);
-
-//		nto->elevinfo.current_orders[package.gpdata[0]][package.gpdata[1]].active = 1;
 		if(nto!=0)
 			order_add_order(nto, floor, panel);
-		//elev_set_button_lamp(package.gpdata[1], package.gpdata[0], 1);
-//		printf("Got new order for ip: %i\n", nto->elevinfo.ip);
 		break;
 	case OPCODE_ORDERDONE:
 		floor = package.gpdata[0];
 		panel = package.gpdata[1];
-//		printf("Order at floor: %i, panel: %i was done by %i\n", package.gpdata[0], package.gpdata[1], nfrom->elevinfo.ip);
-//		nfrom->elevinfo.current_orders[floor][panel].active = 0; // <<<<<
-		clear_order_all_elev(floor, panel);
-//		clear_order_all_elev(floor, panel);
-		//elev_set_button_lamp(package.gpdata[1], package.gpdata[0], 0); // <--- This is handled by light monitor thread
-		break;
-	case OPCODE_BUTTONHIT:
-
-		break;
-	case OPCODE_LIGHT:
-
-		break;
-	case OPCODE_ORDERLIST:
-
+		if(panel==COMMAND)
+			nfrom->elevinfo.current_orders[floor][panel].active = 0;
+		else{
+			clear_order_all_elev(floor, panel);
+		}
 		break;
 	case OPCODE_ELEVSTATE:
 		if(nfrom!=0){
 			nfrom->elevinfo.current_state.direction = package.direction;
 			nfrom->elevinfo.current_state.floor = package.floor;
 		}
-//		printf("elev: %i: \n\tfloor:%i,\n\tdir:%i\n", nfrom->elevinfo.ip, nfrom->elevinfo.current_state.floor, nfrom->elevinfo.current_state.direction);
-		break;
-	case OPCODE_NOOP:
-
 		break;
 	case OPCODE_PEERLOSTTAKEOVER:
-////		printf("Redirect tasks of the lost peer(ip:%i)\n", package.from);
-////        printf("This elev: \n");
-////        order_print_list(nto->elevinfo.current_orders);
-////        printf("Lost elev: \n");
-////		order_print_list(nfrom->elevinfo.current_orders);
-//		lostpeer = nfrom;
-//		processpair = nto;
-//		ordertablemerge(processpair, lostpeer, CALL_UP);
-//		ordertablemerge(processpair, lostpeer, CALL_DOWN);
-////		ordertablemerge(nto->elevinfo.current_orders, nfrom->elevinfo.current_orders, CALL_UP);
-////		ordertablemerge(nto->elevinfo.current_orders, nfrom->elevinfo.current_orders, CALL_DOWN);
-//		order_flush_panel(lostpeer, CALL_UP);
-//		order_flush_panel(lostpeer, CALL_DOWN);
-//		//rmelev(elevfrom);
-//		deactivate(gethead(), *lostpeer);
-////        printf("This elev after merge: \n");
-//
-////        order_print_list(nto->elevinfo.current_orders);
-//		break;
 	case OPCODE_PEERLOST:
 		lostpeer = nfrom;
 		processpair = nto;
@@ -122,74 +71,37 @@ void handle_msg(struct msg package, struct timeval *ttime){
 		order_flush_panel(lostpeer, CALL_UP);
 		order_flush_panel(lostpeer, CALL_DOWN);
 		deactivate(gethead(), *lostpeer);
-	//	rmelev(elevfrom);
-//		cleartable(nfrom->elevinfo.current_orders, CALL_UP);
-//		cleartable(nfrom->elevinfo.current_orders, CALL_DOWN);
-//		ordertablemerge(nto, nfrom, CALL_UP);
-//		ordertablemerge(nto, nfrom, CALL_DOWN);
-//		order_flush_panel(nfrom, CALL_UP);
-//		order_flush_panel(nfrom, CALL_DOWN);
-//		deactivate(gethead(), *nfrom);
-		break;
-	case OPCODE_RECOVER_CMD:
-//		int floor;
-		printf("WHYYY DID YOU GO TO UNUSED COMMAND?\n");
-		if(nto!=0){
-			if(nto->elevinfo.ip == gethead()->elevinfo.ip){
-				printf("Got a recover cmd\n");
-				for(floor = 0; floor<FLOORS; floor++){
-					if(package.gpdata[floor]){
-						order_register_new_order(gethead(), floor, COMMAND);
-//						order_add_order(gethead(), floor, COMMAND);
-					}
-	//				gethead()->elevinfo.current_orders[floor][COMMAND].active |= package.gpdata[floor];
-				}
-			}
-		}
 		break;
 	case OPCODE_ELEVINEMERGENCY:
-		ordertablemerge(nto, nfrom, CALL_UP);
-		ordertablemerge(nto, nfrom, CALL_DOWN);
-//		ordertablemerge(nto->elevinfo.current_orders, nfrom->elevinfo.current_orders, CALL_UP);
-//		ordertablemerge(nto->elevinfo.current_orders, nfrom->elevinfo.current_orders, CALL_DOWN);
-		order_flush_panel(nfrom, CALL_UP);
-		order_flush_panel(nfrom, CALL_DOWN);
-		deactivate(gethead(), *nfrom);
+		lostpeer = nfrom;
+		processpair = nto;
+		ordertablemerge(processpair, lostpeer, CALL_UP);
+		ordertablemerge(processpair, lostpeer, CALL_DOWN);
+		order_flush_panel(lostpeer, CALL_UP);
+		order_flush_panel(lostpeer, CALL_DOWN);
+		deactivate(gethead(), *lostpeer);
 		break;
 	case OPCODE_ELEV_NOT_EMERGENCY:
 		activate(gethead(), *nfrom);
 		break;
+	case OPCODE_NOOP:
+
+		break;
 	}
 }
 
-/* !\brief Function containing recovery routine for elevator reconnected to network.
- *
+/* !\brief Function used to send previous command orders to elevator reconnecting to network.
  *
  */
-void recover_elev(struct node * n){//, int orderlist[][N_PANELS]){
+void recover_elev(struct node * n){
 	int floor;
-//	int ordummy[] = {0};
-//	int cmdorders[FLOORS];
-//	order_print_list(n->elevinfo.current_orders);
-//	for(floor = 0; floor < FLOORS; floor ++){
-//		if(n->elevinfo.current_orders[floor][COMMAND].active){
-//			cmdorders[floor] = 1; // {floor, COMMAND};
-//			printf("Recover: Sending command floor %i\n", floor);
-//		}
-//		else{
-//			cmdorders[floor] = 0;
-//		}
-//
-//	}
-//	send_msg(OPCODE_RECOVER_CMD, n->elevinfo.ip, ordummy, 0,0, cmdorders);
-	for(floor = 0; floor < FLOORS; floor ++){
+	for(floor = 0; floor < N_FLOORS; floor ++){
 		if(n->elevinfo.current_orders[floor][COMMAND].active){
 			order_register_new_order(n, floor, COMMAND);
 		}
 	}
-
-
 }
+
 void send_msg(int msgtype, int to, int orders[][N_PANELS], int direction, int floor, int gpdata[]){
 	struct msg packet = {
 			.msgtype = msgtype,
@@ -198,7 +110,7 @@ void send_msg(int msgtype, int to, int orders[][N_PANELS], int direction, int fl
 			.floor = floor,
 	};
 	int flooriter;
-	for(flooriter = 0; flooriter<FLOORS; flooriter++){
+	for(flooriter = 0; flooriter<N_FLOORS; flooriter++){
 		packet.orders[flooriter][PANEL_CMD] = orders[flooriter][PANEL_CMD];
 		packet.orders[flooriter][PANEL_UP]  = orders[flooriter][PANEL_UP];
 		packet.orders[flooriter][PANEL_DOWN] = orders[flooriter][PANEL_DOWN];
@@ -213,12 +125,10 @@ void send_msg(int msgtype, int to, int orders[][N_PANELS], int direction, int fl
 
 
 
-
-
 /*
  * cJSON parser functions
  */
-char * struct_to_byte(struct msg msg_struct){
+char * pack(struct msg msg_struct){
 	cJSON *root, *msgtype, *from, *to, *gpdata, *panel_cmd, *panel_up, *panel_down, *direction, *floor;
 
 	root 		= cJSON_CreateObject();
@@ -238,32 +148,29 @@ char * struct_to_byte(struct msg msg_struct){
 	cJSON_AddNumberToObject(root, "direction",msg_struct.direction);
 	cJSON_AddNumberToObject(root, "floor"	, msg_struct.floor	);
 
-
 	cJSON_AddItemToObject(root, "panel_cmd"	, panel_cmd);
 	cJSON_AddItemToObject(root, "panel_up"	, panel_up);
 	cJSON_AddItemToObject(root, "panel_down", panel_down);
 	int flooriter;
-	for(flooriter = 0; flooriter<FLOORS; flooriter++){
+	for(flooriter = 0; flooriter<N_FLOORS; flooriter++){
 		cJSON_AddNumberToObject(panel_cmd, "order", msg_struct.orders[flooriter][PANEL_CMD]);
 		cJSON_AddNumberToObject(panel_up, "order", msg_struct.orders[flooriter][PANEL_UP]);
 		cJSON_AddNumberToObject(panel_down, "order", msg_struct.orders[flooriter][PANEL_DOWN]);
 	}
-
 	cJSON_AddItemToObject(	root, "gpdata"		, gpdata);
 	int i;
 	for(i = 0; i < DATALENGTH; i++){
 
 		cJSON_AddNumberToObject(gpdata, "int", msg_struct.gpdata[i]);
 	}
-
 	char * msg = cJSON_Print(root);
 	cJSON_Delete(root);
 	return(msg);
+
 }
 
-struct msg byte_to_struct(char *mesg){
+struct msg unpack(char *mesg){
 	struct msg msg_struct;
-	//if(strlen(mesg)>256){
 
 	cJSON *root = cJSON_Parse(mesg);
 	if(root!=0){
@@ -287,7 +194,7 @@ struct msg byte_to_struct(char *mesg){
 			cJSON * upiter		= cJSON_GetObjectItem(panel_up, "order");
 			cJSON * downiter	= cJSON_GetObjectItem(panel_down,"order");
 			int flooriter;
-			for (flooriter= 0; flooriter<FLOORS; flooriter++){
+			for (flooriter= 0; flooriter<N_FLOORS; flooriter++){
 				msg_struct.orders[flooriter][PANEL_CMD] 	= cmditer->valueint;
 				msg_struct.orders[flooriter][PANEL_UP] 	= upiter->valueint;
 				msg_struct.orders[flooriter][PANEL_DOWN] 	= downiter->valueint;
@@ -309,29 +216,11 @@ struct msg byte_to_struct(char *mesg){
 		}
 	}
 	msg_struct.msgtype = OPCODE_CORRUPT;
+	printf("Detected corrupt shit. string:\n %s\n", mesg);
 	cJSON_Delete(root);
 	return msg_struct;
 }
 
-//char * getcjsonstr(char *string, int start_i){
-//	int end_i = cjsonendindex(string, start_i);
-//	while(end_i<(strlen(string)-1)){
-//		copy string from start to end
-//		start_i = end_i+1;
-//		end_i = cjsonendindex(string, start_i);
-//
-//	}
-//	copy string from start to end
-////
-////	int end_i 	= cjsonendindex(string, start_i);
-////
-////	char * p = string[start -- end]
-////
-////	start_i = end_i+1;
-////	end_i = cjsonendindex(string, start_i)
-//
-//
-//}
 
 /* Returns the index of the last curly bracket.
  * Returns -1 if packet is incomplete
@@ -354,3 +243,5 @@ int cjsonendindex(char * cjson_string, int start_i){
 	}
 	return -1;
 }
+
+

@@ -40,10 +40,8 @@ static sm_config_t config = {.nevents = N_NW_EVENTS, .nstates = N_NW_STATES};
 static int listen_socket;
 static struct nw_node *root;
 
-pthread_t listen_tcp_thread, listen_udp_thread, send_udp_broadcast_thread, timeout_thread;
+pthread_t listen_tcp_thread, listen_udp_thread, send_udp_broadcast_thread, timeout_thread, network_thread;
 struct timeval broadcasttime;
-
-
 
 
 
@@ -55,51 +53,208 @@ static struct state_action_pair_t stateTable[N_NW_STATES][N_NW_EVENTS] = {
 };
 
 
+void network(){
+    network_init();
+    pthread_create(&network_thread, NULL, network_statemachine, (void *) NULL);
+}
 
 void network_init(){
-    const char *myip  = getlocalip();
-    struct in_addr meaddr;
-    inet_pton(AF_INET, myip, &meaddr);
     nw_initlist();
+    const char *myip  = getlocalip();
+	struct in_addr meaddr;
+	inet_pton(AF_INET, myip, &meaddr);
     root->p.ip = meaddr.s_addr;
     pthread_mutex_init(&event.eventMutex, 0);
     state = INIT;
-
     startlisten_udp();
     startlisten_tcp();
     startbroadcast_udp();
-
     pthread_create(&timeout_thread, NULL, start_timer, (void *) NULL);
 }
 
-void *nw_statemachine(){
+void *network_statemachine(){
     while(1){
         statemachine_handleEvent(&stateTable, config, &state, &event);
     }
 }
-pthread_t network_thread;
 
-void network(){
-    network_init();
-    pthread_create(&network_thread, NULL, nw_statemachine, (void *) NULL);
+
+
+void *com_handler(void * peer){
+
+	struct peer* pinf = (struct peer*) peer;
+	struct peer p;
+	p.socket = pinf->socket; // creating a local copy of the peer object
+	p.ip = pinf->ip;
+
+	struct peer * pp = nw_get(p);
+
+	printf("New communication handler thread created for peer connected to socket %d \n", p.socket);
+
+	struct msg newpeermsg = {.msgtype = OPCODE_NEWPEER,.from	 = p.ip,};
+	handle_msg(newpeermsg, 0);
+
+	char recv_msg[MAXRECVSIZE];
+	int read_size;
+	struct timeval ctime, ptime, ttime;
+	gettimeofday(&ttime,0);
+
+	int flags;
+
+	/* Set non-blocking state */
+	if (-1 == (flags = fcntl(pinf->socket, F_GETFL, 0))){
+		flags = 0;
+	}
+	fcntl(p.socket, F_SETFL, flags | O_NONBLOCK);
+
+	char * string 	= calloc(MAXRECVSIZE,1);
+	char * cjsonstr = calloc(MAXRECVSIZE,1);
+	/** Normal operating mode **/
+	while(1){
+		/** Maintain connection by passing and receiving I'm alive **/
+		gettimeofday(&ctime, 0);
+		if((ctime.tv_usec - ptime.tv_usec) >= IMALIVE_UPPERIOD || (ctime.tv_usec<ptime.tv_usec)){
+			struct msg packet = { .msgtype = OPCODE_IMALIVE,};
+			char * cout  = pack(packet);
+			send(p.socket, cout, strlen(cout), 0);
+			gettimeofday(&ptime, 0);
+		}
+
+		/** Receive data **/
+		read_size = recv(pinf->socket, recv_msg, MAXRECVSIZE, 0);
+		if(read_size <= 0){ // ERROR/RECOVERY mode
+				if(read_size == 0){
+						printf("err:peer disconnected (socket %i).\n", pinf->socket);
+						break;
+				}
+				else if((read_size==-1) ){
+					if( (errno != EAGAIN) && (errno != EWOULDBLOCK) ) {
+						perror("Receiving failed\n");
+						break;
+					}
+				}
+				else{
+					0;// Did not receive anything, but no error
+				}
+		}
+		else { // Received something
+			strcpy(string, recv_msg);
+			string[read_size]='\0';
+
+			int start_i = 0;
+			int end_i = cjsonendindex(string, start_i);
+			/* Separate packets arriving together */
+			while(end_i<(strlen(string)-1)){
+				strncpy(cjsonstr, (string+start_i), (end_i-start_i+1));
+				cjsonstr[end_i-start_i+1] = '\0';
+				struct msg packetin = unpack(cjsonstr);
+				packetin.from = p.ip;
+				handle_msg(packetin, &ttime);
+				start_i = end_i+1;
+				end_i = cjsonendindex(string, start_i);
+			}
+			if(end_i!=-1){
+				strncpy(cjsonstr, (string+start_i), (end_i-start_i+1));
+				cjsonstr[end_i-start_i+1] = '\0';
+				struct msg packetin = unpack(cjsonstr);
+				packetin.from = p.ip;
+				handle_msg(packetin, &ttime);
+			}
+		}
+		/** Check for timeout **/
+		gettimeofday(&ctime, 0);
+		if((ctime.tv_sec-ttime.tv_sec) > IMALIVE_TIMEOUT){
+			printf("Timeout on I'm alive, socket: %i\n", pinf->socket);
+			break;
+		}
+		/** Send data **/
+		struct msg elem;
+		while(!cbIsEmpty(&pp->bufout)){  // Send data from buffer
+			 cbRead(&pp->bufout, &elem);
+			 if (elem.msgtype!=OPCODE_CORRUPT){
+				 char * cout  = pack(elem);
+				 send(pinf->socket, cout, strlen(cout), 0);
+				 free(cout);
+			 }
+		}
+	}
+
+	/** Recovery mode: **/
+	free(cjsonstr);
+	free(string);
+	nw_rm(p);
+    nw_setevent(DISCONNECTION);
+
+	struct msg recovermsg = { .from = p.ip, .to	= highest_ip()};
+
+	if(recovermsg.to == root->p.ip){ // I have the highest ip on the network and should take over orders
+		recovermsg.msgtype = OPCODE_PEERLOSTTAKEOVER;
+	}
+	else{
+		recovermsg.msgtype = OPCODE_PEERLOST;
+	}
+	handle_msg(recovermsg, 0);
+
+	close(p.socket);
+
+	printf("Kill communication handler thread\n");
+   	pthread_exit(0);
 }
 
 
 
-void nw_setevent(events_t evnt){
-	pthread_mutex_lock(&event.eventMutex);
-	event.event = evnt;
-	pthread_mutex_unlock(&event.eventMutex);
+int sendtoallpeer(struct msg package){
+	struct peer p = {
+			.ip = TOALLIP
+	};
+	return sendtopeer(package, p);
+
 }
 
-events_t nw_getevent(){
-	events_t evcopy;
-	pthread_mutex_lock(&event.eventMutex);
-	evcopy = event.event;
-	pthread_mutex_unlock(&event.eventMutex);
-	return evcopy;
+int sendtopeer(struct msg package, struct peer p){
+	struct nw_node * iter;
+	iter = root;
+	iter = iter->next;
+
+	while(iter!=0){
+		if((iter->p.ip) == p.ip || p.ip == TOALLIP){
+			struct peer * pp = nw_get(iter->p);
+			cbWrite(&pp->bufout, &package);
+		}
+		iter = iter->next;
+	}
+	return 1;
 }
 
+
+int connect_to_peer(in_addr_t peer_ip){
+	int peer_socket = socket(AF_INET, SOCK_STREAM, 0);
+
+	struct sockaddr_in peer;
+	peer.sin_family			= AF_INET;
+	peer.sin_addr.s_addr	= peer_ip;
+	peer.sin_port			= htons(LISTEN_PORT); // Connect to listen port.
+	if (connect(peer_socket, (struct sockaddr *)&peer , sizeof(peer)) < 0){
+		perror("err: connect. Connecting to peer failed\n");
+		return -1;
+	}
+	struct peer p = peer_object(peer_socket, peer_ip);
+	nw_add(p);
+	assign_com_thread(p);
+	return 1;
+}
+
+
+void assign_com_thread(struct peer p){
+	// We have a connection! Now assign a communication handler thread.
+	struct peer *pinf = malloc(sizeof(struct peer));
+	pinf->socket 	= p.socket;
+	pinf->ip		= p.ip;
+	if( pthread_create( &pinf->com_thread , NULL ,  com_handler , pinf)<0){// peer_socket_p) < 0){
+		perror("err: pthread_create\n");
+		exit(1);
+	}
+}
 
 
 
@@ -114,45 +269,33 @@ void *listen_tcp(){
 	listen_addr.sin_port = htons(LISTEN_PORT);
 	listen_addr.sin_addr.s_addr = htons(INADDR_ANY); // Binding local IP-address
 
-	printf("Listen socket config:\n listen_addr.sin_family = %i;\n listen_addr.sin_port = %i;\n listen_addr.sin_addr.s_addr = %i;\n",
-		   listen_addr.sin_family ,
-		   LISTEN_PORT,
-		   listen_addr.sin_addr.s_addr
-		   );
-
 	listen_socket = socket(AF_INET, SOCK_STREAM, 0);
 	if (setsockopt(listen_socket, SOL_SOCKET, SO_REUSEADDR, (char*)&opt, sizeof(opt)) == -1){
 		perror("err: setsockopt\n");
 		exit(1);
 	}
-
 	if ( bind(listen_socket, (struct sockaddr *)&listen_addr, sizeof listen_addr) == -1){
 		perror("err: bind\n");
 		exit(1);
 	}
 
-
-	// Be proactive, create objects for new peer connections:
 	struct sockaddr_in peer;
-	int new_peer_socket, c;
-	c = sizeof(struct sockaddr_in);
+	int new_peer_socket, structsize;
+	structsize = sizeof(struct sockaddr_in);
 
 	while(1){
 		listen(listen_socket, LISTEN_BACKLOG);
-		if ( (new_peer_socket = accept(listen_socket, (struct sockaddr *)&peer, (socklen_t*)&c)) == -1 ){
+		if ( (new_peer_socket = accept(listen_socket, (struct sockaddr *)&peer, (socklen_t*)&structsize)) == -1 ){
 			perror("err: accept\n");
 			exit(1);
 		}
-		char * peer_ip = inet_ntoa(peer.sin_addr);
 		struct peer newpeer = peer_object(new_peer_socket, peer.sin_addr.s_addr);
 		if(!nw_find(newpeer)){
 			nw_add(newpeer);
-			assign_com_thread(newpeer);//new_peer_socket, peer_ip); //<--- change
+			assign_com_thread(newpeer);
             nw_setevent(CONNECTION);
 		}
-		else{
-			printf("Already in connected list\n");
-			nw_printlist();
+		else{ // Already in connected list
 			close(new_peer_socket);
 		}
 	}
@@ -168,7 +311,6 @@ void* listen_udp_broadcast(){
 		perror("socket");
 		exit(1);
 	}
-	// Bind my UDP socket to a particular port to listen for incoming UDP responses.
 
 	struct sockaddr_in saSocket;
 	memset(&saSocket, 0, sizeof(saSocket));
@@ -213,21 +355,17 @@ void* listen_udp_broadcast(){
 }
 
 
-
 void* send_udp_broadcast() {
-
 	int sock;
 	if ((sock = socket(AF_INET, SOCK_DGRAM, 0)) < 0)
 	{
 		perror("socket");
 		exit(1);
 	}
-
 	int opt = 1;
 	setsockopt(sock,SOL_SOCKET,SO_REUSEADDR,(char*)&opt,sizeof(opt));
 	int broadcastEnable=1;
 	setsockopt(sock, SOL_SOCKET, SO_BROADCAST, &broadcastEnable, sizeof(broadcastEnable));
-
 
 	struct sockaddr_in toAddr;
 	memset(&toAddr, 0, sizeof(toAddr));
@@ -261,8 +399,21 @@ static void *start_timer(){
         }
     }
 }
-static int isalone(){
-    return (nw_count()==0);
+
+
+
+void nw_setevent(events_t evnt){
+	pthread_mutex_lock(&event.eventMutex);
+	event.event = evnt;
+	pthread_mutex_unlock(&event.eventMutex);
+}
+
+events_t nw_getevent(){
+	events_t evcopy;
+	pthread_mutex_lock(&event.eventMutex);
+	evcopy = event.event;
+	pthread_mutex_unlock(&event.eventMutex);
+	return evcopy;
 }
 
 static void startlisten_tcp(){
@@ -302,221 +453,14 @@ static void stopbroadcast_udp(){
     pthread_kill(send_udp_broadcast_thread, 0);
 }
 
-#include <termios.h>
-/* \!brief Communication handler
- *
- */
-void *com_handler(void * peer){
-	// The connection is established. This is the function describing what to communicate.
-	struct peer* pinf = (struct peer*) peer;
-	struct peer p;
-	p.socket = pinf->socket; // creating a local copy of the peer object
-	p.ip = pinf->ip;
 
-	struct peer * pp = nw_get(p);
-
-
-	printf("New communication handler thread created for peer connected to socket %d \n", p.socket);
-
-	struct msg newpeermsg = {
-			.msgtype = OPCODE_NEWPEER,
-			.from	 = p.ip,
-	};
-	handle_msg(newpeermsg, 0);
-
-	char recv_msg[MAXRECVSIZE];//[2000];
-	char send_msg[MAXRECVSIZE];//[2000];
-	int read_size;
-	struct timeval ctime, ptime, ttime;
-	gettimeofday(&ttime,0);
-
-	int flags;
-
-	/* Set non-blocking state */
-	if (-1 == (flags = fcntl(pinf->socket, F_GETFL, 0))){
-		flags = 0;
-	}
-	fcntl(p.socket, F_SETFL, flags | O_NONBLOCK);
-
-	char * string = malloc(MAXRECVSIZE);
-	char * cjsonstr = malloc(MAXRECVSIZE);
-	while(1){
-		/* Maintain connection by passing and receiving I'm alive */
-		gettimeofday(&ctime, 0);
-		if((ctime.tv_usec - ptime.tv_usec) >= IMALIVE_UPPERIOD || (ctime.tv_usec<ptime.tv_usec)){ // check if ctime has been zeroed out. ctime<1000000
-			struct msg packet = {
-					.msgtype = OPCODE_IMALIVE,
-			};
-			char * cout  = struct_to_byte(packet);
-			send(p.socket, cout, strlen(cout), 0);//MAXRECVSIZE
-			gettimeofday(&ptime, 0);
-		}
-
-
-		/* Receive data */
-		read_size = recv(pinf->socket, recv_msg, MAXRECVSIZE, 0);
-		if(read_size <= 0){ // ERROR/RECOVERY mode
-				if(read_size == 0){
-						printf("socket: %i \n", pinf->socket);
-						perror("err:peer disconnected.\n");
-						break;
-				}
-				else if((read_size==-1) ){
-					if( (errno != EAGAIN) && (errno != EWOULDBLOCK) ) {
-						perror("Receiving failed\n");
-						break;
-					}
-					else{
-					}
-				}
-				else{
-					0;// Did not receive anything, but no error
-				}
-		}
-		else {
-			/* Receive data */
-			/**
-			 * CHECK FOR FRAGMENTS
-			 * */
-//			printf("string copyyyyyyyyyy\n");
-			strcpy(string, recv_msg);
-			string[strlen(string)] = '\0';
-//			string = recv_msg;
-
-			int start_i = 0;
-			int end_i = cjsonendindex(string, start_i);
-//			printf("Whilestart\n");
-			while(end_i<(strlen(string)-1)){
-//				printf("Strncpy end:%i.. \n", end_i);
-				strncpy(cjsonstr, (string+start_i), (end_i-start_i+1));
-				cjsonstr[end_i-start_i+1] = '\0';
-//				printf("cjsonstr: %s\n", cjsonstr);
-//				printf("..Strncpy done\n");
-				struct msg packetin = byte_to_struct(cjsonstr);
-//				if(packetin.msgtype!=OPCODE_IMALIVE)
-//						printf("rec: %s\n", string);
-				packetin.from = p.ip;
-//				printf("Starting handle msg\n");
-				handle_msg(packetin, &ttime);
-				start_i = end_i+1;
-				end_i = cjsonendindex(string, start_i);
-
-			}
-//			printf("Whiledone: end_i = %i\n", end_i);
-			if(end_i!=-1){
-				strncpy(cjsonstr, (string+start_i), (end_i-start_i+1));
-				cjsonstr[end_i-start_i+1] = '\0';
-//				printf("cjsonstr: %s\n", cjsonstr);
-				struct msg packetin = byte_to_struct(cjsonstr);
-//				if(packetin.msgtype!=OPCODE_IMALIVE)
-//										printf("rec: %s\n", string);
-				packetin.from = p.ip;
-				handle_msg(packetin, &ttime);
-			}
-
-//			free(cjsonstr);
-//			free(string);
-		}
-
-		gettimeofday(&ctime, 0);
-		if((ctime.tv_sec-ttime.tv_sec) > TIMEOUT){
-			printf("Currtime : % i , timeout : % i\n, if(%i > %i)\n", ctime.tv_sec, ttime.tv_sec,(ctime.tv_sec-ttime.tv_sec), TIMEOUT);
-			printf("TIMEOUT ON I'M ALIVE, socket: %i\n", pinf->socket);
-			break;
-		}
-		/* Send data */
-		struct msg elem;
-		while(!cbIsEmpty(&pp->bufout)){  // Send data from buffer
-			 cbRead(&pp->bufout, &elem);
-			 if (elem.msgtype!=OPCODE_CORRUPT){
-				 char * cout  = struct_to_byte(elem);
-//				 if(elem.msgtype==OPCODE_RECOVER_CMD)
-//					 printf("Sending recover cmd from buffer\n");
-				 send(pinf->socket, cout, strlen(cout), 0);//MAXRECVSIZE
-				 tcflush(pinf->socket, TCOFLUSH);
-				 free(cout);
-
-			 }
-		}
-	}
-	/* Recovery mode: */
-
-	nw_rm(p);
-
-    nw_setevent(DISCONNECTION);
-
-	struct msg recovermsg = {
-		//.msgtype	= OPCODE_PEERLOSTTAKEOVER,
-		.from 		= p.ip,
-		.to			= highest_ip() //root->p.ip
-	};
-//	struct node ppair = peer_object(0, highest_ip());
-//	nto =
-
-	if(recovermsg.to == root->p.ip){ // I have the highest ip on the network
-		printf("I have the highest ip (ip:%i), and will take over for lost peer (ip:%i)\n", root->p.ip, pinf->ip);
-		// Tell com.module that it should be the lost peers process pair
-		recovermsg.msgtype = OPCODE_PEERLOSTTAKEOVER;
-	}
-	else{
-		printf("I do not have the highest ip (ip:%i), and will not take over for lost peer (ip:%i)\n", root->p.ip, pinf->ip);
-		recovermsg.msgtype = OPCODE_PEERLOST;
-	}
-	handle_msg(recovermsg, 0);
-	//
-	close(p.socket);
-
-
-	printf("Kill com handler thread\n");
-   	pthread_exit(0);
+static int isalone(){
+    return (nw_count()==0);
 }
 
 
 
-int connect_to_peer(in_addr_t peer_ip){
-	int peer_socket = socket(AF_INET, SOCK_STREAM, 0);
 
-	struct sockaddr_in peer;
-	peer.sin_family			= AF_INET;
-	peer.sin_addr.s_addr	= peer_ip;
-	peer.sin_port			= htons(LISTEN_PORT); // Connect to listen port.
-	if (connect(peer_socket, (struct sockaddr *)&peer , sizeof(peer)) < 0){
-		perror("err: connect. Connecting to peer failed\n");
-		return -1;
-	}
-
-	struct peer p = peer_object(peer_socket, peer_ip);
-
-	nw_add(p);
-	assign_com_thread(p);
-
-	return 1;
-}
-
-
-void assign_com_thread(struct peer p){//int peer_socket, char* peer_ip){
-	// We have a connection! Now assign a communication handler thread.
-
-	struct peer *pinf = malloc(sizeof(struct peer));
-	pinf->socket 	= p.socket;
-	pinf->ip		= p.ip;
-
-
-	pthread_t com_thread;
-
-	if( pthread_create( &com_thread , NULL ,  com_handler , pinf)<0){// peer_socket_p) < 0){
-		perror("err: pthread_create\n");
-		exit(1);
-	}
-}
-//
-//int terminate(struct peer p){
-//	if(nw_rm(p)){
-//		close(p.socket);
-//		return 1;
-//	}
-//	return 0;
-//}
 
 
 
@@ -562,7 +506,7 @@ char* getlocalip() {
  *
  */
 
-struct peer peer_object(int socket, in_addr_t ip){
+static struct peer peer_object(int socket, in_addr_t ip){
 	struct peer p;
 	p.socket = socket;
 	p.ip = ip;
@@ -570,28 +514,19 @@ struct peer peer_object(int socket, in_addr_t ip){
 	return p;
 }
 
-void nw_initlist(){
+static void nw_initlist(){
 	root = malloc( sizeof(struct nw_node) );
   	root->p.socket 	= 0;
     root->p.ip 		= 0;
     root->next 		= 0;
     root->prev		= 0;
 }
-int nw_printlist(){
-	struct nw_node * iter;
-	iter = root;
-	int i = 0;
-	if(iter!=0){
-		while(iter!=0){
-			printf("nw_node%i, socket = %i, ip = %i\n", i, iter->p.socket, iter->p.ip);//inet_ntoa(tmp.sin_addr) ); // <-- ERROR
-			iter = iter->next;
-			i++;
-		}
-	}
-	return 1;
-}
 
-int nw_count(){
+
+/* !\brief Count the number of connected peers
+ *
+ */
+static int nw_count(){
 	struct nw_node * iter;
 	iter = root;
 	int i = 0;
@@ -604,7 +539,7 @@ int nw_count(){
 	return i-1; // Do not count yourself
 }
 
-int nw_add(struct peer new){
+static int nw_add(struct peer new){
 	struct nw_node * iter, *prev;
 	iter = root;
 	if(iter!=0){
@@ -627,13 +562,12 @@ int nw_add(struct peer new){
 
 }
 
-int nw_rm(struct peer p){
+static int nw_rm(struct peer p){
 	struct nw_node * iter, *prev, *tmp;
 	iter = root;
 	if(iter!=0){
 		while(iter!=0){
 			if((iter->p.ip) == p.ip && (iter->p.socket)==p.socket){
-				//tmp = malloc(sizeof(struct nw_node));
 				tmp = iter;
 				iter->prev->next = iter->next;
 				if(iter->next!=0){
@@ -650,7 +584,7 @@ int nw_rm(struct peer p){
 }
 
 
-int nw_find(struct peer p){
+static int nw_find(struct peer p){
 	struct nw_node * iter;
 	iter = root;
 	if(iter!=0){
@@ -664,7 +598,7 @@ int nw_find(struct peer p){
 	return 0;
 }
 
-in_addr_t highest_ip(){
+static in_addr_t highest_ip(){
 	struct nw_node * iter;
 	iter = root;
 	in_addr_t highest = 0;
@@ -677,26 +611,7 @@ in_addr_t highest_ip(){
 	return highest;
 }
 
-int nw_activate(struct peer p){
-	struct peer * pp = nw_get(p);
-	if(pp!=0){
-		pp->active = TRUE;
-		return 1;
-	}
-	return 0;
-
-}
-
-int nw_deactivate(struct peer p){
-	struct peer * pp = nw_get(p);
-	if(pp!=0){
-		pp->active = FALSE;
-		return 1;
-	}
-	return 0;
-}
-
-struct peer * nw_get(struct peer p){
+static struct peer * nw_get(struct peer p){
 	struct nw_node * iter;
 	iter = root;
 	if(iter!=0){
@@ -713,31 +628,3 @@ struct peer * nw_get(struct peer p){
 
 
 
-
-/* !\brief Add struct msg to out buf for all peers.
- *
- */
-
-int sendtoallpeer(struct msg package){
-	struct peer p = {
-			.ip = TOALLIP
-	};
-	return sendtopeer(package, p);
-
-}
-
-int sendtopeer(struct msg package, struct peer p){
-	struct nw_node * iter;
-	iter = root;
-	iter = iter->next;
-
-	while(iter!=0){
-		if((iter->p.ip) == p.ip || p.ip == TOALLIP){
-			struct peer * pp = nw_get(iter->p);
-			cbWrite(&pp->bufout, &package);
-//			printf("Wrote to buffer (id _%i_, to: %i)\n", package.msgtype, pp->ip);
-		}
-		iter = iter->next;
-	}
-	return 1;
-}
