@@ -84,7 +84,11 @@ void handle_msg(struct msg package, struct timeval *ttime){
 	case OPCODE_ELEV_NOT_EMERGENCY:
 		activate(gethead(), *nfrom);
 		break;
+	case OPCODE_CORRUPT:
+		printf("Received corrupt message\n");
+		break;
 	case OPCODE_NOOP:
+
 
 		break;
 	}
@@ -148,15 +152,15 @@ char * pack(struct msg msg_struct){
 	cJSON_AddNumberToObject(root, "direction",msg_struct.direction);
 	cJSON_AddNumberToObject(root, "floor"	, msg_struct.floor	);
 
-	cJSON_AddItemToObject(root, "panel_cmd"	, panel_cmd);
-	cJSON_AddItemToObject(root, "panel_up"	, panel_up);
-	cJSON_AddItemToObject(root, "panel_down", panel_down);
-	int flooriter;
-	for(flooriter = 0; flooriter<N_FLOORS; flooriter++){
-		cJSON_AddNumberToObject(panel_cmd, "order", msg_struct.orders[flooriter][PANEL_CMD]);
-		cJSON_AddNumberToObject(panel_up, "order", msg_struct.orders[flooriter][PANEL_UP]);
-		cJSON_AddNumberToObject(panel_down, "order", msg_struct.orders[flooriter][PANEL_DOWN]);
-	}
+//	cJSON_AddItemToObject(root, "panel_cmd"	, panel_cmd);
+//	cJSON_AddItemToObject(root, "panel_up"	, panel_up);
+//	cJSON_AddItemToObject(root, "panel_down", panel_down);
+//	int flooriter;
+//	for(flooriter = 0; flooriter<N_FLOORS; flooriter++){
+//		cJSON_AddNumberToObject(panel_cmd, "order", msg_struct.orders[flooriter][PANEL_CMD]);
+//		cJSON_AddNumberToObject(panel_up, "order", msg_struct.orders[flooriter][PANEL_UP]);
+//		cJSON_AddNumberToObject(panel_down, "order", msg_struct.orders[flooriter][PANEL_DOWN]);
+//	}
 	cJSON_AddItemToObject(	root, "gpdata"		, gpdata);
 	int i;
 	for(i = 0; i < DATALENGTH; i++){
@@ -187,21 +191,21 @@ struct msg unpack(char *mesg){
 			msg_struct.direction= direction->valueint;
 			msg_struct.floor	= floor->valueint	;
 
-			cJSON * panel_cmd	= cJSON_GetObjectItem(root, 	"panel_cmd");
-			cJSON * panel_up	= cJSON_GetObjectItem(root, 	"panel_up");
-			cJSON * panel_down	= cJSON_GetObjectItem(root, 	"panel_down");
-			cJSON * cmditer		= cJSON_GetObjectItem(panel_cmd,"order");
-			cJSON * upiter		= cJSON_GetObjectItem(panel_up, "order");
-			cJSON * downiter	= cJSON_GetObjectItem(panel_down,"order");
-			int flooriter;
-			for (flooriter= 0; flooriter<N_FLOORS; flooriter++){
-				msg_struct.orders[flooriter][PANEL_CMD] 	= cmditer->valueint;
-				msg_struct.orders[flooriter][PANEL_UP] 	= upiter->valueint;
-				msg_struct.orders[flooriter][PANEL_DOWN] 	= downiter->valueint;
-				cmditer = cmditer->next;
-				upiter = upiter->next;
-				downiter = downiter->next;
-			}
+//			cJSON * panel_cmd	= cJSON_GetObjectItem(root, 	"panel_cmd");
+//			cJSON * panel_up	= cJSON_GetObjectItem(root, 	"panel_up");
+//			cJSON * panel_down	= cJSON_GetObjectItem(root, 	"panel_down");
+//			cJSON * cmditer		= cJSON_GetObjectItem(panel_cmd,"order");
+//			cJSON * upiter		= cJSON_GetObjectItem(panel_up, "order");
+//			cJSON * downiter	= cJSON_GetObjectItem(panel_down,"order");
+//			int flooriter;
+//			for (flooriter= 0; flooriter<N_FLOORS; flooriter++){
+//				msg_struct.orders[flooriter][PANEL_CMD] 	= cmditer->valueint;
+//				msg_struct.orders[flooriter][PANEL_UP] 	= upiter->valueint;
+//				msg_struct.orders[flooriter][PANEL_DOWN] 	= downiter->valueint;
+//				cmditer = cmditer->next;
+//				upiter = upiter->next;
+//				downiter = downiter->next;
+//			}
 
 			cJSON * gpdata 	= cJSON_GetObjectItem(root, "gpdata");
 			cJSON * dataiter= cJSON_GetObjectItem(gpdata, "int");
@@ -216,7 +220,6 @@ struct msg unpack(char *mesg){
 		}
 	}
 	msg_struct.msgtype = OPCODE_CORRUPT;
-	printf("Detected corrupt shit. string:\n %s\n", mesg);
 	cJSON_Delete(root);
 	return msg_struct;
 }
@@ -234,7 +237,7 @@ int cjsonendindex(char * cjson_string, int start_i){
 			counter+=1;
 			started=1;
 		}
-		else if(cjson_string[i]=='}'){
+		else if(cjson_string[i]=='}' && counter>0){
 			counter-=1;
 		}
 		if(started && counter==0){

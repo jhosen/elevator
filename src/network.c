@@ -79,17 +79,15 @@ void *network_statemachine(){
 }
 
 
-
+//#include <termios.h>
 void *com_handler(void * peer){
-
 	struct peer* pinf = (struct peer*) peer;
 	struct peer p;
 	p.socket = pinf->socket; // creating a local copy of the peer object
 	p.ip = pinf->ip;
-
 	struct peer * pp = nw_get(p);
 
-	printf("New communication handler thread created for peer connected to socket %d \n", p.socket);
+	printf("Peer connected (ip %lu socket %i).\n", pinf->ip, pinf->socket);
 
 	struct msg newpeermsg = {.msgtype = OPCODE_NEWPEER,.from	 = p.ip,};
 	handle_msg(newpeermsg, 0);
@@ -99,9 +97,8 @@ void *com_handler(void * peer){
 	struct timeval ctime, ptime, ttime;
 	gettimeofday(&ttime,0);
 
-	int flags;
-
 	/* Set non-blocking state */
+	int flags;
 	if (-1 == (flags = fcntl(pinf->socket, F_GETFL, 0))){
 		flags = 0;
 	}
@@ -124,12 +121,12 @@ void *com_handler(void * peer){
 		read_size = recv(pinf->socket, recv_msg, MAXRECVSIZE, 0);
 		if(read_size <= 0){ // ERROR/RECOVERY mode
 				if(read_size == 0){
-						printf("err:peer disconnected (socket %i).\n", pinf->socket);
+						printf("Peer disconnected (ip %lu socket %i).\n", pinf->ip, pinf->socket);
 						break;
 				}
 				else if((read_size==-1) ){
 					if( (errno != EAGAIN) && (errno != EWOULDBLOCK) ) {
-						perror("Receiving failed\n");
+						printf("Peer disconnected (ip %lu socket %i).\n", pinf->ip, pinf->socket);
 						break;
 					}
 				}
@@ -161,6 +158,7 @@ void *com_handler(void * peer){
 				handle_msg(packetin, &ttime);
 			}
 		}
+//		tcflush(p.socket, TCIOFLUSH);
 		/** Check for timeout **/
 		gettimeofday(&ctime, 0);
 		if((ctime.tv_sec-ttime.tv_sec) > IMALIVE_TIMEOUT){
@@ -184,9 +182,7 @@ void *com_handler(void * peer){
 	free(string);
 	nw_rm(p);
     nw_setevent(DISCONNECTION);
-
 	struct msg recovermsg = { .from = p.ip, .to	= highest_ip()};
-
 	if(recovermsg.to == root->p.ip){ // I have the highest ip on the network and should take over orders
 		recovermsg.msgtype = OPCODE_PEERLOSTTAKEOVER;
 	}
@@ -194,10 +190,7 @@ void *com_handler(void * peer){
 		recovermsg.msgtype = OPCODE_PEERLOST;
 	}
 	handle_msg(recovermsg, 0);
-
 	close(p.socket);
-
-	printf("Kill communication handler thread\n");
    	pthread_exit(0);
 }
 
@@ -417,7 +410,6 @@ events_t nw_getevent(){
 }
 
 static void startlisten_tcp(){
-    printf("Starting TCP listen\n");
     // listen for incoming tcp connections
 	if ( (pthread_create(&listen_tcp_thread, NULL, listen_tcp, (void *) NULL)) < 0){
 		perror("err:pthread_create(listen_tcp_thread)\n");
@@ -425,47 +417,32 @@ static void startlisten_tcp(){
 }
 
 static void stoplisten_tcp(){
-    printf("Stopping TCP listen\n");
     pthread_kill(listen_tcp_thread, 0);
 }
 
 static void startlisten_udp(){
-    printf("Starting UDP listen\n");
 	if ( (pthread_create(&listen_udp_thread, NULL, listen_udp_broadcast, (void *) NULL)) < 0){
 		perror("err:pthread_create(listen_udp_thread)\n");
 	}
 }
 
 static void stoplisten_udp(){
-    printf("Stopping TCP listen\n");
     pthread_kill(listen_udp_thread, 0);
 }
 
 static void startbroadcast_udp(){
-    printf("Starting UDP broadcast\n");
 	if ( (pthread_create(&send_udp_broadcast_thread, NULL, send_udp_broadcast, (void *) NULL)) < 0){
 		perror("err:pthread_create(send_udp_broadcast_thread)\n");
 	}
 }
 
 static void stopbroadcast_udp(){
-    printf("Stopping UDP broadcast\n");
     pthread_kill(send_udp_broadcast_thread, 0);
 }
-
 
 static int isalone(){
     return (nw_count()==0);
 }
-
-
-
-
-
-
-
-
-
 
 char* getlocalip() {
     struct ifaddrs *ifaddr, *ifa;
