@@ -22,7 +22,7 @@ void handle_msg(struct msg package, struct timeval *ttime){
 	struct node *nfrom=getelevnode(elevfrom);
 	struct node * lostpeer;
 	struct node * processpair;
-	int floor, panel;
+	int floor, panel, direction;
 
 	switch (package.msgtype){
 	case OPCODE_NEWPEER:
@@ -35,7 +35,8 @@ void handle_msg(struct msg package, struct timeval *ttime){
 				recover_elev(nfrom);
 			}
 		}
-        nfrom=getelevnode(elevfrom);
+        nfrom = getelevnode(elevfrom); // This is the new elevator
+        sendsyncinfo(gethead(), nfrom);
 		break;
 	case OPCODE_IMALIVE:
 
@@ -84,6 +85,11 @@ void handle_msg(struct msg package, struct timeval *ttime){
 	case OPCODE_ELEV_NOT_EMERGENCY:
 		activate(gethead(), *nfrom);
 		break;
+	case OPCODE_ELEVSYNC:
+		floor = package.floor;
+		direction = package.direction;
+		getsyncinfo(gethead(),nfrom, package.gpdata, floor, direction);
+		break;
 	case OPCODE_CORRUPT:
 		printf("Received corrupt message\n");
 		break;
@@ -93,7 +99,6 @@ void handle_msg(struct msg package, struct timeval *ttime){
 		break;
 	}
 }
-
 /* !\brief Function used to send previous command orders to elevator reconnecting to network.
  *
  */
@@ -125,15 +130,10 @@ void send_msg(int msgtype, int to, int direction, int floor, int gpdata[]){
  * cJSON parser functions
  */
 char * pack(struct msg msg_struct){
-	cJSON *root, *msgtype, *from, *to, *gpdata, *direction, *floor;
+	cJSON *root,*gpdata;
 
 	root 		= cJSON_CreateObject();
-	msgtype 	= cJSON_CreateObject();
-	from 		= cJSON_CreateObject();
-	to 			= cJSON_CreateObject();
 	gpdata 		= cJSON_CreateObject();
-	direction	= cJSON_CreateObject();
-	floor		= cJSON_CreateObject();
 
 	cJSON_AddNumberToObject(root, "msgtype"	, msg_struct.msgtype);
 	cJSON_AddNumberToObject(root, "from"	, msg_struct.from	);

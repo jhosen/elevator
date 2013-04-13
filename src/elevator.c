@@ -28,7 +28,6 @@ struct state_action_pair_t stateTable[N_STATES][N_EVENTS] = {
 
 void elevator(){
 	operator_init();
-	init_elev_position();
 	statemachine_init(&state, &ev);
 	while(1){
 		statemachine_handleEvent(&stateTable, elevconf, &state, &ev);
@@ -36,12 +35,15 @@ void elevator(){
 }
 
 
-static void init_elev_position(){
+void elevator_init_pos(){
 	if(elev_get_floor_sensor_signal()==BETWEEN_FLOORS){
 		control_down();
 		while(elev_get_floor_sensor_signal()==BETWEEN_FLOORS)
 			; // wait
 	}
+	int floor = elev_get_floor_sensor_signal();
+	set_last_floor(floor);
+	control_setcurpos(floor);
 	control_stop();
 }
 

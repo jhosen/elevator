@@ -40,6 +40,6 @@ void set_elev_event(events_t event);
 /*	!\brief Runs elevator to floor below
  *
  */
-static void init_elev_position();
+void elevator_init_pos();
 
 #endif /* ELEVATOR_H_ */

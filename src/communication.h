@@ -19,7 +19,7 @@
 
 typedef enum {OPCODE_IMALIVE, OPCODE_NEWORDER, OPCODE_ELEVSTATE, OPCODE_NOOP, OPCODE_PEERLOSTTAKEOVER,
 			OPCODE_PEERLOST, OPCODE_NEWPEER, OPCODE_CORRUPT, OPCODE_ORDERDONE, OPCODE_ELEVINEMERGENCY,
-			OPCODE_ELEV_NOT_EMERGENCY} com_opcode_t;
+			OPCODE_ELEV_NOT_EMERGENCY, OPCODE_ELEVSYNC} com_opcode_t;
 
 
 
@@ -60,7 +60,6 @@ void handle_msg(struct msg package, struct timeval *ttime);
  *
  */
 void send_msg(int msgtype, int to, int direction, int floor, int gpdata[]);
-
 
 /* Parser functions using cJSON */
 char* 	pack(struct msg msg_struct);

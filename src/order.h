@@ -137,4 +137,9 @@ void init_order(in_addr_t this_ip);
 
 struct node * weightfunction(struct node* root, struct order new_order);
 
+/* Functions used to sync up new elevators with updated order information. */
+void sendsyncinfo(struct node * fromelev, struct node *toelev);
+
+void getsyncinfo(struct node* toelev, struct node * fromelev, int gpdata[], int position, int direction);
+
 #endif

@@ -31,7 +31,7 @@ void init_order(in_addr_t this_ip){
 	order_flush_panel(&head, COMMAND);
     /* Start thread for monitoring ordered floors and set lamps */
     pthread_t order_monitor_thread;
-    if ( (pthread_create(&order_monitor_thread, NULL, order_monitor, (void *) NULL)) < 0){
+    if ( (pthread_create(order_monitor_thread, NULL, order_monitor, (void *) NULL)) < 0){
 		perror("err:pthread_create(order_monitor)\n");
 	}
 }
@@ -483,6 +483,36 @@ void addelev(struct elevator elev){
 	n->elevinfo = elev;
 	add(&head, n);
 
+}
+
+
+void sendsyncinfo(struct node * fromelev, struct node *toelev){
+	int gpdata[8];
+	int floor, panel;
+	int orderbits = 0;
+	for (floor = 0; floor < N_FLOORS; floor ++){
+		for (panel = CALL_UP; panel <= COMMAND; panel++){
+			if(fromelev->elevinfo.current_orders[floor][panel].active){
+				orderbits |= (1<<(N_FLOORS*panel+floor));
+			}
+		}
+	}
+	gpdata[0] = orderbits;
+	send_msg(OPCODE_ELEVSYNC, toelev->elevinfo.ip, get_last_dir(), get_last_floor(), gpdata);
+
+}
+void getsyncinfo(struct node* toelev, struct node * fromelev, int gpdata[], int position, int direction){
+	int orderbits = gpdata[0];
+	int floor, panel;
+	for (floor = 0; floor < N_FLOORS; floor ++){
+		for (panel = CALL_UP; panel <= COMMAND; panel++){
+			if(orderbits & (1<<(N_FLOORS*panel+floor))){
+				order_add_order(fromelev, floor, panel);
+			}
+		}
+	}
+	fromelev->elevinfo.current_state.direction 	= direction;
+	fromelev->elevinfo.current_state.floor 		= position;
 }
 //
 //void weightfunction_sim() {
