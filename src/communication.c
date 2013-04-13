@@ -99,17 +99,6 @@ void handle_msg(struct msg package, struct timeval *ttime){
 		break;
 	}
 }
-/* !\brief Function used to send previous command orders to elevator reconnecting to network.
- *
- */
-void recover_elev(struct node * n){
-	int floor;
-	for(floor = 0; floor < N_FLOORS; floor ++){
-		if(n->elevinfo.current_orders[floor][COMMAND].active){
-			order_register_new_order(n, floor, COMMAND);
-		}
-	}
-}
 
 void send_msg(int msgtype, int to, int direction, int floor, int gpdata[]){
 	struct msg packet = {

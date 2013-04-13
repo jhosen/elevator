@@ -514,6 +514,17 @@ void getsyncinfo(struct node* toelev, struct node * fromelev, int gpdata[], int 
 	fromelev->elevinfo.current_state.direction 	= direction;
 	fromelev->elevinfo.current_state.floor 		= position;
 }
+
+void recover_elev(struct node * n){
+	int floor;
+	for(floor = 0; floor < N_FLOORS; floor ++){
+		if(n->elevinfo.current_orders[floor][COMMAND].active){
+			order_register_new_order(n, floor, COMMAND);
+		}
+	}
+}
+
+
 //
 //void weightfunction_sim() {
 //

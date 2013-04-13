@@ -11,11 +11,9 @@
 #include "operator.h"
 #include "order.h"
 
-
 static state_t state;
 static event_t ev;
 static sm_config_t elevconf = {.nstates = N_STATES, .nevents=N_EVENTS};
-
 
 struct state_action_pair_t stateTable[N_STATES][N_EVENTS] = {
 /* state|event:	NOEVENT						 			STOP_BUTTON							OBSTRUCTION								FLOORSENSOR*/
@@ -34,7 +32,6 @@ void elevator(){
 	}
 }
 
-
 void elevator_init_pos(){
 	if(elev_get_floor_sensor_signal()==BETWEEN_FLOORS){
 		control_down();
@@ -47,11 +44,8 @@ void elevator_init_pos(){
 	control_stop();
 }
 
-
 void set_elev_event(events_t event){
 	pthread_mutex_lock(&ev.eventMutex);
 	ev.event = event;
 	pthread_mutex_unlock(&ev.eventMutex);
 }
-
-

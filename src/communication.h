@@ -8,7 +8,6 @@
 #ifndef COMMUNICATION_H_
 #define COMMUNICATION_H_
 
-
 #include <time.h>
 #include "order.h"
 #include <arpa/inet.h>
@@ -16,15 +15,9 @@
 #define DATALENGTH 	8 // this is the size of the data array passed in the struct
 #define TOALLIP		0
 
-
 typedef enum {OPCODE_IMALIVE, OPCODE_NEWORDER, OPCODE_ELEVSTATE, OPCODE_NOOP, OPCODE_PEERLOSTTAKEOVER,
 			OPCODE_PEERLOST, OPCODE_NEWPEER, OPCODE_CORRUPT, OPCODE_ORDERDONE, OPCODE_ELEVINEMERGENCY,
 			OPCODE_ELEV_NOT_EMERGENCY, OPCODE_ELEVSYNC} com_opcode_t;
-
-
-
-
-
 
 struct msg {
 	int msgtype;

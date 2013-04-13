@@ -39,7 +39,6 @@ static struct node {
 	struct elevator elevinfo;
 };
 
-
 /* !\brief Order table check functions
  *
  */
@@ -141,5 +140,11 @@ struct node * weightfunction(struct node* root, struct order new_order);
 void sendsyncinfo(struct node * fromelev, struct node *toelev);
 
 void getsyncinfo(struct node* toelev, struct node * fromelev, int gpdata[], int position, int direction);
+
+/* !\brief Function used to send previous command orders to elevator reconnecting to network.
+ *
+ */
+void recover_elev(struct node * n);
+
 
 #endif
