@@ -1,0 +1,77 @@
+\hypertarget{elevator_8c}{\section{elevator.\-c File Reference}
+\label{elevator_8c}\index{elevator.\-c@{elevator.\-c}}
+}
+{\ttfamily \#include \char`\"{}elevator.\-h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}drivers/elev.\-h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}utils/statemachine.\-h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}control.\-h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}operator.\-h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}order.\-h\char`\"{}}\\*
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \hyperlink{elevator_8c_a362a607e9b1e24c7c02550b447e1179a}{elevator} ()
+\item 
+void \hyperlink{elevator_8c_a33cb18162bdb26dbd9626cfb5ce5ea7c}{elevator\-\_\-init\-\_\-pos} ()
+\item 
+void \hyperlink{elevator_8c_a6239e906f03d64f43237e520e9544a90}{set\-\_\-elev\-\_\-event} (\hyperlink{statemachine_8h_afa19c64a1a59097d61f4885e8b143a01}{events\-\_\-t} event)
+\end{DoxyCompactItemize}
+\subsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+struct \hyperlink{structstate__action__pair__t}{state\-\_\-action\-\_\-pair\-\_\-t} \hyperlink{elevator_8c_a0a83c05f6489cf06885b0ced7c79a72c}{state\-Table} \mbox{[}\hyperlink{elevator_8h_aead26966d3626590ee9ec5053b139f9b}{N\-\_\-\-S\-T\-A\-T\-E\-S}\mbox{]}\mbox{[}\hyperlink{elevator_8h_ad57385a7bbcf00dd1ac27baa3de0b0f8}{N\-\_\-\-E\-V\-E\-N\-T\-S}\mbox{]}
+\end{DoxyCompactItemize}
+
+
+\subsection{Function Documentation}
+\hypertarget{elevator_8c_a362a607e9b1e24c7c02550b447e1179a}{\index{elevator.\-c@{elevator.\-c}!elevator@{elevator}}
+\index{elevator@{elevator}!elevator.c@{elevator.\-c}}
+\subsubsection[{elevator}]{\setlength{\rightskip}{0pt plus 5cm}void {\bf elevator} (
+\begin{DoxyParamCaption}
+\item[{void}]{}
+\end{DoxyParamCaption}
+)}}\label{elevator_8c_a362a607e9b1e24c7c02550b447e1179a}
+\hypertarget{elevator_8c_a33cb18162bdb26dbd9626cfb5ce5ea7c}{\index{elevator.\-c@{elevator.\-c}!elevator\-\_\-init\-\_\-pos@{elevator\-\_\-init\-\_\-pos}}
+\index{elevator\-\_\-init\-\_\-pos@{elevator\-\_\-init\-\_\-pos}!elevator.c@{elevator.\-c}}
+\subsubsection[{elevator\-\_\-init\-\_\-pos}]{\setlength{\rightskip}{0pt plus 5cm}void elevator\-\_\-init\-\_\-pos (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{elevator_8c_a33cb18162bdb26dbd9626cfb5ce5ea7c}
+\hypertarget{elevator_8c_a6239e906f03d64f43237e520e9544a90}{\index{elevator.\-c@{elevator.\-c}!set\-\_\-elev\-\_\-event@{set\-\_\-elev\-\_\-event}}
+\index{set\-\_\-elev\-\_\-event@{set\-\_\-elev\-\_\-event}!elevator.c@{elevator.\-c}}
+\subsubsection[{set\-\_\-elev\-\_\-event}]{\setlength{\rightskip}{0pt plus 5cm}void set\-\_\-elev\-\_\-event (
+\begin{DoxyParamCaption}
+\item[{{\bf events\-\_\-t}}]{event}
+\end{DoxyParamCaption}
+)}}\label{elevator_8c_a6239e906f03d64f43237e520e9544a90}
+
+
+\subsection{Variable Documentation}
+\hypertarget{elevator_8c_a0a83c05f6489cf06885b0ced7c79a72c}{\index{elevator.\-c@{elevator.\-c}!state\-Table@{state\-Table}}
+\index{state\-Table@{state\-Table}!elevator.c@{elevator.\-c}}
+\subsubsection[{state\-Table}]{\setlength{\rightskip}{0pt plus 5cm}struct {\bf state\-\_\-action\-\_\-pair\-\_\-t} state\-Table\mbox{[}{\bf N\-\_\-\-S\-T\-A\-T\-E\-S}\mbox{]}\mbox{[}{\bf N\-\_\-\-E\-V\-E\-N\-T\-S}\mbox{]}}}\label{elevator_8c_a0a83c05f6489cf06885b0ced7c79a72c}
+{\bfseries Initial value\-:}
+\begin{DoxyCode}
+= \{
+
+    \{\{\hyperlink{elevator_8h_a9a6f50cd83755f346f3cd5e2d9a0c743a887d2cbfd9131de5cc3745731421b34b}{EXECUTE},   \hyperlink{control_8c_aac8a0cac0492e829f8f08257fea27b39}{control\_setdir},       \hyperlink{order_8c_a3aadc459b637624c8b906fbb1cf40c67}{order\_requests}\},  \{
+      \hyperlink{elevator_8h_a9a6f50cd83755f346f3cd5e2d9a0c743af6d2c5530a33aa5706c870ba62cbdc42}{EM\_STOP}, \hyperlink{control_8c_a3f1b75a1f54de504ff0e3f7ec149c63c}{control\_emergency}, NULL\},      \{\hyperlink{elevator_8h_a9a6f50cd83755f346f3cd5e2d9a0c743a9ce8b97728ecadd1f627ef9f2521004a}{EM\_OBSTR},  
+      \hyperlink{control_8c_a3f1b75a1f54de504ff0e3f7ec149c63c}{control\_emergency}, \hyperlink{control_8c_ad66139b6eb2f2149bc74c28af40b53d2}{obstr\_on}\},      \{\hyperlink{elevator_8h_aae4cbbda28172458fd50cad1b84c9000afd6a0e4343048b10646dd2976cc5ad18}{IDLE} ,     NULL,               NULL\}               
+      \},
+    \{\{\hyperlink{elevator_8h_a9a6f50cd83755f346f3cd5e2d9a0c743a18cd602003cbe103c9e4c31b1457bb36}{DOOROPEN}, \hyperlink{control_8c_acf07e343332b8742158699860950e476}{control\_executeorder},
+      \hyperlink{order_8c_a524a0c277b99f737c800612520a23814}{order\_should\_stay}\},\{\hyperlink{elevator_8h_a9a6f50cd83755f346f3cd5e2d9a0c743af6d2c5530a33aa5706c870ba62cbdc42}{EM\_STOP},    \hyperlink{control_8c_a3f1b75a1f54de504ff0e3f7ec149c63c}{control\_emergency}, NULL\},      \{
+      \hyperlink{elevator_8h_a9a6f50cd83755f346f3cd5e2d9a0c743a9ce8b97728ecadd1f627ef9f2521004a}{EM\_OBSTR},   \hyperlink{control_8c_a3f1b75a1f54de504ff0e3f7ec149c63c}{control\_emergency}, \hyperlink{control_8c_ad66139b6eb2f2149bc74c28af40b53d2}{obstr\_on}\},      \{
+      \hyperlink{elevator_8h_a9a6f50cd83755f346f3cd5e2d9a0c743a18cd602003cbe103c9e4c31b1457bb36}{DOOROPEN} , \hyperlink{control_8c_acf07e343332b8742158699860950e476}{control\_executeorder}, \hyperlink{order_8c_a5d2994eb15998a72a18bbe355730da16}{order\_should\_stop}\} \},
+    \{\{\hyperlink{elevator_8h_a9a6f50cd83755f346f3cd5e2d9a0c743af6d2c5530a33aa5706c870ba62cbdc42}{EM\_STOP},   NULL,               NULL\},              \{\hyperlink{elevator_8h_aae4cbbda28172458fd50cad1b84c9000afd6a0e4343048b10646dd2976cc5ad18}{IDLE},      
+      \hyperlink{control_8c_aefa2590897ff827e03bc1256a47b8db9}{control\_emrestart}, \hyperlink{control_8c_a31537c2bbde8501818d9a1ce91e2fc76}{obstr\_off}\},    \{\hyperlink{elevator_8h_a9a6f50cd83755f346f3cd5e2d9a0c743af6d2c5530a33aa5706c870ba62cbdc42}{EM\_STOP},    NULL,               NULL\},          
+      \{\hyperlink{elevator_8h_a9a6f50cd83755f346f3cd5e2d9a0c743af6d2c5530a33aa5706c870ba62cbdc42}{EM\_STOP},     NULL,               NULL\}               \},
+    \{\{\hyperlink{elevator_8h_a9a6f50cd83755f346f3cd5e2d9a0c743a9ce8b97728ecadd1f627ef9f2521004a}{EM\_OBSTR}, NULL,               NULL\},              \{\hyperlink{elevator_8h_a9a6f50cd83755f346f3cd5e2d9a0c743a9ce8b97728ecadd1f627ef9f2521004a}{EM\_OBSTR},  NULL,               
+      NULL\},      \{\hyperlink{elevator_8h_aae4cbbda28172458fd50cad1b84c9000afd6a0e4343048b10646dd2976cc5ad18}{IDLE},      \hyperlink{control_8c_aefa2590897ff827e03bc1256a47b8db9}{control\_emrestart}, \hyperlink{control_8c_a31537c2bbde8501818d9a1ce91e2fc76}{obstr\_off}\},    \{
+      \hyperlink{elevator_8h_a9a6f50cd83755f346f3cd5e2d9a0c743a9ce8b97728ecadd1f627ef9f2521004a}{EM\_OBSTR},   \hyperlink{control_8c_a0e970914a5f5781681d2a473511fa20a}{control\_closedoor},     NULL\}               \},
+    \{\{\hyperlink{elevator_8h_aae4cbbda28172458fd50cad1b84c9000afd6a0e4343048b10646dd2976cc5ad18}{IDLE},     \hyperlink{control_8c_a0e970914a5f5781681d2a473511fa20a}{control\_closedoor},\hyperlink{control_8c_a228f9cd6fb37bbc8e6c8f6fd6f326fa8}{control\_timeoutdoor}\}, \{
+      \hyperlink{elevator_8h_a9a6f50cd83755f346f3cd5e2d9a0c743af6d2c5530a33aa5706c870ba62cbdc42}{EM\_STOP}, \hyperlink{control_8c_a3f1b75a1f54de504ff0e3f7ec149c63c}{control\_emergency},     NULL\},      \{\hyperlink{elevator_8h_a9a6f50cd83755f346f3cd5e2d9a0c743a9ce8b97728ecadd1f627ef9f2521004a}{EM\_OBSTR},  
+      \hyperlink{control_8c_afab161ffc95f9fc7adcba368411f5f1a}{control\_obstr},         \hyperlink{control_8c_ad66139b6eb2f2149bc74c28af40b53d2}{obstr\_on}\},      \{\hyperlink{elevator_8h_aae4cbbda28172458fd50cad1b84c9000afd6a0e4343048b10646dd2976cc5ad18}{IDLE},      
+      \hyperlink{control_8c_a0e970914a5f5781681d2a473511fa20a}{control\_closedoor},     \hyperlink{control_8c_a8a647ecffb5763fd3c0382bcbdc29300}{control\_betweenfloors}\}\},
+\}
+\end{DoxyCode}

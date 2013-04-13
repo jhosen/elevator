@@ -1,0 +1,125 @@
+\hypertarget{cb__buffer_8h}{\section{utils/cb\-\_\-buffer.h File Reference}
+\label{cb__buffer_8h}\index{utils/cb\-\_\-buffer.\-h@{utils/cb\-\_\-buffer.\-h}}
+}
+\subsection*{Data Structures}
+\begin{DoxyCompactItemize}
+\item 
+struct \hyperlink{struct_circular_buffer}{Circular\-Buffer}
+\begin{DoxyCompactList}\small\item\em Type-\/defining a \hyperlink{struct_circular_buffer}{Circular\-Buffer} type for internal buffering when receiving and transmitting data by network. \hyperlink{struct_circular_buffer}{Circular\-Buffer} is F\-I\-F\-O. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \hyperlink{cb__buffer_8h_abc8c2d7ea52d953d20af7da707c69eab}{O\-V\-E\-R\-W\-R\-I\-T\-E\-\_\-\-B\-U\-F\-F\-E\-R\-\_\-\-O\-N\-\_\-\-O\-V\-E\-R\-F\-L\-O\-W}~1
+\end{DoxyCompactItemize}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \hyperlink{cb__buffer_8h_a010a4c9a452ec2f6b3270bfc107c50dd}{init\-\_\-main\-\_\-cb} (void)
+\begin{DoxyCompactList}\small\item\em Initiates the two local buffers/queues from main application. \end{DoxyCompactList}\item 
+void \hyperlink{cb__buffer_8h_a87fd8995fbb18b36ab14c0e008411a21}{cb\-Init} (\hyperlink{struct_circular_buffer}{Circular\-Buffer} $\ast$cb, int size)
+\begin{DoxyCompactList}\small\item\em Sets start and counter attribute of cb to zero, and size to size. This function is run by \hyperlink{cb__buffer_8h_a010a4c9a452ec2f6b3270bfc107c50dd}{init\-\_\-main\-\_\-cb()}. \end{DoxyCompactList}\item 
+int \hyperlink{cb__buffer_8h_afc7b7095107799df848a26418a83a45c}{cb\-Is\-Full} (\hyperlink{struct_circular_buffer}{Circular\-Buffer} $\ast$cb)
+\begin{DoxyCompactList}\small\item\em Evaluates to true if buffer is full. Return false if there is still more space. \end{DoxyCompactList}\item 
+int \hyperlink{cb__buffer_8h_a7886b832e3cfc486fb50e5cf392f1d27}{cb\-Is\-Empty} (\hyperlink{struct_circular_buffer}{Circular\-Buffer} $\ast$cb)
+\begin{DoxyCompactList}\small\item\em Return true if buffer is empty. \end{DoxyCompactList}\item 
+void \hyperlink{cb__buffer_8h_a9c8aa8abce3dcf4bebbb8009dfb0f87d}{cb\-Write} (\hyperlink{struct_circular_buffer}{Circular\-Buffer} $\ast$cb, struct \hyperlink{structmsg}{msg} $\ast$elem)
+\begin{DoxyCompactList}\small\item\em loads buffer with a msg packet type. \end{DoxyCompactList}\item 
+void \hyperlink{cb__buffer_8h_a6dc48cac947d44127674fb990201a622}{cb\-Read} (\hyperlink{struct_circular_buffer}{Circular\-Buffer} $\ast$cb, struct \hyperlink{structmsg}{msg} $\ast$elem)
+\begin{DoxyCompactList}\small\item\em Copy a element from cb and paste it in elem. This function also deletes the element it reads. Function is implemented F\-I\-F\-O. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Macro Definition Documentation}
+\hypertarget{cb__buffer_8h_abc8c2d7ea52d953d20af7da707c69eab}{\index{cb\-\_\-buffer.\-h@{cb\-\_\-buffer.\-h}!O\-V\-E\-R\-W\-R\-I\-T\-E\-\_\-\-B\-U\-F\-F\-E\-R\-\_\-\-O\-N\-\_\-\-O\-V\-E\-R\-F\-L\-O\-W@{O\-V\-E\-R\-W\-R\-I\-T\-E\-\_\-\-B\-U\-F\-F\-E\-R\-\_\-\-O\-N\-\_\-\-O\-V\-E\-R\-F\-L\-O\-W}}
+\index{O\-V\-E\-R\-W\-R\-I\-T\-E\-\_\-\-B\-U\-F\-F\-E\-R\-\_\-\-O\-N\-\_\-\-O\-V\-E\-R\-F\-L\-O\-W@{O\-V\-E\-R\-W\-R\-I\-T\-E\-\_\-\-B\-U\-F\-F\-E\-R\-\_\-\-O\-N\-\_\-\-O\-V\-E\-R\-F\-L\-O\-W}!cb_buffer.h@{cb\-\_\-buffer.\-h}}
+\subsubsection[{O\-V\-E\-R\-W\-R\-I\-T\-E\-\_\-\-B\-U\-F\-F\-E\-R\-\_\-\-O\-N\-\_\-\-O\-V\-E\-R\-F\-L\-O\-W}]{\setlength{\rightskip}{0pt plus 5cm}\#define O\-V\-E\-R\-W\-R\-I\-T\-E\-\_\-\-B\-U\-F\-F\-E\-R\-\_\-\-O\-N\-\_\-\-O\-V\-E\-R\-F\-L\-O\-W~1}}\label{cb__buffer_8h_abc8c2d7ea52d953d20af7da707c69eab}
+
+
+\subsection{Function Documentation}
+\hypertarget{cb__buffer_8h_a87fd8995fbb18b36ab14c0e008411a21}{\index{cb\-\_\-buffer.\-h@{cb\-\_\-buffer.\-h}!cb\-Init@{cb\-Init}}
+\index{cb\-Init@{cb\-Init}!cb_buffer.h@{cb\-\_\-buffer.\-h}}
+\subsubsection[{cb\-Init}]{\setlength{\rightskip}{0pt plus 5cm}void cb\-Init (
+\begin{DoxyParamCaption}
+\item[{{\bf Circular\-Buffer} $\ast$}]{cb, }
+\item[{int}]{size}
+\end{DoxyParamCaption}
+)}}\label{cb__buffer_8h_a87fd8995fbb18b36ab14c0e008411a21}
+
+
+Sets start and counter attribute of cb to zero, and size to size. This function is run by \hyperlink{cb__buffer_8h_a010a4c9a452ec2f6b3270bfc107c50dd}{init\-\_\-main\-\_\-cb()}. 
+
+\hypertarget{cb__buffer_8h_a7886b832e3cfc486fb50e5cf392f1d27}{\index{cb\-\_\-buffer.\-h@{cb\-\_\-buffer.\-h}!cb\-Is\-Empty@{cb\-Is\-Empty}}
+\index{cb\-Is\-Empty@{cb\-Is\-Empty}!cb_buffer.h@{cb\-\_\-buffer.\-h}}
+\subsubsection[{cb\-Is\-Empty}]{\setlength{\rightskip}{0pt plus 5cm}int cb\-Is\-Empty (
+\begin{DoxyParamCaption}
+\item[{{\bf Circular\-Buffer} $\ast$}]{cb}
+\end{DoxyParamCaption}
+)}}\label{cb__buffer_8h_a7886b832e3cfc486fb50e5cf392f1d27}
+
+
+Return true if buffer is empty. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em cb} & is either cb\-\_\-load or cb\-\_\-store \\
+\hline
+\end{DoxyParams}
+\hypertarget{cb__buffer_8h_afc7b7095107799df848a26418a83a45c}{\index{cb\-\_\-buffer.\-h@{cb\-\_\-buffer.\-h}!cb\-Is\-Full@{cb\-Is\-Full}}
+\index{cb\-Is\-Full@{cb\-Is\-Full}!cb_buffer.h@{cb\-\_\-buffer.\-h}}
+\subsubsection[{cb\-Is\-Full}]{\setlength{\rightskip}{0pt plus 5cm}int cb\-Is\-Full (
+\begin{DoxyParamCaption}
+\item[{{\bf Circular\-Buffer} $\ast$}]{cb}
+\end{DoxyParamCaption}
+)}}\label{cb__buffer_8h_afc7b7095107799df848a26418a83a45c}
+
+
+Evaluates to true if buffer is full. Return false if there is still more space. 
+
+\hypertarget{cb__buffer_8h_a6dc48cac947d44127674fb990201a622}{\index{cb\-\_\-buffer.\-h@{cb\-\_\-buffer.\-h}!cb\-Read@{cb\-Read}}
+\index{cb\-Read@{cb\-Read}!cb_buffer.h@{cb\-\_\-buffer.\-h}}
+\subsubsection[{cb\-Read}]{\setlength{\rightskip}{0pt plus 5cm}void cb\-Read (
+\begin{DoxyParamCaption}
+\item[{{\bf Circular\-Buffer} $\ast$}]{cb, }
+\item[{struct {\bf msg} $\ast$}]{elem}
+\end{DoxyParamCaption}
+)}}\label{cb__buffer_8h_a6dc48cac947d44127674fb990201a622}
+
+
+Copy a element from cb and paste it in elem. This function also deletes the element it reads. Function is implemented F\-I\-F\-O. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em cb} & is the buffer/queue we want to read from. \\
+\hline
+{\em elem} & is the place we want to store element from cb. \\
+\hline
+\end{DoxyParams}
+\hypertarget{cb__buffer_8h_a9c8aa8abce3dcf4bebbb8009dfb0f87d}{\index{cb\-\_\-buffer.\-h@{cb\-\_\-buffer.\-h}!cb\-Write@{cb\-Write}}
+\index{cb\-Write@{cb\-Write}!cb_buffer.h@{cb\-\_\-buffer.\-h}}
+\subsubsection[{cb\-Write}]{\setlength{\rightskip}{0pt plus 5cm}void cb\-Write (
+\begin{DoxyParamCaption}
+\item[{{\bf Circular\-Buffer} $\ast$}]{cb, }
+\item[{struct {\bf msg} $\ast$}]{elem}
+\end{DoxyParamCaption}
+)}}\label{cb__buffer_8h_a9c8aa8abce3dcf4bebbb8009dfb0f87d}
+
+
+loads buffer with a msg packet type. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em cb} & is the buffer/queue we want to write to. \\
+\hline
+{\em elem} & is the element we want to put on the queue. \\
+\hline
+\end{DoxyParams}
+\hypertarget{cb__buffer_8h_a010a4c9a452ec2f6b3270bfc107c50dd}{\index{cb\-\_\-buffer.\-h@{cb\-\_\-buffer.\-h}!init\-\_\-main\-\_\-cb@{init\-\_\-main\-\_\-cb}}
+\index{init\-\_\-main\-\_\-cb@{init\-\_\-main\-\_\-cb}!cb_buffer.h@{cb\-\_\-buffer.\-h}}
+\subsubsection[{init\-\_\-main\-\_\-cb}]{\setlength{\rightskip}{0pt plus 5cm}void init\-\_\-main\-\_\-cb (
+\begin{DoxyParamCaption}
+\item[{void}]{}
+\end{DoxyParamCaption}
+)}}\label{cb__buffer_8h_a010a4c9a452ec2f6b3270bfc107c50dd}
+
+
+Initiates the two local buffers/queues from main application. 
+

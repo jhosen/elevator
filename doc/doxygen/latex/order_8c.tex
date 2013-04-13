@@ -1,0 +1,294 @@
+\hypertarget{order_8c}{\section{order.\-c File Reference}
+\label{order_8c}\index{order.\-c@{order.\-c}}
+}
+{\ttfamily \#include $<$arpa/inet.\-h$>$}\\*
+{\ttfamily \#include $<$stdio.\-h$>$}\\*
+{\ttfamily \#include \char`\"{}drivers/elev.\-h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}communication.\-h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}network.\-h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}order.\-h\char`\"{}}\\*
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+struct node $\ast$ \hyperlink{order_8c_acaec4a36de22ec1ddc5139717583913e}{gethead} ()
+\item 
+int \hyperlink{order_8c_a6f0d72c6372b6150b260a70e0c4ecbb5}{get\-\_\-last\-\_\-floor} ()
+\item 
+void \hyperlink{order_8c_ac349c210b237d6c2171f5fc178001767}{set\-\_\-last\-\_\-floor} (int floor)
+\item 
+void \hyperlink{order_8c_ab14c6ce995c710097aab7a78142cd8b2}{init\-\_\-order} (in\-\_\-addr\-\_\-t this\-\_\-ip)
+\item 
+void \hyperlink{order_8c_a29b2374c8f7a8f21891308c2c97b0cda}{order\-\_\-add\-\_\-order} (struct node $\ast$\hyperlink{structelevator}{elevator}, int floor, int panel)
+\item 
+void \hyperlink{order_8c_a647e9f0c9d82b3ab910cf5041522f2a6}{order\-\_\-register\-\_\-new\-\_\-order} (struct node $\ast$\hyperlink{structelevator}{elevator}, int floor, int panel)
+\item 
+void \hyperlink{order_8c_a831f523fac48516cfc190a1e032c7b9c}{order\-\_\-register\-\_\-as\-\_\-done} (int floor, int panel)
+\item 
+void \hyperlink{order_8c_a31d70d1932ccd38c62f903a120f71d56}{order\-\_\-flush\-\_\-panel} (struct node $\ast$\hyperlink{structelevator}{elevator}, enum \hyperlink{order_8h_a9275874ac61d3750aa677a36da714373}{panel\-\_\-type} panel)
+\item 
+void \hyperlink{order_8c_af175837e73e0fbb30f4f212c65a58ae8}{order\-\_\-reset\-\_\-current\-\_\-floor} ()
+\item 
+void \hyperlink{order_8c_afb0f1474a3d6f3c85e286d3a8b0824ba}{clear\-\_\-order\-\_\-all\-\_\-elev} (int floor, int panel)
+\item 
+int \hyperlink{order_8c_a8802eee85d1c9374d4128bed38b70ab1}{order\-\_\-check\-\_\-request\-\_\-current\-\_\-floor} ()
+\item 
+int \hyperlink{order_8c_af96392a8ba90e0d3813968c2410ce2e7}{order\-\_\-check\-\_\-request\-\_\-above} ()
+\item 
+int \hyperlink{order_8c_a83f3f76e47162f1d87e76b607fea770e}{order\-\_\-check\-\_\-request\-\_\-below} ()
+\item 
+int \hyperlink{order_8c_a3aadc459b637624c8b906fbb1cf40c67}{order\-\_\-requests} ()
+\item 
+int \hyperlink{order_8c_a524a0c277b99f737c800612520a23814}{order\-\_\-should\-\_\-stay} ()
+\item 
+int \hyperlink{order_8c_a5d2994eb15998a72a18bbe355730da16}{order\-\_\-should\-\_\-stop} ()
+\item 
+int \hyperlink{order_8c_a830ce663a6aff7cb7fae9dc2a6e145ef}{order\-\_\-pridir} ()
+\item 
+void \hyperlink{order_8c_ae48c55bf2d2349a3571b030233e4f9eb}{ordertablemerge} (struct node $\ast$elevto, struct node $\ast$elevfrom, enum \hyperlink{order_8h_a9275874ac61d3750aa677a36da714373}{panel\-\_\-type} panel)
+\item 
+void $\ast$ \hyperlink{order_8c_a2cbd908262a8e384f84753808b302591}{order\-\_\-monitor} ()
+\item 
+void \hyperlink{order_8c_a3d034707fa10f3e748829051f37281a5}{order\-\_\-print\-\_\-list} (\hyperlink{structorder__t}{order\-\_\-t} orders\mbox{[}$\,$\mbox{]}\mbox{[}\hyperlink{elevator_8h_a8409515e250357c28eff995fd872f1ec}{N\-\_\-\-P\-A\-N\-E\-L\-S}\mbox{]})
+\item 
+struct node $\ast$ \hyperlink{order_8c_aa6e41e73fbd50a00aaf08df8c82baf8b}{weightfunction} (struct node $\ast$root, struct \hyperlink{structorder}{order} new\-\_\-order)
+\item 
+void \hyperlink{order_8c_a7156b8872bf8688439c143cc4bf040ce}{activate} (struct node $\ast$root, struct node n)
+\item 
+void \hyperlink{order_8c_aa737015cbd52771e62461b7e89ebba62}{deactivate} (struct node $\ast$root, struct node n)
+\item 
+struct node $\ast$ \hyperlink{order_8c_a997e2eab6550c29528f2cb5093b08a9c}{get} (struct node $\ast$root, struct node n)
+\item 
+int \hyperlink{order_8c_a24fd41885fd2fcb5ff19e7438af17242}{count} (struct node $\ast$root)
+\item 
+struct node $\ast$ \hyperlink{order_8c_a38cbc62e73cb8df6c54008c903e3005c}{getelevnode} (struct \hyperlink{structelevator}{elevator} elev)
+\item 
+void \hyperlink{order_8c_ac821b8fe2329c5004715b53b95b35010}{addelev} (struct \hyperlink{structelevator}{elevator} elev)
+\item 
+void \hyperlink{order_8c_a9d1a9c6a641eec63d3b2780171fb7031}{sendsyncinfo} (struct node $\ast$fromelev, struct node $\ast$toelev)
+\item 
+void \hyperlink{order_8c_a0d58b791196de661ee4ab323f70533d9}{getsyncinfo} (struct node $\ast$toelev, struct node $\ast$fromelev, int gpdata\mbox{[}$\,$\mbox{]}, int position, int direction)
+\end{DoxyCompactItemize}
+
+
+\subsection{Function Documentation}
+\hypertarget{order_8c_a7156b8872bf8688439c143cc4bf040ce}{\index{order.\-c@{order.\-c}!activate@{activate}}
+\index{activate@{activate}!order.c@{order.\-c}}
+\subsubsection[{activate}]{\setlength{\rightskip}{0pt plus 5cm}void activate (
+\begin{DoxyParamCaption}
+\item[{struct node $\ast$}]{root, }
+\item[{struct node}]{n}
+\end{DoxyParamCaption}
+)}}\label{order_8c_a7156b8872bf8688439c143cc4bf040ce}
+\hypertarget{order_8c_ac821b8fe2329c5004715b53b95b35010}{\index{order.\-c@{order.\-c}!addelev@{addelev}}
+\index{addelev@{addelev}!order.c@{order.\-c}}
+\subsubsection[{addelev}]{\setlength{\rightskip}{0pt plus 5cm}void addelev (
+\begin{DoxyParamCaption}
+\item[{struct {\bf elevator}}]{elev}
+\end{DoxyParamCaption}
+)}}\label{order_8c_ac821b8fe2329c5004715b53b95b35010}
+\hypertarget{order_8c_afb0f1474a3d6f3c85e286d3a8b0824ba}{\index{order.\-c@{order.\-c}!clear\-\_\-order\-\_\-all\-\_\-elev@{clear\-\_\-order\-\_\-all\-\_\-elev}}
+\index{clear\-\_\-order\-\_\-all\-\_\-elev@{clear\-\_\-order\-\_\-all\-\_\-elev}!order.c@{order.\-c}}
+\subsubsection[{clear\-\_\-order\-\_\-all\-\_\-elev}]{\setlength{\rightskip}{0pt plus 5cm}void clear\-\_\-order\-\_\-all\-\_\-elev (
+\begin{DoxyParamCaption}
+\item[{int}]{floor, }
+\item[{int}]{panel}
+\end{DoxyParamCaption}
+)}}\label{order_8c_afb0f1474a3d6f3c85e286d3a8b0824ba}
+\hypertarget{order_8c_a24fd41885fd2fcb5ff19e7438af17242}{\index{order.\-c@{order.\-c}!count@{count}}
+\index{count@{count}!order.c@{order.\-c}}
+\subsubsection[{count}]{\setlength{\rightskip}{0pt plus 5cm}int count (
+\begin{DoxyParamCaption}
+\item[{struct node $\ast$}]{root}
+\end{DoxyParamCaption}
+)}}\label{order_8c_a24fd41885fd2fcb5ff19e7438af17242}
+\hypertarget{order_8c_aa737015cbd52771e62461b7e89ebba62}{\index{order.\-c@{order.\-c}!deactivate@{deactivate}}
+\index{deactivate@{deactivate}!order.c@{order.\-c}}
+\subsubsection[{deactivate}]{\setlength{\rightskip}{0pt plus 5cm}void deactivate (
+\begin{DoxyParamCaption}
+\item[{struct node $\ast$}]{root, }
+\item[{struct node}]{n}
+\end{DoxyParamCaption}
+)}}\label{order_8c_aa737015cbd52771e62461b7e89ebba62}
+\hypertarget{order_8c_a997e2eab6550c29528f2cb5093b08a9c}{\index{order.\-c@{order.\-c}!get@{get}}
+\index{get@{get}!order.c@{order.\-c}}
+\subsubsection[{get}]{\setlength{\rightskip}{0pt plus 5cm}struct node$\ast$ get (
+\begin{DoxyParamCaption}
+\item[{struct node $\ast$}]{root, }
+\item[{struct node}]{n}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [read]}}}\label{order_8c_a997e2eab6550c29528f2cb5093b08a9c}
+\hypertarget{order_8c_a6f0d72c6372b6150b260a70e0c4ecbb5}{\index{order.\-c@{order.\-c}!get\-\_\-last\-\_\-floor@{get\-\_\-last\-\_\-floor}}
+\index{get\-\_\-last\-\_\-floor@{get\-\_\-last\-\_\-floor}!order.c@{order.\-c}}
+\subsubsection[{get\-\_\-last\-\_\-floor}]{\setlength{\rightskip}{0pt plus 5cm}int get\-\_\-last\-\_\-floor (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{order_8c_a6f0d72c6372b6150b260a70e0c4ecbb5}
+\hypertarget{order_8c_a38cbc62e73cb8df6c54008c903e3005c}{\index{order.\-c@{order.\-c}!getelevnode@{getelevnode}}
+\index{getelevnode@{getelevnode}!order.c@{order.\-c}}
+\subsubsection[{getelevnode}]{\setlength{\rightskip}{0pt plus 5cm}struct node$\ast$ getelevnode (
+\begin{DoxyParamCaption}
+\item[{struct {\bf elevator}}]{elev}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [read]}}}\label{order_8c_a38cbc62e73cb8df6c54008c903e3005c}
+\hypertarget{order_8c_acaec4a36de22ec1ddc5139717583913e}{\index{order.\-c@{order.\-c}!gethead@{gethead}}
+\index{gethead@{gethead}!order.c@{order.\-c}}
+\subsubsection[{gethead}]{\setlength{\rightskip}{0pt plus 5cm}struct node$\ast$ gethead (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [read]}}}\label{order_8c_acaec4a36de22ec1ddc5139717583913e}
+\hypertarget{order_8c_a0d58b791196de661ee4ab323f70533d9}{\index{order.\-c@{order.\-c}!getsyncinfo@{getsyncinfo}}
+\index{getsyncinfo@{getsyncinfo}!order.c@{order.\-c}}
+\subsubsection[{getsyncinfo}]{\setlength{\rightskip}{0pt plus 5cm}void getsyncinfo (
+\begin{DoxyParamCaption}
+\item[{struct node $\ast$}]{toelev, }
+\item[{struct node $\ast$}]{fromelev, }
+\item[{int}]{gpdata\mbox{[}$\,$\mbox{]}, }
+\item[{int}]{position, }
+\item[{int}]{direction}
+\end{DoxyParamCaption}
+)}}\label{order_8c_a0d58b791196de661ee4ab323f70533d9}
+\hypertarget{order_8c_ab14c6ce995c710097aab7a78142cd8b2}{\index{order.\-c@{order.\-c}!init\-\_\-order@{init\-\_\-order}}
+\index{init\-\_\-order@{init\-\_\-order}!order.c@{order.\-c}}
+\subsubsection[{init\-\_\-order}]{\setlength{\rightskip}{0pt plus 5cm}void init\-\_\-order (
+\begin{DoxyParamCaption}
+\item[{in\-\_\-addr\-\_\-t}]{this\-\_\-ip}
+\end{DoxyParamCaption}
+)}}\label{order_8c_ab14c6ce995c710097aab7a78142cd8b2}
+\hypertarget{order_8c_a29b2374c8f7a8f21891308c2c97b0cda}{\index{order.\-c@{order.\-c}!order\-\_\-add\-\_\-order@{order\-\_\-add\-\_\-order}}
+\index{order\-\_\-add\-\_\-order@{order\-\_\-add\-\_\-order}!order.c@{order.\-c}}
+\subsubsection[{order\-\_\-add\-\_\-order}]{\setlength{\rightskip}{0pt plus 5cm}void order\-\_\-add\-\_\-order (
+\begin{DoxyParamCaption}
+\item[{struct node $\ast$}]{elevator, }
+\item[{int}]{floor, }
+\item[{int}]{panel}
+\end{DoxyParamCaption}
+)}}\label{order_8c_a29b2374c8f7a8f21891308c2c97b0cda}
+\hypertarget{order_8c_af96392a8ba90e0d3813968c2410ce2e7}{\index{order.\-c@{order.\-c}!order\-\_\-check\-\_\-request\-\_\-above@{order\-\_\-check\-\_\-request\-\_\-above}}
+\index{order\-\_\-check\-\_\-request\-\_\-above@{order\-\_\-check\-\_\-request\-\_\-above}!order.c@{order.\-c}}
+\subsubsection[{order\-\_\-check\-\_\-request\-\_\-above}]{\setlength{\rightskip}{0pt plus 5cm}int order\-\_\-check\-\_\-request\-\_\-above (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{order_8c_af96392a8ba90e0d3813968c2410ce2e7}
+\hypertarget{order_8c_a83f3f76e47162f1d87e76b607fea770e}{\index{order.\-c@{order.\-c}!order\-\_\-check\-\_\-request\-\_\-below@{order\-\_\-check\-\_\-request\-\_\-below}}
+\index{order\-\_\-check\-\_\-request\-\_\-below@{order\-\_\-check\-\_\-request\-\_\-below}!order.c@{order.\-c}}
+\subsubsection[{order\-\_\-check\-\_\-request\-\_\-below}]{\setlength{\rightskip}{0pt plus 5cm}int order\-\_\-check\-\_\-request\-\_\-below (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{order_8c_a83f3f76e47162f1d87e76b607fea770e}
+\hypertarget{order_8c_a8802eee85d1c9374d4128bed38b70ab1}{\index{order.\-c@{order.\-c}!order\-\_\-check\-\_\-request\-\_\-current\-\_\-floor@{order\-\_\-check\-\_\-request\-\_\-current\-\_\-floor}}
+\index{order\-\_\-check\-\_\-request\-\_\-current\-\_\-floor@{order\-\_\-check\-\_\-request\-\_\-current\-\_\-floor}!order.c@{order.\-c}}
+\subsubsection[{order\-\_\-check\-\_\-request\-\_\-current\-\_\-floor}]{\setlength{\rightskip}{0pt plus 5cm}int order\-\_\-check\-\_\-request\-\_\-current\-\_\-floor (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{order_8c_a8802eee85d1c9374d4128bed38b70ab1}
+\hypertarget{order_8c_a31d70d1932ccd38c62f903a120f71d56}{\index{order.\-c@{order.\-c}!order\-\_\-flush\-\_\-panel@{order\-\_\-flush\-\_\-panel}}
+\index{order\-\_\-flush\-\_\-panel@{order\-\_\-flush\-\_\-panel}!order.c@{order.\-c}}
+\subsubsection[{order\-\_\-flush\-\_\-panel}]{\setlength{\rightskip}{0pt plus 5cm}void order\-\_\-flush\-\_\-panel (
+\begin{DoxyParamCaption}
+\item[{struct node $\ast$}]{elevator, }
+\item[{enum {\bf panel\-\_\-type}}]{panel}
+\end{DoxyParamCaption}
+)}}\label{order_8c_a31d70d1932ccd38c62f903a120f71d56}
+\hypertarget{order_8c_a2cbd908262a8e384f84753808b302591}{\index{order.\-c@{order.\-c}!order\-\_\-monitor@{order\-\_\-monitor}}
+\index{order\-\_\-monitor@{order\-\_\-monitor}!order.c@{order.\-c}}
+\subsubsection[{order\-\_\-monitor}]{\setlength{\rightskip}{0pt plus 5cm}void$\ast$ order\-\_\-monitor (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{order_8c_a2cbd908262a8e384f84753808b302591}
+\hypertarget{order_8c_a830ce663a6aff7cb7fae9dc2a6e145ef}{\index{order.\-c@{order.\-c}!order\-\_\-pridir@{order\-\_\-pridir}}
+\index{order\-\_\-pridir@{order\-\_\-pridir}!order.c@{order.\-c}}
+\subsubsection[{order\-\_\-pridir}]{\setlength{\rightskip}{0pt plus 5cm}int order\-\_\-pridir (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{order_8c_a830ce663a6aff7cb7fae9dc2a6e145ef}
+\hypertarget{order_8c_a3d034707fa10f3e748829051f37281a5}{\index{order.\-c@{order.\-c}!order\-\_\-print\-\_\-list@{order\-\_\-print\-\_\-list}}
+\index{order\-\_\-print\-\_\-list@{order\-\_\-print\-\_\-list}!order.c@{order.\-c}}
+\subsubsection[{order\-\_\-print\-\_\-list}]{\setlength{\rightskip}{0pt plus 5cm}void order\-\_\-print\-\_\-list (
+\begin{DoxyParamCaption}
+\item[{{\bf order\-\_\-t}}]{orders\mbox{[}$\,$\mbox{]}\mbox{[}\-N\-\_\-\-P\-A\-N\-E\-L\-S\mbox{]}}
+\end{DoxyParamCaption}
+)}}\label{order_8c_a3d034707fa10f3e748829051f37281a5}
+\hypertarget{order_8c_a831f523fac48516cfc190a1e032c7b9c}{\index{order.\-c@{order.\-c}!order\-\_\-register\-\_\-as\-\_\-done@{order\-\_\-register\-\_\-as\-\_\-done}}
+\index{order\-\_\-register\-\_\-as\-\_\-done@{order\-\_\-register\-\_\-as\-\_\-done}!order.c@{order.\-c}}
+\subsubsection[{order\-\_\-register\-\_\-as\-\_\-done}]{\setlength{\rightskip}{0pt plus 5cm}void order\-\_\-register\-\_\-as\-\_\-done (
+\begin{DoxyParamCaption}
+\item[{int}]{floor, }
+\item[{int}]{panel}
+\end{DoxyParamCaption}
+)}}\label{order_8c_a831f523fac48516cfc190a1e032c7b9c}
+\hypertarget{order_8c_a647e9f0c9d82b3ab910cf5041522f2a6}{\index{order.\-c@{order.\-c}!order\-\_\-register\-\_\-new\-\_\-order@{order\-\_\-register\-\_\-new\-\_\-order}}
+\index{order\-\_\-register\-\_\-new\-\_\-order@{order\-\_\-register\-\_\-new\-\_\-order}!order.c@{order.\-c}}
+\subsubsection[{order\-\_\-register\-\_\-new\-\_\-order}]{\setlength{\rightskip}{0pt plus 5cm}void order\-\_\-register\-\_\-new\-\_\-order (
+\begin{DoxyParamCaption}
+\item[{struct node $\ast$}]{elevator, }
+\item[{int}]{floor, }
+\item[{int}]{panel}
+\end{DoxyParamCaption}
+)}}\label{order_8c_a647e9f0c9d82b3ab910cf5041522f2a6}
+\hypertarget{order_8c_a3aadc459b637624c8b906fbb1cf40c67}{\index{order.\-c@{order.\-c}!order\-\_\-requests@{order\-\_\-requests}}
+\index{order\-\_\-requests@{order\-\_\-requests}!order.c@{order.\-c}}
+\subsubsection[{order\-\_\-requests}]{\setlength{\rightskip}{0pt plus 5cm}int order\-\_\-requests (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{order_8c_a3aadc459b637624c8b906fbb1cf40c67}
+\hypertarget{order_8c_af175837e73e0fbb30f4f212c65a58ae8}{\index{order.\-c@{order.\-c}!order\-\_\-reset\-\_\-current\-\_\-floor@{order\-\_\-reset\-\_\-current\-\_\-floor}}
+\index{order\-\_\-reset\-\_\-current\-\_\-floor@{order\-\_\-reset\-\_\-current\-\_\-floor}!order.c@{order.\-c}}
+\subsubsection[{order\-\_\-reset\-\_\-current\-\_\-floor}]{\setlength{\rightskip}{0pt plus 5cm}void order\-\_\-reset\-\_\-current\-\_\-floor (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{order_8c_af175837e73e0fbb30f4f212c65a58ae8}
+\hypertarget{order_8c_a524a0c277b99f737c800612520a23814}{\index{order.\-c@{order.\-c}!order\-\_\-should\-\_\-stay@{order\-\_\-should\-\_\-stay}}
+\index{order\-\_\-should\-\_\-stay@{order\-\_\-should\-\_\-stay}!order.c@{order.\-c}}
+\subsubsection[{order\-\_\-should\-\_\-stay}]{\setlength{\rightskip}{0pt plus 5cm}int order\-\_\-should\-\_\-stay (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{order_8c_a524a0c277b99f737c800612520a23814}
+\hypertarget{order_8c_a5d2994eb15998a72a18bbe355730da16}{\index{order.\-c@{order.\-c}!order\-\_\-should\-\_\-stop@{order\-\_\-should\-\_\-stop}}
+\index{order\-\_\-should\-\_\-stop@{order\-\_\-should\-\_\-stop}!order.c@{order.\-c}}
+\subsubsection[{order\-\_\-should\-\_\-stop}]{\setlength{\rightskip}{0pt plus 5cm}int order\-\_\-should\-\_\-stop (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{order_8c_a5d2994eb15998a72a18bbe355730da16}
+\hypertarget{order_8c_ae48c55bf2d2349a3571b030233e4f9eb}{\index{order.\-c@{order.\-c}!ordertablemerge@{ordertablemerge}}
+\index{ordertablemerge@{ordertablemerge}!order.c@{order.\-c}}
+\subsubsection[{ordertablemerge}]{\setlength{\rightskip}{0pt plus 5cm}void ordertablemerge (
+\begin{DoxyParamCaption}
+\item[{struct node $\ast$}]{elevto, }
+\item[{struct node $\ast$}]{elevfrom, }
+\item[{enum {\bf panel\-\_\-type}}]{panel}
+\end{DoxyParamCaption}
+)}}\label{order_8c_ae48c55bf2d2349a3571b030233e4f9eb}
+\hypertarget{order_8c_a9d1a9c6a641eec63d3b2780171fb7031}{\index{order.\-c@{order.\-c}!sendsyncinfo@{sendsyncinfo}}
+\index{sendsyncinfo@{sendsyncinfo}!order.c@{order.\-c}}
+\subsubsection[{sendsyncinfo}]{\setlength{\rightskip}{0pt plus 5cm}void sendsyncinfo (
+\begin{DoxyParamCaption}
+\item[{struct node $\ast$}]{fromelev, }
+\item[{struct node $\ast$}]{toelev}
+\end{DoxyParamCaption}
+)}}\label{order_8c_a9d1a9c6a641eec63d3b2780171fb7031}
+\hypertarget{order_8c_ac349c210b237d6c2171f5fc178001767}{\index{order.\-c@{order.\-c}!set\-\_\-last\-\_\-floor@{set\-\_\-last\-\_\-floor}}
+\index{set\-\_\-last\-\_\-floor@{set\-\_\-last\-\_\-floor}!order.c@{order.\-c}}
+\subsubsection[{set\-\_\-last\-\_\-floor}]{\setlength{\rightskip}{0pt plus 5cm}void set\-\_\-last\-\_\-floor (
+\begin{DoxyParamCaption}
+\item[{int}]{floor}
+\end{DoxyParamCaption}
+)}}\label{order_8c_ac349c210b237d6c2171f5fc178001767}
+\hypertarget{order_8c_aa6e41e73fbd50a00aaf08df8c82baf8b}{\index{order.\-c@{order.\-c}!weightfunction@{weightfunction}}
+\index{weightfunction@{weightfunction}!order.c@{order.\-c}}
+\subsubsection[{weightfunction}]{\setlength{\rightskip}{0pt plus 5cm}struct node$\ast$ weightfunction (
+\begin{DoxyParamCaption}
+\item[{struct node $\ast$}]{root, }
+\item[{struct {\bf order}}]{new\-\_\-order}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [read]}}}\label{order_8c_aa6e41e73fbd50a00aaf08df8c82baf8b}

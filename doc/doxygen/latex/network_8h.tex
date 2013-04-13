@@ -1,0 +1,273 @@
+\hypertarget{network_8h}{\section{network.\-h File Reference}
+\label{network_8h}\index{network.\-h@{network.\-h}}
+}
+{\ttfamily \#include $<$arpa/inet.\-h$>$}\\*
+{\ttfamily \#include $<$pthread.\-h$>$}\\*
+{\ttfamily \#include \char`\"{}utils/cb\-\_\-buffer.\-h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}utils/statemachine.\-h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}communication.\-h\char`\"{}}\\*
+\subsection*{Data Structures}
+\begin{DoxyCompactItemize}
+\item 
+struct \hyperlink{structpeer}{peer}
+\item 
+struct \hyperlink{structnw__node}{nw\-\_\-node}
+\end{DoxyCompactItemize}
+\subsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \hyperlink{network_8h_a7cb1dd1dcff79cc8f70159a7ee2767e6}{L\-A\-N\-\_\-\-B\-R\-O\-A\-D\-C\-A\-S\-T\-\_\-\-I\-P}~\char`\"{}129.\-241.\-187.\-255\char`\"{}
+\item 
+\#define \hyperlink{network_8h_aa9cdc7927d2c822c77c092ce2af33d15}{M\-A\-X\-R\-E\-C\-V\-S\-I\-Z\-E}~4096
+\item 
+\#define \hyperlink{network_8h_a6b20d41d6252e9871430c242cb1a56e7}{B\-U\-F\-F\-E\-R\-\_\-\-S\-I\-Z\-E}~128
+\item 
+\#define \hyperlink{network_8h_a848750161824c5aa011ed0442ec0863c}{L\-I\-S\-T\-E\-N\-\_\-\-B\-A\-C\-K\-L\-O\-G}~5
+\item 
+\#define \hyperlink{network_8h_a4fba0963c20988d1f1a45afb1c636e44}{L\-I\-S\-T\-E\-N\-\_\-\-P\-O\-R\-T}~3000
+\item 
+\#define \hyperlink{network_8h_a205e10274d27e19d48cb64ab591f4b41}{U\-D\-P\-\_\-\-L\-I\-S\-T\-E\-N\-\_\-\-P\-O\-R\-T}~3002
+\item 
+\#define \hyperlink{network_8h_add022bb4a229664afbcbfed746cdac24}{I\-M\-A\-L\-I\-V\-E\-\_\-\-T\-I\-M\-E\-O\-U\-T}~3
+\item 
+\#define \hyperlink{network_8h_a10e88f10c6df19012c8eda48f4710720}{P\-I\-N\-G\-P\-E\-R\-I\-O\-D}~0.\-1
+\item 
+\#define \hyperlink{network_8h_a247c18e11761f9bd55cffbcda32fb49f}{I\-M\-A\-L\-I\-V\-E\-\_\-\-U\-P\-P\-E\-R\-I\-O\-D}~100000
+\item 
+\#define \hyperlink{network_8h_a79b376883704daad5c69804fcb2078ba}{B\-R\-O\-A\-D\-C\-A\-S\-T\-\_\-\-P\-E\-R\-I\-O\-D}~1
+\item 
+\#define \hyperlink{network_8h_a8e924f84633a06587052450c6130c131}{N\-\_\-\-N\-W\-\_\-\-S\-T\-A\-T\-E\-S}~3
+\item 
+\#define \hyperlink{network_8h_a054d4399aaa1f8633807f18ae3c2f741}{N\-\_\-\-N\-W\-\_\-\-E\-V\-E\-N\-T\-S}~4
+\item 
+\#define \hyperlink{network_8h_a748e986dbff1b35bc12c1fe6ea046887}{N\-W\-\_\-\-B\-C\-\_\-\-T\-I\-M\-E}~3
+\end{DoxyCompactItemize}
+\subsection*{Enumerations}
+\begin{DoxyCompactItemize}
+\item 
+enum \hyperlink{network_8h_a06df839e1ece18f68174ad6602bd336a}{nw\-\_\-event\-\_\-t} \{ \hyperlink{network_8h_a06df839e1ece18f68174ad6602bd336aab1ef110533383bd417ee6e406700dfbd}{T\-I\-M\-E\-O\-U\-T\-\_\-\-B\-C} = 1, 
+\hyperlink{network_8h_a06df839e1ece18f68174ad6602bd336aa883e4c63ec87687e6b2847bfd99c601e}{C\-O\-N\-N\-E\-C\-T\-I\-O\-N}, 
+\hyperlink{network_8h_a06df839e1ece18f68174ad6602bd336aa7b1e5139921b6ff7e0084530ec82040a}{D\-I\-S\-C\-O\-N\-N\-E\-C\-T\-I\-O\-N}
+ \}
+\item 
+enum \hyperlink{network_8h_a1e83fa46443d025ea514958fc4b84f43}{nw\-\_\-state\-\_\-t} \{ \hyperlink{network_8h_a1e83fa46443d025ea514958fc4b84f43a0cb1b2c6a7db1f1084886c98909a3f36}{I\-N\-I\-T}, 
+\hyperlink{network_8h_a1e83fa46443d025ea514958fc4b84f43ae083799213f730f75ff5eb8da4abcaff}{A\-L\-O\-N\-E}, 
+\hyperlink{network_8h_a1e83fa46443d025ea514958fc4b84f43a38b7803ce18b4539764cac6b13611dcc}{O\-N\-L\-I\-N\-E}
+ \}
+\end{DoxyCompactItemize}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \hyperlink{network_8h_ac9ce2b2726e18b41fc6df738445a8948}{network\-\_\-init} (void)
+\item 
+void $\ast$ \hyperlink{network_8h_ab04620f62a6ebf1766900248360d02d9}{network\-\_\-statemachine} ()
+\item 
+void \hyperlink{network_8h_a2b61ae1651a921d5ebd7d3e4c35bde13}{network} ()
+\item 
+void $\ast$ \hyperlink{network_8h_a7d30c43e4e36e6814869d87da6b14006}{com\-\_\-handler} (void $\ast$peer\-\_\-inf)
+\item 
+int \hyperlink{network_8h_a24c4d46ffb308b5ad6fd4cde1192dbc7}{sendtoallpeer} (struct \hyperlink{structmsg}{msg} package)
+\item 
+int \hyperlink{network_8h_a20f1cba53a1c863a360d32459c43c939}{sendtopeer} (struct \hyperlink{structmsg}{msg} package, struct \hyperlink{structpeer}{peer} p)
+\item 
+int \hyperlink{network_8h_a89649123b7b66a20340f65caea49d878}{connect\-\_\-to\-\_\-peer} (in\-\_\-addr\-\_\-t peer\-\_\-ip)
+\item 
+void \hyperlink{network_8h_a3ae4e3e4aceacf59ec718bd4fc43cfbc}{assign\-\_\-com\-\_\-thread} (struct \hyperlink{structpeer}{peer} p)
+\item 
+void $\ast$ \hyperlink{network_8h_a91a476062cb553f94439999901f213fc}{listen\-\_\-udp\-\_\-broadcast} ()
+\item 
+void $\ast$ \hyperlink{network_8h_af6818661760af6df23232a1f7ce0ed4b}{send\-\_\-udp\-\_\-broadcast} ()
+\item 
+void $\ast$ \hyperlink{network_8h_a024795b101ad0f8f0b773481198d4ce1}{listen\-\_\-tcp} ()
+\item 
+void \hyperlink{network_8h_a96ec265b4bf0630c9d5af0a53ca11792}{nw\-\_\-setevent} (\hyperlink{statemachine_8h_afa19c64a1a59097d61f4885e8b143a01}{events\-\_\-t} evnt)
+\item 
+\hyperlink{statemachine_8h_afa19c64a1a59097d61f4885e8b143a01}{events\-\_\-t} \hyperlink{network_8h_abb8231ed6bbd6b0030bb64369c952353}{nw\-\_\-getevent} ()
+\item 
+char $\ast$ \hyperlink{network_8h_ae99112e357d288ff700cad7afdd52959}{getlocalip} ()
+\end{DoxyCompactItemize}
+
+
+\subsection{Macro Definition Documentation}
+\hypertarget{network_8h_a79b376883704daad5c69804fcb2078ba}{\index{network.\-h@{network.\-h}!B\-R\-O\-A\-D\-C\-A\-S\-T\-\_\-\-P\-E\-R\-I\-O\-D@{B\-R\-O\-A\-D\-C\-A\-S\-T\-\_\-\-P\-E\-R\-I\-O\-D}}
+\index{B\-R\-O\-A\-D\-C\-A\-S\-T\-\_\-\-P\-E\-R\-I\-O\-D@{B\-R\-O\-A\-D\-C\-A\-S\-T\-\_\-\-P\-E\-R\-I\-O\-D}!network.h@{network.\-h}}
+\subsubsection[{B\-R\-O\-A\-D\-C\-A\-S\-T\-\_\-\-P\-E\-R\-I\-O\-D}]{\setlength{\rightskip}{0pt plus 5cm}\#define B\-R\-O\-A\-D\-C\-A\-S\-T\-\_\-\-P\-E\-R\-I\-O\-D~1}}\label{network_8h_a79b376883704daad5c69804fcb2078ba}
+\hypertarget{network_8h_a6b20d41d6252e9871430c242cb1a56e7}{\index{network.\-h@{network.\-h}!B\-U\-F\-F\-E\-R\-\_\-\-S\-I\-Z\-E@{B\-U\-F\-F\-E\-R\-\_\-\-S\-I\-Z\-E}}
+\index{B\-U\-F\-F\-E\-R\-\_\-\-S\-I\-Z\-E@{B\-U\-F\-F\-E\-R\-\_\-\-S\-I\-Z\-E}!network.h@{network.\-h}}
+\subsubsection[{B\-U\-F\-F\-E\-R\-\_\-\-S\-I\-Z\-E}]{\setlength{\rightskip}{0pt plus 5cm}\#define B\-U\-F\-F\-E\-R\-\_\-\-S\-I\-Z\-E~128}}\label{network_8h_a6b20d41d6252e9871430c242cb1a56e7}
+\hypertarget{network_8h_add022bb4a229664afbcbfed746cdac24}{\index{network.\-h@{network.\-h}!I\-M\-A\-L\-I\-V\-E\-\_\-\-T\-I\-M\-E\-O\-U\-T@{I\-M\-A\-L\-I\-V\-E\-\_\-\-T\-I\-M\-E\-O\-U\-T}}
+\index{I\-M\-A\-L\-I\-V\-E\-\_\-\-T\-I\-M\-E\-O\-U\-T@{I\-M\-A\-L\-I\-V\-E\-\_\-\-T\-I\-M\-E\-O\-U\-T}!network.h@{network.\-h}}
+\subsubsection[{I\-M\-A\-L\-I\-V\-E\-\_\-\-T\-I\-M\-E\-O\-U\-T}]{\setlength{\rightskip}{0pt plus 5cm}\#define I\-M\-A\-L\-I\-V\-E\-\_\-\-T\-I\-M\-E\-O\-U\-T~3}}\label{network_8h_add022bb4a229664afbcbfed746cdac24}
+\hypertarget{network_8h_a247c18e11761f9bd55cffbcda32fb49f}{\index{network.\-h@{network.\-h}!I\-M\-A\-L\-I\-V\-E\-\_\-\-U\-P\-P\-E\-R\-I\-O\-D@{I\-M\-A\-L\-I\-V\-E\-\_\-\-U\-P\-P\-E\-R\-I\-O\-D}}
+\index{I\-M\-A\-L\-I\-V\-E\-\_\-\-U\-P\-P\-E\-R\-I\-O\-D@{I\-M\-A\-L\-I\-V\-E\-\_\-\-U\-P\-P\-E\-R\-I\-O\-D}!network.h@{network.\-h}}
+\subsubsection[{I\-M\-A\-L\-I\-V\-E\-\_\-\-U\-P\-P\-E\-R\-I\-O\-D}]{\setlength{\rightskip}{0pt plus 5cm}\#define I\-M\-A\-L\-I\-V\-E\-\_\-\-U\-P\-P\-E\-R\-I\-O\-D~100000}}\label{network_8h_a247c18e11761f9bd55cffbcda32fb49f}
+\hypertarget{network_8h_a7cb1dd1dcff79cc8f70159a7ee2767e6}{\index{network.\-h@{network.\-h}!L\-A\-N\-\_\-\-B\-R\-O\-A\-D\-C\-A\-S\-T\-\_\-\-I\-P@{L\-A\-N\-\_\-\-B\-R\-O\-A\-D\-C\-A\-S\-T\-\_\-\-I\-P}}
+\index{L\-A\-N\-\_\-\-B\-R\-O\-A\-D\-C\-A\-S\-T\-\_\-\-I\-P@{L\-A\-N\-\_\-\-B\-R\-O\-A\-D\-C\-A\-S\-T\-\_\-\-I\-P}!network.h@{network.\-h}}
+\subsubsection[{L\-A\-N\-\_\-\-B\-R\-O\-A\-D\-C\-A\-S\-T\-\_\-\-I\-P}]{\setlength{\rightskip}{0pt plus 5cm}\#define L\-A\-N\-\_\-\-B\-R\-O\-A\-D\-C\-A\-S\-T\-\_\-\-I\-P~\char`\"{}129.\-241.\-187.\-255\char`\"{}}}\label{network_8h_a7cb1dd1dcff79cc8f70159a7ee2767e6}
+\hypertarget{network_8h_a848750161824c5aa011ed0442ec0863c}{\index{network.\-h@{network.\-h}!L\-I\-S\-T\-E\-N\-\_\-\-B\-A\-C\-K\-L\-O\-G@{L\-I\-S\-T\-E\-N\-\_\-\-B\-A\-C\-K\-L\-O\-G}}
+\index{L\-I\-S\-T\-E\-N\-\_\-\-B\-A\-C\-K\-L\-O\-G@{L\-I\-S\-T\-E\-N\-\_\-\-B\-A\-C\-K\-L\-O\-G}!network.h@{network.\-h}}
+\subsubsection[{L\-I\-S\-T\-E\-N\-\_\-\-B\-A\-C\-K\-L\-O\-G}]{\setlength{\rightskip}{0pt plus 5cm}\#define L\-I\-S\-T\-E\-N\-\_\-\-B\-A\-C\-K\-L\-O\-G~5}}\label{network_8h_a848750161824c5aa011ed0442ec0863c}
+\hypertarget{network_8h_a4fba0963c20988d1f1a45afb1c636e44}{\index{network.\-h@{network.\-h}!L\-I\-S\-T\-E\-N\-\_\-\-P\-O\-R\-T@{L\-I\-S\-T\-E\-N\-\_\-\-P\-O\-R\-T}}
+\index{L\-I\-S\-T\-E\-N\-\_\-\-P\-O\-R\-T@{L\-I\-S\-T\-E\-N\-\_\-\-P\-O\-R\-T}!network.h@{network.\-h}}
+\subsubsection[{L\-I\-S\-T\-E\-N\-\_\-\-P\-O\-R\-T}]{\setlength{\rightskip}{0pt plus 5cm}\#define L\-I\-S\-T\-E\-N\-\_\-\-P\-O\-R\-T~3000}}\label{network_8h_a4fba0963c20988d1f1a45afb1c636e44}
+\hypertarget{network_8h_aa9cdc7927d2c822c77c092ce2af33d15}{\index{network.\-h@{network.\-h}!M\-A\-X\-R\-E\-C\-V\-S\-I\-Z\-E@{M\-A\-X\-R\-E\-C\-V\-S\-I\-Z\-E}}
+\index{M\-A\-X\-R\-E\-C\-V\-S\-I\-Z\-E@{M\-A\-X\-R\-E\-C\-V\-S\-I\-Z\-E}!network.h@{network.\-h}}
+\subsubsection[{M\-A\-X\-R\-E\-C\-V\-S\-I\-Z\-E}]{\setlength{\rightskip}{0pt plus 5cm}\#define M\-A\-X\-R\-E\-C\-V\-S\-I\-Z\-E~4096}}\label{network_8h_aa9cdc7927d2c822c77c092ce2af33d15}
+\hypertarget{network_8h_a054d4399aaa1f8633807f18ae3c2f741}{\index{network.\-h@{network.\-h}!N\-\_\-\-N\-W\-\_\-\-E\-V\-E\-N\-T\-S@{N\-\_\-\-N\-W\-\_\-\-E\-V\-E\-N\-T\-S}}
+\index{N\-\_\-\-N\-W\-\_\-\-E\-V\-E\-N\-T\-S@{N\-\_\-\-N\-W\-\_\-\-E\-V\-E\-N\-T\-S}!network.h@{network.\-h}}
+\subsubsection[{N\-\_\-\-N\-W\-\_\-\-E\-V\-E\-N\-T\-S}]{\setlength{\rightskip}{0pt plus 5cm}\#define N\-\_\-\-N\-W\-\_\-\-E\-V\-E\-N\-T\-S~4}}\label{network_8h_a054d4399aaa1f8633807f18ae3c2f741}
+\hypertarget{network_8h_a8e924f84633a06587052450c6130c131}{\index{network.\-h@{network.\-h}!N\-\_\-\-N\-W\-\_\-\-S\-T\-A\-T\-E\-S@{N\-\_\-\-N\-W\-\_\-\-S\-T\-A\-T\-E\-S}}
+\index{N\-\_\-\-N\-W\-\_\-\-S\-T\-A\-T\-E\-S@{N\-\_\-\-N\-W\-\_\-\-S\-T\-A\-T\-E\-S}!network.h@{network.\-h}}
+\subsubsection[{N\-\_\-\-N\-W\-\_\-\-S\-T\-A\-T\-E\-S}]{\setlength{\rightskip}{0pt plus 5cm}\#define N\-\_\-\-N\-W\-\_\-\-S\-T\-A\-T\-E\-S~3}}\label{network_8h_a8e924f84633a06587052450c6130c131}
+\hypertarget{network_8h_a748e986dbff1b35bc12c1fe6ea046887}{\index{network.\-h@{network.\-h}!N\-W\-\_\-\-B\-C\-\_\-\-T\-I\-M\-E@{N\-W\-\_\-\-B\-C\-\_\-\-T\-I\-M\-E}}
+\index{N\-W\-\_\-\-B\-C\-\_\-\-T\-I\-M\-E@{N\-W\-\_\-\-B\-C\-\_\-\-T\-I\-M\-E}!network.h@{network.\-h}}
+\subsubsection[{N\-W\-\_\-\-B\-C\-\_\-\-T\-I\-M\-E}]{\setlength{\rightskip}{0pt plus 5cm}\#define N\-W\-\_\-\-B\-C\-\_\-\-T\-I\-M\-E~3}}\label{network_8h_a748e986dbff1b35bc12c1fe6ea046887}
+\hypertarget{network_8h_a10e88f10c6df19012c8eda48f4710720}{\index{network.\-h@{network.\-h}!P\-I\-N\-G\-P\-E\-R\-I\-O\-D@{P\-I\-N\-G\-P\-E\-R\-I\-O\-D}}
+\index{P\-I\-N\-G\-P\-E\-R\-I\-O\-D@{P\-I\-N\-G\-P\-E\-R\-I\-O\-D}!network.h@{network.\-h}}
+\subsubsection[{P\-I\-N\-G\-P\-E\-R\-I\-O\-D}]{\setlength{\rightskip}{0pt plus 5cm}\#define P\-I\-N\-G\-P\-E\-R\-I\-O\-D~0.\-1}}\label{network_8h_a10e88f10c6df19012c8eda48f4710720}
+\hypertarget{network_8h_a205e10274d27e19d48cb64ab591f4b41}{\index{network.\-h@{network.\-h}!U\-D\-P\-\_\-\-L\-I\-S\-T\-E\-N\-\_\-\-P\-O\-R\-T@{U\-D\-P\-\_\-\-L\-I\-S\-T\-E\-N\-\_\-\-P\-O\-R\-T}}
+\index{U\-D\-P\-\_\-\-L\-I\-S\-T\-E\-N\-\_\-\-P\-O\-R\-T@{U\-D\-P\-\_\-\-L\-I\-S\-T\-E\-N\-\_\-\-P\-O\-R\-T}!network.h@{network.\-h}}
+\subsubsection[{U\-D\-P\-\_\-\-L\-I\-S\-T\-E\-N\-\_\-\-P\-O\-R\-T}]{\setlength{\rightskip}{0pt plus 5cm}\#define U\-D\-P\-\_\-\-L\-I\-S\-T\-E\-N\-\_\-\-P\-O\-R\-T~3002}}\label{network_8h_a205e10274d27e19d48cb64ab591f4b41}
+
+
+\subsection{Enumeration Type Documentation}
+\hypertarget{network_8h_a06df839e1ece18f68174ad6602bd336a}{\index{network.\-h@{network.\-h}!nw\-\_\-event\-\_\-t@{nw\-\_\-event\-\_\-t}}
+\index{nw\-\_\-event\-\_\-t@{nw\-\_\-event\-\_\-t}!network.h@{network.\-h}}
+\subsubsection[{nw\-\_\-event\-\_\-t}]{\setlength{\rightskip}{0pt plus 5cm}enum {\bf nw\-\_\-event\-\_\-t}}}\label{network_8h_a06df839e1ece18f68174ad6602bd336a}
+\begin{Desc}
+\item[Enumerator]\par
+\begin{description}
+\index{T\-I\-M\-E\-O\-U\-T\-\_\-\-B\-C@{T\-I\-M\-E\-O\-U\-T\-\_\-\-B\-C}!network.\-h@{network.\-h}}\index{network.\-h@{network.\-h}!T\-I\-M\-E\-O\-U\-T\-\_\-\-B\-C@{T\-I\-M\-E\-O\-U\-T\-\_\-\-B\-C}}\item[{\em 
+\hypertarget{network_8h_a06df839e1ece18f68174ad6602bd336aab1ef110533383bd417ee6e406700dfbd}{T\-I\-M\-E\-O\-U\-T\-\_\-\-B\-C}\label{network_8h_a06df839e1ece18f68174ad6602bd336aab1ef110533383bd417ee6e406700dfbd}
+}]\index{C\-O\-N\-N\-E\-C\-T\-I\-O\-N@{C\-O\-N\-N\-E\-C\-T\-I\-O\-N}!network.\-h@{network.\-h}}\index{network.\-h@{network.\-h}!C\-O\-N\-N\-E\-C\-T\-I\-O\-N@{C\-O\-N\-N\-E\-C\-T\-I\-O\-N}}\item[{\em 
+\hypertarget{network_8h_a06df839e1ece18f68174ad6602bd336aa883e4c63ec87687e6b2847bfd99c601e}{C\-O\-N\-N\-E\-C\-T\-I\-O\-N}\label{network_8h_a06df839e1ece18f68174ad6602bd336aa883e4c63ec87687e6b2847bfd99c601e}
+}]\index{D\-I\-S\-C\-O\-N\-N\-E\-C\-T\-I\-O\-N@{D\-I\-S\-C\-O\-N\-N\-E\-C\-T\-I\-O\-N}!network.\-h@{network.\-h}}\index{network.\-h@{network.\-h}!D\-I\-S\-C\-O\-N\-N\-E\-C\-T\-I\-O\-N@{D\-I\-S\-C\-O\-N\-N\-E\-C\-T\-I\-O\-N}}\item[{\em 
+\hypertarget{network_8h_a06df839e1ece18f68174ad6602bd336aa7b1e5139921b6ff7e0084530ec82040a}{D\-I\-S\-C\-O\-N\-N\-E\-C\-T\-I\-O\-N}\label{network_8h_a06df839e1ece18f68174ad6602bd336aa7b1e5139921b6ff7e0084530ec82040a}
+}]\end{description}
+\end{Desc}
+\hypertarget{network_8h_a1e83fa46443d025ea514958fc4b84f43}{\index{network.\-h@{network.\-h}!nw\-\_\-state\-\_\-t@{nw\-\_\-state\-\_\-t}}
+\index{nw\-\_\-state\-\_\-t@{nw\-\_\-state\-\_\-t}!network.h@{network.\-h}}
+\subsubsection[{nw\-\_\-state\-\_\-t}]{\setlength{\rightskip}{0pt plus 5cm}enum {\bf nw\-\_\-state\-\_\-t}}}\label{network_8h_a1e83fa46443d025ea514958fc4b84f43}
+\begin{Desc}
+\item[Enumerator]\par
+\begin{description}
+\index{I\-N\-I\-T@{I\-N\-I\-T}!network.\-h@{network.\-h}}\index{network.\-h@{network.\-h}!I\-N\-I\-T@{I\-N\-I\-T}}\item[{\em 
+\hypertarget{network_8h_a1e83fa46443d025ea514958fc4b84f43a0cb1b2c6a7db1f1084886c98909a3f36}{I\-N\-I\-T}\label{network_8h_a1e83fa46443d025ea514958fc4b84f43a0cb1b2c6a7db1f1084886c98909a3f36}
+}]\index{A\-L\-O\-N\-E@{A\-L\-O\-N\-E}!network.\-h@{network.\-h}}\index{network.\-h@{network.\-h}!A\-L\-O\-N\-E@{A\-L\-O\-N\-E}}\item[{\em 
+\hypertarget{network_8h_a1e83fa46443d025ea514958fc4b84f43ae083799213f730f75ff5eb8da4abcaff}{A\-L\-O\-N\-E}\label{network_8h_a1e83fa46443d025ea514958fc4b84f43ae083799213f730f75ff5eb8da4abcaff}
+}]\index{O\-N\-L\-I\-N\-E@{O\-N\-L\-I\-N\-E}!network.\-h@{network.\-h}}\index{network.\-h@{network.\-h}!O\-N\-L\-I\-N\-E@{O\-N\-L\-I\-N\-E}}\item[{\em 
+\hypertarget{network_8h_a1e83fa46443d025ea514958fc4b84f43a38b7803ce18b4539764cac6b13611dcc}{O\-N\-L\-I\-N\-E}\label{network_8h_a1e83fa46443d025ea514958fc4b84f43a38b7803ce18b4539764cac6b13611dcc}
+}]\end{description}
+\end{Desc}
+
+
+\subsection{Function Documentation}
+\hypertarget{network_8h_a3ae4e3e4aceacf59ec718bd4fc43cfbc}{\index{network.\-h@{network.\-h}!assign\-\_\-com\-\_\-thread@{assign\-\_\-com\-\_\-thread}}
+\index{assign\-\_\-com\-\_\-thread@{assign\-\_\-com\-\_\-thread}!network.h@{network.\-h}}
+\subsubsection[{assign\-\_\-com\-\_\-thread}]{\setlength{\rightskip}{0pt plus 5cm}void assign\-\_\-com\-\_\-thread (
+\begin{DoxyParamCaption}
+\item[{struct {\bf peer}}]{p}
+\end{DoxyParamCaption}
+)}}\label{network_8h_a3ae4e3e4aceacf59ec718bd4fc43cfbc}
+\hypertarget{network_8h_a7d30c43e4e36e6814869d87da6b14006}{\index{network.\-h@{network.\-h}!com\-\_\-handler@{com\-\_\-handler}}
+\index{com\-\_\-handler@{com\-\_\-handler}!network.h@{network.\-h}}
+\subsubsection[{com\-\_\-handler}]{\setlength{\rightskip}{0pt plus 5cm}void$\ast$ com\-\_\-handler (
+\begin{DoxyParamCaption}
+\item[{void $\ast$}]{peer\-\_\-inf}
+\end{DoxyParamCaption}
+)}}\label{network_8h_a7d30c43e4e36e6814869d87da6b14006}
+Normal operating mode
+
+Maintain connection by passing and receiving I'm alive
+
+Receive data
+
+Check for timeout
+
+Send data
+
+Recovery mode\-: \hypertarget{network_8h_a89649123b7b66a20340f65caea49d878}{\index{network.\-h@{network.\-h}!connect\-\_\-to\-\_\-peer@{connect\-\_\-to\-\_\-peer}}
+\index{connect\-\_\-to\-\_\-peer@{connect\-\_\-to\-\_\-peer}!network.h@{network.\-h}}
+\subsubsection[{connect\-\_\-to\-\_\-peer}]{\setlength{\rightskip}{0pt plus 5cm}int connect\-\_\-to\-\_\-peer (
+\begin{DoxyParamCaption}
+\item[{in\-\_\-addr\-\_\-t}]{peer\-\_\-ip}
+\end{DoxyParamCaption}
+)}}\label{network_8h_a89649123b7b66a20340f65caea49d878}
+\hypertarget{network_8h_ae99112e357d288ff700cad7afdd52959}{\index{network.\-h@{network.\-h}!getlocalip@{getlocalip}}
+\index{getlocalip@{getlocalip}!network.h@{network.\-h}}
+\subsubsection[{getlocalip}]{\setlength{\rightskip}{0pt plus 5cm}char$\ast$ getlocalip (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{network_8h_ae99112e357d288ff700cad7afdd52959}
+\hypertarget{network_8h_a024795b101ad0f8f0b773481198d4ce1}{\index{network.\-h@{network.\-h}!listen\-\_\-tcp@{listen\-\_\-tcp}}
+\index{listen\-\_\-tcp@{listen\-\_\-tcp}!network.h@{network.\-h}}
+\subsubsection[{listen\-\_\-tcp}]{\setlength{\rightskip}{0pt plus 5cm}void$\ast$ listen\-\_\-tcp (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{network_8h_a024795b101ad0f8f0b773481198d4ce1}
+\hypertarget{network_8h_a91a476062cb553f94439999901f213fc}{\index{network.\-h@{network.\-h}!listen\-\_\-udp\-\_\-broadcast@{listen\-\_\-udp\-\_\-broadcast}}
+\index{listen\-\_\-udp\-\_\-broadcast@{listen\-\_\-udp\-\_\-broadcast}!network.h@{network.\-h}}
+\subsubsection[{listen\-\_\-udp\-\_\-broadcast}]{\setlength{\rightskip}{0pt plus 5cm}void$\ast$ listen\-\_\-udp\-\_\-broadcast (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{network_8h_a91a476062cb553f94439999901f213fc}
+\hypertarget{network_8h_a2b61ae1651a921d5ebd7d3e4c35bde13}{\index{network.\-h@{network.\-h}!network@{network}}
+\index{network@{network}!network.h@{network.\-h}}
+\subsubsection[{network}]{\setlength{\rightskip}{0pt plus 5cm}void network (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{network_8h_a2b61ae1651a921d5ebd7d3e4c35bde13}
+\hypertarget{network_8h_ac9ce2b2726e18b41fc6df738445a8948}{\index{network.\-h@{network.\-h}!network\-\_\-init@{network\-\_\-init}}
+\index{network\-\_\-init@{network\-\_\-init}!network.h@{network.\-h}}
+\subsubsection[{network\-\_\-init}]{\setlength{\rightskip}{0pt plus 5cm}void network\-\_\-init (
+\begin{DoxyParamCaption}
+\item[{void}]{}
+\end{DoxyParamCaption}
+)}}\label{network_8h_ac9ce2b2726e18b41fc6df738445a8948}
+\hypertarget{network_8h_ab04620f62a6ebf1766900248360d02d9}{\index{network.\-h@{network.\-h}!network\-\_\-statemachine@{network\-\_\-statemachine}}
+\index{network\-\_\-statemachine@{network\-\_\-statemachine}!network.h@{network.\-h}}
+\subsubsection[{network\-\_\-statemachine}]{\setlength{\rightskip}{0pt plus 5cm}void$\ast$ network\-\_\-statemachine (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{network_8h_ab04620f62a6ebf1766900248360d02d9}
+\hypertarget{network_8h_abb8231ed6bbd6b0030bb64369c952353}{\index{network.\-h@{network.\-h}!nw\-\_\-getevent@{nw\-\_\-getevent}}
+\index{nw\-\_\-getevent@{nw\-\_\-getevent}!network.h@{network.\-h}}
+\subsubsection[{nw\-\_\-getevent}]{\setlength{\rightskip}{0pt plus 5cm}{\bf events\-\_\-t} nw\-\_\-getevent (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{network_8h_abb8231ed6bbd6b0030bb64369c952353}
+\hypertarget{network_8h_a96ec265b4bf0630c9d5af0a53ca11792}{\index{network.\-h@{network.\-h}!nw\-\_\-setevent@{nw\-\_\-setevent}}
+\index{nw\-\_\-setevent@{nw\-\_\-setevent}!network.h@{network.\-h}}
+\subsubsection[{nw\-\_\-setevent}]{\setlength{\rightskip}{0pt plus 5cm}void nw\-\_\-setevent (
+\begin{DoxyParamCaption}
+\item[{{\bf events\-\_\-t}}]{evnt}
+\end{DoxyParamCaption}
+)}}\label{network_8h_a96ec265b4bf0630c9d5af0a53ca11792}
+\hypertarget{network_8h_af6818661760af6df23232a1f7ce0ed4b}{\index{network.\-h@{network.\-h}!send\-\_\-udp\-\_\-broadcast@{send\-\_\-udp\-\_\-broadcast}}
+\index{send\-\_\-udp\-\_\-broadcast@{send\-\_\-udp\-\_\-broadcast}!network.h@{network.\-h}}
+\subsubsection[{send\-\_\-udp\-\_\-broadcast}]{\setlength{\rightskip}{0pt plus 5cm}void$\ast$ send\-\_\-udp\-\_\-broadcast (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{network_8h_af6818661760af6df23232a1f7ce0ed4b}
+\hypertarget{network_8h_a24c4d46ffb308b5ad6fd4cde1192dbc7}{\index{network.\-h@{network.\-h}!sendtoallpeer@{sendtoallpeer}}
+\index{sendtoallpeer@{sendtoallpeer}!network.h@{network.\-h}}
+\subsubsection[{sendtoallpeer}]{\setlength{\rightskip}{0pt plus 5cm}int sendtoallpeer (
+\begin{DoxyParamCaption}
+\item[{struct {\bf msg}}]{package}
+\end{DoxyParamCaption}
+)}}\label{network_8h_a24c4d46ffb308b5ad6fd4cde1192dbc7}
+\hypertarget{network_8h_a20f1cba53a1c863a360d32459c43c939}{\index{network.\-h@{network.\-h}!sendtopeer@{sendtopeer}}
+\index{sendtopeer@{sendtopeer}!network.h@{network.\-h}}
+\subsubsection[{sendtopeer}]{\setlength{\rightskip}{0pt plus 5cm}int sendtopeer (
+\begin{DoxyParamCaption}
+\item[{struct {\bf msg}}]{package, }
+\item[{struct {\bf peer}}]{p}
+\end{DoxyParamCaption}
+)}}\label{network_8h_a20f1cba53a1c863a360d32459c43c939}

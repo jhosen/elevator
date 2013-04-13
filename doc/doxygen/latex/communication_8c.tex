@@ -1,0 +1,76 @@
+\hypertarget{communication_8c}{\section{communication.\-c File Reference}
+\label{communication_8c}\index{communication.\-c@{communication.\-c}}
+}
+{\ttfamily \#include $<$stdlib.\-h$>$}\\*
+{\ttfamily \#include $<$time.\-h$>$}\\*
+{\ttfamily \#include $<$arpa/inet.\-h$>$}\\*
+{\ttfamily \#include \char`\"{}utils/c\-J\-S\-O\-N.\-h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}communication.\-h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}network.\-h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}order.\-h\char`\"{}}\\*
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \hyperlink{communication_8c_ad31ea930ade62ad7d30e54707e14200e}{handle\-\_\-msg} (struct \hyperlink{structmsg}{msg} package, struct timeval $\ast$ttime)
+\item 
+void \hyperlink{communication_8c_a1f29beeed66b9ac128d3f67f53279c0e}{recover\-\_\-elev} (struct node $\ast$n)
+\item 
+void \hyperlink{communication_8c_a382a14fd5543ef913887ced1a13b57b0}{send\-\_\-msg} (int msgtype, int to, int direction, int floor, int gpdata\mbox{[}$\,$\mbox{]})
+\item 
+char $\ast$ \hyperlink{communication_8c_a53ed4b4450deb2174cb25a8b480d4483}{pack} (struct \hyperlink{structmsg}{msg} msg\-\_\-struct)
+\item 
+struct \hyperlink{structmsg}{msg} \hyperlink{communication_8c_a19151ea0190463ebdddf19b6e5530c19}{unpack} (char $\ast$mesg)
+\item 
+int \hyperlink{communication_8c_aa7d262aba3b448f6d531a7f8cba4e8e4}{cjsonendindex} (char $\ast$cjson\-\_\-string, int start\-\_\-i)
+\end{DoxyCompactItemize}
+
+
+\subsection{Function Documentation}
+\hypertarget{communication_8c_aa7d262aba3b448f6d531a7f8cba4e8e4}{\index{communication.\-c@{communication.\-c}!cjsonendindex@{cjsonendindex}}
+\index{cjsonendindex@{cjsonendindex}!communication.c@{communication.\-c}}
+\subsubsection[{cjsonendindex}]{\setlength{\rightskip}{0pt plus 5cm}int cjsonendindex (
+\begin{DoxyParamCaption}
+\item[{char $\ast$}]{cjson\-\_\-string, }
+\item[{int}]{start\-\_\-i}
+\end{DoxyParamCaption}
+)}}\label{communication_8c_aa7d262aba3b448f6d531a7f8cba4e8e4}
+\hypertarget{communication_8c_ad31ea930ade62ad7d30e54707e14200e}{\index{communication.\-c@{communication.\-c}!handle\-\_\-msg@{handle\-\_\-msg}}
+\index{handle\-\_\-msg@{handle\-\_\-msg}!communication.c@{communication.\-c}}
+\subsubsection[{handle\-\_\-msg}]{\setlength{\rightskip}{0pt plus 5cm}void handle\-\_\-msg (
+\begin{DoxyParamCaption}
+\item[{struct {\bf msg}}]{package, }
+\item[{struct timeval $\ast$}]{ttime}
+\end{DoxyParamCaption}
+)}}\label{communication_8c_ad31ea930ade62ad7d30e54707e14200e}
+\hypertarget{communication_8c_a53ed4b4450deb2174cb25a8b480d4483}{\index{communication.\-c@{communication.\-c}!pack@{pack}}
+\index{pack@{pack}!communication.c@{communication.\-c}}
+\subsubsection[{pack}]{\setlength{\rightskip}{0pt plus 5cm}char$\ast$ pack (
+\begin{DoxyParamCaption}
+\item[{struct {\bf msg}}]{msg\-\_\-struct}
+\end{DoxyParamCaption}
+)}}\label{communication_8c_a53ed4b4450deb2174cb25a8b480d4483}
+\hypertarget{communication_8c_a1f29beeed66b9ac128d3f67f53279c0e}{\index{communication.\-c@{communication.\-c}!recover\-\_\-elev@{recover\-\_\-elev}}
+\index{recover\-\_\-elev@{recover\-\_\-elev}!communication.c@{communication.\-c}}
+\subsubsection[{recover\-\_\-elev}]{\setlength{\rightskip}{0pt plus 5cm}void recover\-\_\-elev (
+\begin{DoxyParamCaption}
+\item[{struct node $\ast$}]{n}
+\end{DoxyParamCaption}
+)}}\label{communication_8c_a1f29beeed66b9ac128d3f67f53279c0e}
+\hypertarget{communication_8c_a382a14fd5543ef913887ced1a13b57b0}{\index{communication.\-c@{communication.\-c}!send\-\_\-msg@{send\-\_\-msg}}
+\index{send\-\_\-msg@{send\-\_\-msg}!communication.c@{communication.\-c}}
+\subsubsection[{send\-\_\-msg}]{\setlength{\rightskip}{0pt plus 5cm}void send\-\_\-msg (
+\begin{DoxyParamCaption}
+\item[{int}]{msgtype, }
+\item[{int}]{to, }
+\item[{int}]{direction, }
+\item[{int}]{floor, }
+\item[{int}]{gpdata\mbox{[}$\,$\mbox{]}}
+\end{DoxyParamCaption}
+)}}\label{communication_8c_a382a14fd5543ef913887ced1a13b57b0}
+\hypertarget{communication_8c_a19151ea0190463ebdddf19b6e5530c19}{\index{communication.\-c@{communication.\-c}!unpack@{unpack}}
+\index{unpack@{unpack}!communication.c@{communication.\-c}}
+\subsubsection[{unpack}]{\setlength{\rightskip}{0pt plus 5cm}struct {\bf msg} unpack (
+\begin{DoxyParamCaption}
+\item[{char $\ast$}]{mesg}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [read]}}}\label{communication_8c_a19151ea0190463ebdddf19b6e5530c19}

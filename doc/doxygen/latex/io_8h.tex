@@ -1,0 +1,100 @@
+\hypertarget{io_8h}{\section{drivers/io.h File Reference}
+\label{io_8h}\index{drivers/io.\-h@{drivers/io.\-h}}
+}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+int \hyperlink{io_8h_a12ce98b64f2019ac45b44826a4db7ec9}{io\-\_\-init} ()
+\item 
+void \hyperlink{io_8h_a4d538858b80ee856217e3ecfde8a3c60}{io\-\_\-set\-\_\-bit} (int channel)
+\item 
+void \hyperlink{io_8h_a97951257634a0778b858a4ced7558f81}{io\-\_\-clear\-\_\-bit} (int channel)
+\item 
+void \hyperlink{io_8h_a1c2c5df63111187109ef11be354621bd}{io\-\_\-write\-\_\-analog} (int channel, int value)
+\item 
+int \hyperlink{io_8h_ae9e08ee7d41b07b153e2ddaae4dc53cb}{io\-\_\-read\-\_\-bit} (int channel)
+\item 
+int \hyperlink{io_8h_ab145a5637d2c463dfb5741e1a748dd74}{io\-\_\-read\-\_\-analog} (int channel)
+\end{DoxyCompactItemize}
+
+
+\subsection{Function Documentation}
+\hypertarget{io_8h_a97951257634a0778b858a4ced7558f81}{\index{io.\-h@{io.\-h}!io\-\_\-clear\-\_\-bit@{io\-\_\-clear\-\_\-bit}}
+\index{io\-\_\-clear\-\_\-bit@{io\-\_\-clear\-\_\-bit}!io.h@{io.\-h}}
+\subsubsection[{io\-\_\-clear\-\_\-bit}]{\setlength{\rightskip}{0pt plus 5cm}void io\-\_\-clear\-\_\-bit (
+\begin{DoxyParamCaption}
+\item[{int}]{channel}
+\end{DoxyParamCaption}
+)}}\label{io_8h_a97951257634a0778b858a4ced7558f81}
+Clears a digital channel bit. 
+\begin{DoxyParams}{Parameters}
+{\em channel} & Channel bit to set. \\
+\hline
+\end{DoxyParams}
+\hypertarget{io_8h_a12ce98b64f2019ac45b44826a4db7ec9}{\index{io.\-h@{io.\-h}!io\-\_\-init@{io\-\_\-init}}
+\index{io\-\_\-init@{io\-\_\-init}!io.h@{io.\-h}}
+\subsubsection[{io\-\_\-init}]{\setlength{\rightskip}{0pt plus 5cm}int io\-\_\-init (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{io_8h_a12ce98b64f2019ac45b44826a4db7ec9}
+Initialize lib\-Comedi in \char`\"{}\-Sanntidssalen\char`\"{} \begin{DoxyReturn}{Returns}
+Non-\/zero on success and 0 on failure 
+\end{DoxyReturn}
+\hypertarget{io_8h_ab145a5637d2c463dfb5741e1a748dd74}{\index{io.\-h@{io.\-h}!io\-\_\-read\-\_\-analog@{io\-\_\-read\-\_\-analog}}
+\index{io\-\_\-read\-\_\-analog@{io\-\_\-read\-\_\-analog}!io.h@{io.\-h}}
+\subsubsection[{io\-\_\-read\-\_\-analog}]{\setlength{\rightskip}{0pt plus 5cm}int io\-\_\-read\-\_\-analog (
+\begin{DoxyParamCaption}
+\item[{int}]{channel}
+\end{DoxyParamCaption}
+)}}\label{io_8h_ab145a5637d2c463dfb5741e1a748dd74}
+Reads a bit value from an analog channel. 
+\begin{DoxyParams}{Parameters}
+{\em channel} & Channel to read from. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Value read. 
+\end{DoxyReturn}
+\hypertarget{io_8h_ae9e08ee7d41b07b153e2ddaae4dc53cb}{\index{io.\-h@{io.\-h}!io\-\_\-read\-\_\-bit@{io\-\_\-read\-\_\-bit}}
+\index{io\-\_\-read\-\_\-bit@{io\-\_\-read\-\_\-bit}!io.h@{io.\-h}}
+\subsubsection[{io\-\_\-read\-\_\-bit}]{\setlength{\rightskip}{0pt plus 5cm}int io\-\_\-read\-\_\-bit (
+\begin{DoxyParamCaption}
+\item[{int}]{channel}
+\end{DoxyParamCaption}
+)}}\label{io_8h_ae9e08ee7d41b07b153e2ddaae4dc53cb}
+Reads a bit value from a digital channel. 
+\begin{DoxyParams}{Parameters}
+{\em channel} & Channel to read from. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Value read. 
+\end{DoxyReturn}
+\hypertarget{io_8h_a4d538858b80ee856217e3ecfde8a3c60}{\index{io.\-h@{io.\-h}!io\-\_\-set\-\_\-bit@{io\-\_\-set\-\_\-bit}}
+\index{io\-\_\-set\-\_\-bit@{io\-\_\-set\-\_\-bit}!io.h@{io.\-h}}
+\subsubsection[{io\-\_\-set\-\_\-bit}]{\setlength{\rightskip}{0pt plus 5cm}void io\-\_\-set\-\_\-bit (
+\begin{DoxyParamCaption}
+\item[{int}]{channel}
+\end{DoxyParamCaption}
+)}}\label{io_8h_a4d538858b80ee856217e3ecfde8a3c60}
+Sets a digital channel bit. 
+\begin{DoxyParams}{Parameters}
+{\em channel} & Channel bit to set. \\
+\hline
+\end{DoxyParams}
+\hypertarget{io_8h_a1c2c5df63111187109ef11be354621bd}{\index{io.\-h@{io.\-h}!io\-\_\-write\-\_\-analog@{io\-\_\-write\-\_\-analog}}
+\index{io\-\_\-write\-\_\-analog@{io\-\_\-write\-\_\-analog}!io.h@{io.\-h}}
+\subsubsection[{io\-\_\-write\-\_\-analog}]{\setlength{\rightskip}{0pt plus 5cm}void io\-\_\-write\-\_\-analog (
+\begin{DoxyParamCaption}
+\item[{int}]{channel, }
+\item[{int}]{value}
+\end{DoxyParamCaption}
+)}}\label{io_8h_a1c2c5df63111187109ef11be354621bd}
+Writes a value to an analog channel. 
+\begin{DoxyParams}{Parameters}
+{\em channel} & Channel to write to. \\
+\hline
+{\em value} & Value to write. \\
+\hline
+\end{DoxyParams}

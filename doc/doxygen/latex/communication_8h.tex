@@ -1,0 +1,141 @@
+\hypertarget{communication_8h}{\section{communication.\-h File Reference}
+\label{communication_8h}\index{communication.\-h@{communication.\-h}}
+}
+{\ttfamily \#include $<$time.\-h$>$}\\*
+{\ttfamily \#include \char`\"{}order.\-h\char`\"{}}\\*
+{\ttfamily \#include $<$arpa/inet.\-h$>$}\\*
+\subsection*{Data Structures}
+\begin{DoxyCompactItemize}
+\item 
+struct \hyperlink{structmsg}{msg}
+\item 
+struct \hyperlink{structstate}{state}
+\end{DoxyCompactItemize}
+\subsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \hyperlink{communication_8h_aa0ab1d7cdee0ee968fd32174c6b3bad2}{D\-A\-T\-A\-L\-E\-N\-G\-T\-H}~8
+\item 
+\#define \hyperlink{communication_8h_ad3cbc9aa9afc23e68f46cbe18c3d99d7}{T\-O\-A\-L\-L\-I\-P}~0
+\end{DoxyCompactItemize}
+\subsection*{Enumerations}
+\begin{DoxyCompactItemize}
+\item 
+enum \hyperlink{communication_8h_ae01cbfa01098b9baeab8b8ff7d90a52d}{com\-\_\-opcode\-\_\-t} \{ \\*
+\hyperlink{communication_8h_ae01cbfa01098b9baeab8b8ff7d90a52daa65e42c7b8368018169d519a88bf7869}{O\-P\-C\-O\-D\-E\-\_\-\-I\-M\-A\-L\-I\-V\-E}, 
+\hyperlink{communication_8h_ae01cbfa01098b9baeab8b8ff7d90a52da26dcabf282eb3e8ef0d57a451be4e4d8}{O\-P\-C\-O\-D\-E\-\_\-\-N\-E\-W\-O\-R\-D\-E\-R}, 
+\hyperlink{communication_8h_ae01cbfa01098b9baeab8b8ff7d90a52dac1c2995832231039b87b4ac28808ed82}{O\-P\-C\-O\-D\-E\-\_\-\-E\-L\-E\-V\-S\-T\-A\-T\-E}, 
+\hyperlink{communication_8h_ae01cbfa01098b9baeab8b8ff7d90a52da04f709c153f558b27ca23e1bd11550fa}{O\-P\-C\-O\-D\-E\-\_\-\-N\-O\-O\-P}, 
+\\*
+\hyperlink{communication_8h_ae01cbfa01098b9baeab8b8ff7d90a52da780e58d910454cf7d410e16bcf505930}{O\-P\-C\-O\-D\-E\-\_\-\-P\-E\-E\-R\-L\-O\-S\-T\-T\-A\-K\-E\-O\-V\-E\-R}, 
+\hyperlink{communication_8h_ae01cbfa01098b9baeab8b8ff7d90a52daf430ce06e0c9391df44a3d3b1f405151}{O\-P\-C\-O\-D\-E\-\_\-\-P\-E\-E\-R\-L\-O\-S\-T}, 
+\hyperlink{communication_8h_ae01cbfa01098b9baeab8b8ff7d90a52da4da1c7aa2e787850685c56bd49215697}{O\-P\-C\-O\-D\-E\-\_\-\-N\-E\-W\-P\-E\-E\-R}, 
+\hyperlink{communication_8h_ae01cbfa01098b9baeab8b8ff7d90a52dab4c65a2a6f3894828463523f1a62a8e1}{O\-P\-C\-O\-D\-E\-\_\-\-C\-O\-R\-R\-U\-P\-T}, 
+\\*
+\hyperlink{communication_8h_ae01cbfa01098b9baeab8b8ff7d90a52da2c7cf6300ab3cb96fd12a3796a7fe21b}{O\-P\-C\-O\-D\-E\-\_\-\-O\-R\-D\-E\-R\-D\-O\-N\-E}, 
+\hyperlink{communication_8h_ae01cbfa01098b9baeab8b8ff7d90a52da8e756521bace288348124bbcbd5a6cf4}{O\-P\-C\-O\-D\-E\-\_\-\-E\-L\-E\-V\-I\-N\-E\-M\-E\-R\-G\-E\-N\-C\-Y}, 
+\hyperlink{communication_8h_ae01cbfa01098b9baeab8b8ff7d90a52daedce9ada644746f4cb07b0b4abc8cae3}{O\-P\-C\-O\-D\-E\-\_\-\-E\-L\-E\-V\-\_\-\-N\-O\-T\-\_\-\-E\-M\-E\-R\-G\-E\-N\-C\-Y}, 
+\hyperlink{communication_8h_ae01cbfa01098b9baeab8b8ff7d90a52dac8281b9f2ee98472f7425937cbda3804}{O\-P\-C\-O\-D\-E\-\_\-\-E\-L\-E\-V\-S\-Y\-N\-C}
+ \}
+\end{DoxyCompactItemize}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \hyperlink{communication_8h_ad31ea930ade62ad7d30e54707e14200e}{handle\-\_\-msg} (struct \hyperlink{structmsg}{msg} package, struct timeval $\ast$ttime)
+\item 
+void \hyperlink{communication_8h_a382a14fd5543ef913887ced1a13b57b0}{send\-\_\-msg} (int msgtype, int to, int direction, int floor, int gpdata\mbox{[}$\,$\mbox{]})
+\item 
+char $\ast$ \hyperlink{communication_8h_a53ed4b4450deb2174cb25a8b480d4483}{pack} (struct \hyperlink{structmsg}{msg} msg\-\_\-struct)
+\item 
+struct \hyperlink{structmsg}{msg} \hyperlink{communication_8h_a01ec040e794f89432bcdc07c80ba0a64}{unpack} (char $\ast$\hyperlink{structmsg}{msg})
+\item 
+int \hyperlink{communication_8h_aa7d262aba3b448f6d531a7f8cba4e8e4}{cjsonendindex} (char $\ast$cjson\-\_\-string, int start\-\_\-i)
+\end{DoxyCompactItemize}
+
+
+\subsection{Macro Definition Documentation}
+\hypertarget{communication_8h_aa0ab1d7cdee0ee968fd32174c6b3bad2}{\index{communication.\-h@{communication.\-h}!D\-A\-T\-A\-L\-E\-N\-G\-T\-H@{D\-A\-T\-A\-L\-E\-N\-G\-T\-H}}
+\index{D\-A\-T\-A\-L\-E\-N\-G\-T\-H@{D\-A\-T\-A\-L\-E\-N\-G\-T\-H}!communication.h@{communication.\-h}}
+\subsubsection[{D\-A\-T\-A\-L\-E\-N\-G\-T\-H}]{\setlength{\rightskip}{0pt plus 5cm}\#define D\-A\-T\-A\-L\-E\-N\-G\-T\-H~8}}\label{communication_8h_aa0ab1d7cdee0ee968fd32174c6b3bad2}
+\hypertarget{communication_8h_ad3cbc9aa9afc23e68f46cbe18c3d99d7}{\index{communication.\-h@{communication.\-h}!T\-O\-A\-L\-L\-I\-P@{T\-O\-A\-L\-L\-I\-P}}
+\index{T\-O\-A\-L\-L\-I\-P@{T\-O\-A\-L\-L\-I\-P}!communication.h@{communication.\-h}}
+\subsubsection[{T\-O\-A\-L\-L\-I\-P}]{\setlength{\rightskip}{0pt plus 5cm}\#define T\-O\-A\-L\-L\-I\-P~0}}\label{communication_8h_ad3cbc9aa9afc23e68f46cbe18c3d99d7}
+
+
+\subsection{Enumeration Type Documentation}
+\hypertarget{communication_8h_ae01cbfa01098b9baeab8b8ff7d90a52d}{\index{communication.\-h@{communication.\-h}!com\-\_\-opcode\-\_\-t@{com\-\_\-opcode\-\_\-t}}
+\index{com\-\_\-opcode\-\_\-t@{com\-\_\-opcode\-\_\-t}!communication.h@{communication.\-h}}
+\subsubsection[{com\-\_\-opcode\-\_\-t}]{\setlength{\rightskip}{0pt plus 5cm}enum {\bf com\-\_\-opcode\-\_\-t}}}\label{communication_8h_ae01cbfa01098b9baeab8b8ff7d90a52d}
+\begin{Desc}
+\item[Enumerator]\par
+\begin{description}
+\index{O\-P\-C\-O\-D\-E\-\_\-\-I\-M\-A\-L\-I\-V\-E@{O\-P\-C\-O\-D\-E\-\_\-\-I\-M\-A\-L\-I\-V\-E}!communication.\-h@{communication.\-h}}\index{communication.\-h@{communication.\-h}!O\-P\-C\-O\-D\-E\-\_\-\-I\-M\-A\-L\-I\-V\-E@{O\-P\-C\-O\-D\-E\-\_\-\-I\-M\-A\-L\-I\-V\-E}}\item[{\em 
+\hypertarget{communication_8h_ae01cbfa01098b9baeab8b8ff7d90a52daa65e42c7b8368018169d519a88bf7869}{O\-P\-C\-O\-D\-E\-\_\-\-I\-M\-A\-L\-I\-V\-E}\label{communication_8h_ae01cbfa01098b9baeab8b8ff7d90a52daa65e42c7b8368018169d519a88bf7869}
+}]\index{O\-P\-C\-O\-D\-E\-\_\-\-N\-E\-W\-O\-R\-D\-E\-R@{O\-P\-C\-O\-D\-E\-\_\-\-N\-E\-W\-O\-R\-D\-E\-R}!communication.\-h@{communication.\-h}}\index{communication.\-h@{communication.\-h}!O\-P\-C\-O\-D\-E\-\_\-\-N\-E\-W\-O\-R\-D\-E\-R@{O\-P\-C\-O\-D\-E\-\_\-\-N\-E\-W\-O\-R\-D\-E\-R}}\item[{\em 
+\hypertarget{communication_8h_ae01cbfa01098b9baeab8b8ff7d90a52da26dcabf282eb3e8ef0d57a451be4e4d8}{O\-P\-C\-O\-D\-E\-\_\-\-N\-E\-W\-O\-R\-D\-E\-R}\label{communication_8h_ae01cbfa01098b9baeab8b8ff7d90a52da26dcabf282eb3e8ef0d57a451be4e4d8}
+}]\index{O\-P\-C\-O\-D\-E\-\_\-\-E\-L\-E\-V\-S\-T\-A\-T\-E@{O\-P\-C\-O\-D\-E\-\_\-\-E\-L\-E\-V\-S\-T\-A\-T\-E}!communication.\-h@{communication.\-h}}\index{communication.\-h@{communication.\-h}!O\-P\-C\-O\-D\-E\-\_\-\-E\-L\-E\-V\-S\-T\-A\-T\-E@{O\-P\-C\-O\-D\-E\-\_\-\-E\-L\-E\-V\-S\-T\-A\-T\-E}}\item[{\em 
+\hypertarget{communication_8h_ae01cbfa01098b9baeab8b8ff7d90a52dac1c2995832231039b87b4ac28808ed82}{O\-P\-C\-O\-D\-E\-\_\-\-E\-L\-E\-V\-S\-T\-A\-T\-E}\label{communication_8h_ae01cbfa01098b9baeab8b8ff7d90a52dac1c2995832231039b87b4ac28808ed82}
+}]\index{O\-P\-C\-O\-D\-E\-\_\-\-N\-O\-O\-P@{O\-P\-C\-O\-D\-E\-\_\-\-N\-O\-O\-P}!communication.\-h@{communication.\-h}}\index{communication.\-h@{communication.\-h}!O\-P\-C\-O\-D\-E\-\_\-\-N\-O\-O\-P@{O\-P\-C\-O\-D\-E\-\_\-\-N\-O\-O\-P}}\item[{\em 
+\hypertarget{communication_8h_ae01cbfa01098b9baeab8b8ff7d90a52da04f709c153f558b27ca23e1bd11550fa}{O\-P\-C\-O\-D\-E\-\_\-\-N\-O\-O\-P}\label{communication_8h_ae01cbfa01098b9baeab8b8ff7d90a52da04f709c153f558b27ca23e1bd11550fa}
+}]\index{O\-P\-C\-O\-D\-E\-\_\-\-P\-E\-E\-R\-L\-O\-S\-T\-T\-A\-K\-E\-O\-V\-E\-R@{O\-P\-C\-O\-D\-E\-\_\-\-P\-E\-E\-R\-L\-O\-S\-T\-T\-A\-K\-E\-O\-V\-E\-R}!communication.\-h@{communication.\-h}}\index{communication.\-h@{communication.\-h}!O\-P\-C\-O\-D\-E\-\_\-\-P\-E\-E\-R\-L\-O\-S\-T\-T\-A\-K\-E\-O\-V\-E\-R@{O\-P\-C\-O\-D\-E\-\_\-\-P\-E\-E\-R\-L\-O\-S\-T\-T\-A\-K\-E\-O\-V\-E\-R}}\item[{\em 
+\hypertarget{communication_8h_ae01cbfa01098b9baeab8b8ff7d90a52da780e58d910454cf7d410e16bcf505930}{O\-P\-C\-O\-D\-E\-\_\-\-P\-E\-E\-R\-L\-O\-S\-T\-T\-A\-K\-E\-O\-V\-E\-R}\label{communication_8h_ae01cbfa01098b9baeab8b8ff7d90a52da780e58d910454cf7d410e16bcf505930}
+}]\index{O\-P\-C\-O\-D\-E\-\_\-\-P\-E\-E\-R\-L\-O\-S\-T@{O\-P\-C\-O\-D\-E\-\_\-\-P\-E\-E\-R\-L\-O\-S\-T}!communication.\-h@{communication.\-h}}\index{communication.\-h@{communication.\-h}!O\-P\-C\-O\-D\-E\-\_\-\-P\-E\-E\-R\-L\-O\-S\-T@{O\-P\-C\-O\-D\-E\-\_\-\-P\-E\-E\-R\-L\-O\-S\-T}}\item[{\em 
+\hypertarget{communication_8h_ae01cbfa01098b9baeab8b8ff7d90a52daf430ce06e0c9391df44a3d3b1f405151}{O\-P\-C\-O\-D\-E\-\_\-\-P\-E\-E\-R\-L\-O\-S\-T}\label{communication_8h_ae01cbfa01098b9baeab8b8ff7d90a52daf430ce06e0c9391df44a3d3b1f405151}
+}]\index{O\-P\-C\-O\-D\-E\-\_\-\-N\-E\-W\-P\-E\-E\-R@{O\-P\-C\-O\-D\-E\-\_\-\-N\-E\-W\-P\-E\-E\-R}!communication.\-h@{communication.\-h}}\index{communication.\-h@{communication.\-h}!O\-P\-C\-O\-D\-E\-\_\-\-N\-E\-W\-P\-E\-E\-R@{O\-P\-C\-O\-D\-E\-\_\-\-N\-E\-W\-P\-E\-E\-R}}\item[{\em 
+\hypertarget{communication_8h_ae01cbfa01098b9baeab8b8ff7d90a52da4da1c7aa2e787850685c56bd49215697}{O\-P\-C\-O\-D\-E\-\_\-\-N\-E\-W\-P\-E\-E\-R}\label{communication_8h_ae01cbfa01098b9baeab8b8ff7d90a52da4da1c7aa2e787850685c56bd49215697}
+}]\index{O\-P\-C\-O\-D\-E\-\_\-\-C\-O\-R\-R\-U\-P\-T@{O\-P\-C\-O\-D\-E\-\_\-\-C\-O\-R\-R\-U\-P\-T}!communication.\-h@{communication.\-h}}\index{communication.\-h@{communication.\-h}!O\-P\-C\-O\-D\-E\-\_\-\-C\-O\-R\-R\-U\-P\-T@{O\-P\-C\-O\-D\-E\-\_\-\-C\-O\-R\-R\-U\-P\-T}}\item[{\em 
+\hypertarget{communication_8h_ae01cbfa01098b9baeab8b8ff7d90a52dab4c65a2a6f3894828463523f1a62a8e1}{O\-P\-C\-O\-D\-E\-\_\-\-C\-O\-R\-R\-U\-P\-T}\label{communication_8h_ae01cbfa01098b9baeab8b8ff7d90a52dab4c65a2a6f3894828463523f1a62a8e1}
+}]\index{O\-P\-C\-O\-D\-E\-\_\-\-O\-R\-D\-E\-R\-D\-O\-N\-E@{O\-P\-C\-O\-D\-E\-\_\-\-O\-R\-D\-E\-R\-D\-O\-N\-E}!communication.\-h@{communication.\-h}}\index{communication.\-h@{communication.\-h}!O\-P\-C\-O\-D\-E\-\_\-\-O\-R\-D\-E\-R\-D\-O\-N\-E@{O\-P\-C\-O\-D\-E\-\_\-\-O\-R\-D\-E\-R\-D\-O\-N\-E}}\item[{\em 
+\hypertarget{communication_8h_ae01cbfa01098b9baeab8b8ff7d90a52da2c7cf6300ab3cb96fd12a3796a7fe21b}{O\-P\-C\-O\-D\-E\-\_\-\-O\-R\-D\-E\-R\-D\-O\-N\-E}\label{communication_8h_ae01cbfa01098b9baeab8b8ff7d90a52da2c7cf6300ab3cb96fd12a3796a7fe21b}
+}]\index{O\-P\-C\-O\-D\-E\-\_\-\-E\-L\-E\-V\-I\-N\-E\-M\-E\-R\-G\-E\-N\-C\-Y@{O\-P\-C\-O\-D\-E\-\_\-\-E\-L\-E\-V\-I\-N\-E\-M\-E\-R\-G\-E\-N\-C\-Y}!communication.\-h@{communication.\-h}}\index{communication.\-h@{communication.\-h}!O\-P\-C\-O\-D\-E\-\_\-\-E\-L\-E\-V\-I\-N\-E\-M\-E\-R\-G\-E\-N\-C\-Y@{O\-P\-C\-O\-D\-E\-\_\-\-E\-L\-E\-V\-I\-N\-E\-M\-E\-R\-G\-E\-N\-C\-Y}}\item[{\em 
+\hypertarget{communication_8h_ae01cbfa01098b9baeab8b8ff7d90a52da8e756521bace288348124bbcbd5a6cf4}{O\-P\-C\-O\-D\-E\-\_\-\-E\-L\-E\-V\-I\-N\-E\-M\-E\-R\-G\-E\-N\-C\-Y}\label{communication_8h_ae01cbfa01098b9baeab8b8ff7d90a52da8e756521bace288348124bbcbd5a6cf4}
+}]\index{O\-P\-C\-O\-D\-E\-\_\-\-E\-L\-E\-V\-\_\-\-N\-O\-T\-\_\-\-E\-M\-E\-R\-G\-E\-N\-C\-Y@{O\-P\-C\-O\-D\-E\-\_\-\-E\-L\-E\-V\-\_\-\-N\-O\-T\-\_\-\-E\-M\-E\-R\-G\-E\-N\-C\-Y}!communication.\-h@{communication.\-h}}\index{communication.\-h@{communication.\-h}!O\-P\-C\-O\-D\-E\-\_\-\-E\-L\-E\-V\-\_\-\-N\-O\-T\-\_\-\-E\-M\-E\-R\-G\-E\-N\-C\-Y@{O\-P\-C\-O\-D\-E\-\_\-\-E\-L\-E\-V\-\_\-\-N\-O\-T\-\_\-\-E\-M\-E\-R\-G\-E\-N\-C\-Y}}\item[{\em 
+\hypertarget{communication_8h_ae01cbfa01098b9baeab8b8ff7d90a52daedce9ada644746f4cb07b0b4abc8cae3}{O\-P\-C\-O\-D\-E\-\_\-\-E\-L\-E\-V\-\_\-\-N\-O\-T\-\_\-\-E\-M\-E\-R\-G\-E\-N\-C\-Y}\label{communication_8h_ae01cbfa01098b9baeab8b8ff7d90a52daedce9ada644746f4cb07b0b4abc8cae3}
+}]\index{O\-P\-C\-O\-D\-E\-\_\-\-E\-L\-E\-V\-S\-Y\-N\-C@{O\-P\-C\-O\-D\-E\-\_\-\-E\-L\-E\-V\-S\-Y\-N\-C}!communication.\-h@{communication.\-h}}\index{communication.\-h@{communication.\-h}!O\-P\-C\-O\-D\-E\-\_\-\-E\-L\-E\-V\-S\-Y\-N\-C@{O\-P\-C\-O\-D\-E\-\_\-\-E\-L\-E\-V\-S\-Y\-N\-C}}\item[{\em 
+\hypertarget{communication_8h_ae01cbfa01098b9baeab8b8ff7d90a52dac8281b9f2ee98472f7425937cbda3804}{O\-P\-C\-O\-D\-E\-\_\-\-E\-L\-E\-V\-S\-Y\-N\-C}\label{communication_8h_ae01cbfa01098b9baeab8b8ff7d90a52dac8281b9f2ee98472f7425937cbda3804}
+}]\end{description}
+\end{Desc}
+
+
+\subsection{Function Documentation}
+\hypertarget{communication_8h_aa7d262aba3b448f6d531a7f8cba4e8e4}{\index{communication.\-h@{communication.\-h}!cjsonendindex@{cjsonendindex}}
+\index{cjsonendindex@{cjsonendindex}!communication.h@{communication.\-h}}
+\subsubsection[{cjsonendindex}]{\setlength{\rightskip}{0pt plus 5cm}int cjsonendindex (
+\begin{DoxyParamCaption}
+\item[{char $\ast$}]{cjson\-\_\-string, }
+\item[{int}]{start\-\_\-i}
+\end{DoxyParamCaption}
+)}}\label{communication_8h_aa7d262aba3b448f6d531a7f8cba4e8e4}
+\hypertarget{communication_8h_ad31ea930ade62ad7d30e54707e14200e}{\index{communication.\-h@{communication.\-h}!handle\-\_\-msg@{handle\-\_\-msg}}
+\index{handle\-\_\-msg@{handle\-\_\-msg}!communication.h@{communication.\-h}}
+\subsubsection[{handle\-\_\-msg}]{\setlength{\rightskip}{0pt plus 5cm}void handle\-\_\-msg (
+\begin{DoxyParamCaption}
+\item[{struct {\bf msg}}]{package, }
+\item[{struct timeval $\ast$}]{ttime}
+\end{DoxyParamCaption}
+)}}\label{communication_8h_ad31ea930ade62ad7d30e54707e14200e}
+\hypertarget{communication_8h_a53ed4b4450deb2174cb25a8b480d4483}{\index{communication.\-h@{communication.\-h}!pack@{pack}}
+\index{pack@{pack}!communication.h@{communication.\-h}}
+\subsubsection[{pack}]{\setlength{\rightskip}{0pt plus 5cm}char$\ast$ pack (
+\begin{DoxyParamCaption}
+\item[{struct {\bf msg}}]{msg\-\_\-struct}
+\end{DoxyParamCaption}
+)}}\label{communication_8h_a53ed4b4450deb2174cb25a8b480d4483}
+\hypertarget{communication_8h_a382a14fd5543ef913887ced1a13b57b0}{\index{communication.\-h@{communication.\-h}!send\-\_\-msg@{send\-\_\-msg}}
+\index{send\-\_\-msg@{send\-\_\-msg}!communication.h@{communication.\-h}}
+\subsubsection[{send\-\_\-msg}]{\setlength{\rightskip}{0pt plus 5cm}void send\-\_\-msg (
+\begin{DoxyParamCaption}
+\item[{int}]{msgtype, }
+\item[{int}]{to, }
+\item[{int}]{direction, }
+\item[{int}]{floor, }
+\item[{int}]{gpdata\mbox{[}$\,$\mbox{]}}
+\end{DoxyParamCaption}
+)}}\label{communication_8h_a382a14fd5543ef913887ced1a13b57b0}
+\hypertarget{communication_8h_a01ec040e794f89432bcdc07c80ba0a64}{\index{communication.\-h@{communication.\-h}!unpack@{unpack}}
+\index{unpack@{unpack}!communication.h@{communication.\-h}}
+\subsubsection[{unpack}]{\setlength{\rightskip}{0pt plus 5cm}struct {\bf msg} unpack (
+\begin{DoxyParamCaption}
+\item[{char $\ast$}]{msg}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [read]}}}\label{communication_8h_a01ec040e794f89432bcdc07c80ba0a64}

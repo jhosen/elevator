@@ -1,0 +1,279 @@
+\hypertarget{elev_8h}{\section{drivers/elev.h File Reference}
+\label{elev_8h}\index{drivers/elev.\-h@{drivers/elev.\-h}}
+}
+\subsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \hyperlink{elev_8h_ae0592e3739e5e1e76234bb1caf9d1305}{N\-\_\-\-F\-L\-O\-O\-R\-S}~4
+\end{DoxyCompactItemize}
+\subsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+typedef enum \hyperlink{elev_8h_a53b93eadbbde69e00119434663ff7b7a}{elev\-\_\-direction\-\_\-t} \hyperlink{elev_8h_aa8cd347d5782433d35a4b44d2215552c}{elev\-\_\-direction\-\_\-t}
+\item 
+typedef enum \hyperlink{elev_8h_adcfd1d97f649104e730621bccb3e111d}{tag\-\_\-elev\-\_\-signal} \hyperlink{elev_8h_a552adbceb37bababf8244aa4d4efb48c}{elev\-\_\-signal\-\_\-t}
+\end{DoxyCompactItemize}
+\subsection*{Enumerations}
+\begin{DoxyCompactItemize}
+\item 
+enum \hyperlink{elev_8h_a53b93eadbbde69e00119434663ff7b7a}{elev\-\_\-direction\-\_\-t} \{ \hyperlink{elev_8h_a53b93eadbbde69e00119434663ff7b7aa237b788c39919cfc1e8562869a3af310}{E\-L\-E\-V\-\_\-\-D\-I\-R\-\_\-\-U\-P} = 0, 
+\hyperlink{elev_8h_a53b93eadbbde69e00119434663ff7b7aa4c4ddafdbed1b652a40108cfd776a421}{E\-L\-E\-V\-\_\-\-D\-I\-R\-\_\-\-D\-O\-W\-N} = 1, 
+\hyperlink{elev_8h_a53b93eadbbde69e00119434663ff7b7aa29a643abb9f86420cb0419d039d78073}{E\-L\-E\-V\-\_\-\-D\-I\-R\-\_\-\-C\-O\-M\-M\-A\-N\-D} = 2, 
+\hyperlink{elev_8h_a53b93eadbbde69e00119434663ff7b7aac95e0d41c3df6f976a5782e74236df56}{E\-L\-E\-V\-\_\-\-D\-I\-R\-\_\-\-N\-O\-N\-E} = 2
+ \}
+\item 
+enum \hyperlink{elev_8h_adcfd1d97f649104e730621bccb3e111d}{tag\-\_\-elev\-\_\-signal} \{ \\*
+\hyperlink{elev_8h_adcfd1d97f649104e730621bccb3e111da8adcc497dcbd5fd8c2bf3cb8e053b8ae}{S\-I\-G\-N\-A\-L\-\_\-\-T\-Y\-P\-E\-\_\-\-C\-A\-L\-L\-\_\-\-U\-P} = 0, 
+\hyperlink{elev_8h_adcfd1d97f649104e730621bccb3e111da94989330021f43c6ec42ce5d7ec348c2}{S\-I\-G\-N\-A\-L\-\_\-\-T\-Y\-P\-E\-\_\-\-C\-A\-L\-L\-\_\-\-D\-O\-W\-N} = 1, 
+\hyperlink{elev_8h_adcfd1d97f649104e730621bccb3e111da0554fa75f183858a62238ba980272d4d}{S\-I\-G\-N\-A\-L\-\_\-\-T\-Y\-P\-E\-\_\-\-C\-O\-M\-M\-A\-N\-D} = 2, 
+\hyperlink{elev_8h_adcfd1d97f649104e730621bccb3e111daf19b13ca478002888dddd3eecfa62be2}{S\-I\-G\-N\-A\-L\-\_\-\-T\-Y\-P\-E\-\_\-\-S\-E\-N\-S\-O\-R} = 3, 
+\\*
+\hyperlink{elev_8h_adcfd1d97f649104e730621bccb3e111da14b8e81dd4ff95ca253351dccbb4bc31}{S\-I\-G\-N\-A\-L\-\_\-\-T\-Y\-P\-E\-\_\-\-S\-T\-O\-P} = 4, 
+\hyperlink{elev_8h_adcfd1d97f649104e730621bccb3e111daa78af6655290d0f51391659f8ba965b8}{S\-I\-G\-N\-A\-L\-\_\-\-T\-Y\-P\-E\-\_\-\-O\-B\-S\-T\-R} = 5
+ \}
+\end{DoxyCompactItemize}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \hyperlink{elev_8h_aa186c7534ee60c6b5bff35317532dc41}{elev\-\_\-set\-\_\-speed} (int speed)
+\item 
+void \hyperlink{elev_8h_a6ce9a34b8677b483b0d8f9dc47b42c40}{elev\-\_\-set\-\_\-door\-\_\-open\-\_\-lamp} (int value)
+\item 
+void \hyperlink{elev_8h_a8590f49cd533698d26231f7273141cc1}{elev\-\_\-toggle\-\_\-stop\-\_\-lamp} ()
+\item 
+int \hyperlink{elev_8h_ab1739733d6d71428b84097de6c523ce6}{elev\-\_\-if\-\_\-emergency} ()
+\item 
+void \hyperlink{elev_8h_a85de2a6536b4dd0c83bac19923500740}{elev\-\_\-set\-\_\-stop\-\_\-lamp} (int value)
+\item 
+void \hyperlink{elev_8h_a6af53dd3ebae3a5791ba345eac84d4be}{elev\-\_\-set\-\_\-floor\-\_\-indicator} (int floor)
+\item 
+void \hyperlink{elev_8h_a436fb24d0ae312744d416866c89d713d}{elev\-\_\-set\-\_\-button\-\_\-lamp} (\hyperlink{elev_8h_a53b93eadbbde69e00119434663ff7b7a}{elev\-\_\-direction\-\_\-t} lamp, int floor, int value)
+\item 
+int \hyperlink{elev_8h_a97d30b7e2538acf5647515638070fdc5}{elev\-\_\-get\-\_\-floor\-\_\-sensor\-\_\-signal} (void)
+\item 
+void \hyperlink{elev_8h_a7814fffb1c7cd91d37d8e9ac699de615}{elev\-\_\-register\-\_\-callback} (\hyperlink{elev_8h_a552adbceb37bababf8244aa4d4efb48c}{elev\-\_\-signal\-\_\-t} type, void($\ast$callback)(int, int))
+\item 
+void \hyperlink{elev_8h_ac3cfd147914faed159ed3290d29d5a4f}{elev\-\_\-unregister\-\_\-callback} (\hyperlink{elev_8h_a552adbceb37bababf8244aa4d4efb48c}{elev\-\_\-signal\-\_\-t} type)
+\item 
+int \hyperlink{elev_8h_a949b0e1f7c0f03ea6f92008c378e4573}{elev\-\_\-init} (void)
+\item 
+int \hyperlink{elev_8h_ad521989ab4c1ba0a24937f22dfdae3b4}{elev\-\_\-enable\-\_\-callbacks} (void)
+\item 
+void \hyperlink{elev_8h_a1c638f89811b7dc27b03c14ded650413}{elev\-\_\-disable\-\_\-callbacks} (int thread)
+\item 
+void \hyperlink{elev_8h_a4b9c82b159077e807108f3647b0f0b8d}{elev\-\_\-reset\-\_\-all\-\_\-lamps} (void)
+\end{DoxyCompactItemize}
+
+
+\subsection{Macro Definition Documentation}
+\hypertarget{elev_8h_ae0592e3739e5e1e76234bb1caf9d1305}{\index{elev.\-h@{elev.\-h}!N\-\_\-\-F\-L\-O\-O\-R\-S@{N\-\_\-\-F\-L\-O\-O\-R\-S}}
+\index{N\-\_\-\-F\-L\-O\-O\-R\-S@{N\-\_\-\-F\-L\-O\-O\-R\-S}!elev.h@{elev.\-h}}
+\subsubsection[{N\-\_\-\-F\-L\-O\-O\-R\-S}]{\setlength{\rightskip}{0pt plus 5cm}\#define N\-\_\-\-F\-L\-O\-O\-R\-S~4}}\label{elev_8h_ae0592e3739e5e1e76234bb1caf9d1305}
+
+
+\subsection{Typedef Documentation}
+\hypertarget{elev_8h_aa8cd347d5782433d35a4b44d2215552c}{\index{elev.\-h@{elev.\-h}!elev\-\_\-direction\-\_\-t@{elev\-\_\-direction\-\_\-t}}
+\index{elev\-\_\-direction\-\_\-t@{elev\-\_\-direction\-\_\-t}!elev.h@{elev.\-h}}
+\subsubsection[{elev\-\_\-direction\-\_\-t}]{\setlength{\rightskip}{0pt plus 5cm}typedef enum {\bf elev\-\_\-direction\-\_\-t}
+	 {\bf elev\-\_\-direction\-\_\-t}}}\label{elev_8h_aa8cd347d5782433d35a4b44d2215552c}
+\hypertarget{elev_8h_a552adbceb37bababf8244aa4d4efb48c}{\index{elev.\-h@{elev.\-h}!elev\-\_\-signal\-\_\-t@{elev\-\_\-signal\-\_\-t}}
+\index{elev\-\_\-signal\-\_\-t@{elev\-\_\-signal\-\_\-t}!elev.h@{elev.\-h}}
+\subsubsection[{elev\-\_\-signal\-\_\-t}]{\setlength{\rightskip}{0pt plus 5cm}typedef enum {\bf tag\-\_\-elev\-\_\-signal}  {\bf elev\-\_\-signal\-\_\-t}}}\label{elev_8h_a552adbceb37bababf8244aa4d4efb48c}
+Signal type definitions for register\-\_\-callback(). 
+
+\subsection{Enumeration Type Documentation}
+\hypertarget{elev_8h_a53b93eadbbde69e00119434663ff7b7a}{\index{elev.\-h@{elev.\-h}!elev\-\_\-direction\-\_\-t@{elev\-\_\-direction\-\_\-t}}
+\index{elev\-\_\-direction\-\_\-t@{elev\-\_\-direction\-\_\-t}!elev.h@{elev.\-h}}
+\subsubsection[{elev\-\_\-direction\-\_\-t}]{\setlength{\rightskip}{0pt plus 5cm}enum {\bf elev\-\_\-direction\-\_\-t}}}\label{elev_8h_a53b93eadbbde69e00119434663ff7b7a}
+\begin{Desc}
+\item[Enumerator]\par
+\begin{description}
+\index{E\-L\-E\-V\-\_\-\-D\-I\-R\-\_\-\-U\-P@{E\-L\-E\-V\-\_\-\-D\-I\-R\-\_\-\-U\-P}!elev.\-h@{elev.\-h}}\index{elev.\-h@{elev.\-h}!E\-L\-E\-V\-\_\-\-D\-I\-R\-\_\-\-U\-P@{E\-L\-E\-V\-\_\-\-D\-I\-R\-\_\-\-U\-P}}\item[{\em 
+\hypertarget{elev_8h_a53b93eadbbde69e00119434663ff7b7aa237b788c39919cfc1e8562869a3af310}{E\-L\-E\-V\-\_\-\-D\-I\-R\-\_\-\-U\-P}\label{elev_8h_a53b93eadbbde69e00119434663ff7b7aa237b788c39919cfc1e8562869a3af310}
+}]\index{E\-L\-E\-V\-\_\-\-D\-I\-R\-\_\-\-D\-O\-W\-N@{E\-L\-E\-V\-\_\-\-D\-I\-R\-\_\-\-D\-O\-W\-N}!elev.\-h@{elev.\-h}}\index{elev.\-h@{elev.\-h}!E\-L\-E\-V\-\_\-\-D\-I\-R\-\_\-\-D\-O\-W\-N@{E\-L\-E\-V\-\_\-\-D\-I\-R\-\_\-\-D\-O\-W\-N}}\item[{\em 
+\hypertarget{elev_8h_a53b93eadbbde69e00119434663ff7b7aa4c4ddafdbed1b652a40108cfd776a421}{E\-L\-E\-V\-\_\-\-D\-I\-R\-\_\-\-D\-O\-W\-N}\label{elev_8h_a53b93eadbbde69e00119434663ff7b7aa4c4ddafdbed1b652a40108cfd776a421}
+}]\index{E\-L\-E\-V\-\_\-\-D\-I\-R\-\_\-\-C\-O\-M\-M\-A\-N\-D@{E\-L\-E\-V\-\_\-\-D\-I\-R\-\_\-\-C\-O\-M\-M\-A\-N\-D}!elev.\-h@{elev.\-h}}\index{elev.\-h@{elev.\-h}!E\-L\-E\-V\-\_\-\-D\-I\-R\-\_\-\-C\-O\-M\-M\-A\-N\-D@{E\-L\-E\-V\-\_\-\-D\-I\-R\-\_\-\-C\-O\-M\-M\-A\-N\-D}}\item[{\em 
+\hypertarget{elev_8h_a53b93eadbbde69e00119434663ff7b7aa29a643abb9f86420cb0419d039d78073}{E\-L\-E\-V\-\_\-\-D\-I\-R\-\_\-\-C\-O\-M\-M\-A\-N\-D}\label{elev_8h_a53b93eadbbde69e00119434663ff7b7aa29a643abb9f86420cb0419d039d78073}
+}]\index{E\-L\-E\-V\-\_\-\-D\-I\-R\-\_\-\-N\-O\-N\-E@{E\-L\-E\-V\-\_\-\-D\-I\-R\-\_\-\-N\-O\-N\-E}!elev.\-h@{elev.\-h}}\index{elev.\-h@{elev.\-h}!E\-L\-E\-V\-\_\-\-D\-I\-R\-\_\-\-N\-O\-N\-E@{E\-L\-E\-V\-\_\-\-D\-I\-R\-\_\-\-N\-O\-N\-E}}\item[{\em 
+\hypertarget{elev_8h_a53b93eadbbde69e00119434663ff7b7aac95e0d41c3df6f976a5782e74236df56}{E\-L\-E\-V\-\_\-\-D\-I\-R\-\_\-\-N\-O\-N\-E}\label{elev_8h_a53b93eadbbde69e00119434663ff7b7aac95e0d41c3df6f976a5782e74236df56}
+}]\end{description}
+\end{Desc}
+\hypertarget{elev_8h_adcfd1d97f649104e730621bccb3e111d}{\index{elev.\-h@{elev.\-h}!tag\-\_\-elev\-\_\-signal@{tag\-\_\-elev\-\_\-signal}}
+\index{tag\-\_\-elev\-\_\-signal@{tag\-\_\-elev\-\_\-signal}!elev.h@{elev.\-h}}
+\subsubsection[{tag\-\_\-elev\-\_\-signal}]{\setlength{\rightskip}{0pt plus 5cm}enum {\bf tag\-\_\-elev\-\_\-signal}}}\label{elev_8h_adcfd1d97f649104e730621bccb3e111d}
+Signal type definitions for register\-\_\-callback(). \begin{Desc}
+\item[Enumerator]\par
+\begin{description}
+\index{S\-I\-G\-N\-A\-L\-\_\-\-T\-Y\-P\-E\-\_\-\-C\-A\-L\-L\-\_\-\-U\-P@{S\-I\-G\-N\-A\-L\-\_\-\-T\-Y\-P\-E\-\_\-\-C\-A\-L\-L\-\_\-\-U\-P}!elev.\-h@{elev.\-h}}\index{elev.\-h@{elev.\-h}!S\-I\-G\-N\-A\-L\-\_\-\-T\-Y\-P\-E\-\_\-\-C\-A\-L\-L\-\_\-\-U\-P@{S\-I\-G\-N\-A\-L\-\_\-\-T\-Y\-P\-E\-\_\-\-C\-A\-L\-L\-\_\-\-U\-P}}\item[{\em 
+\hypertarget{elev_8h_adcfd1d97f649104e730621bccb3e111da8adcc497dcbd5fd8c2bf3cb8e053b8ae}{S\-I\-G\-N\-A\-L\-\_\-\-T\-Y\-P\-E\-\_\-\-C\-A\-L\-L\-\_\-\-U\-P}\label{elev_8h_adcfd1d97f649104e730621bccb3e111da8adcc497dcbd5fd8c2bf3cb8e053b8ae}
+}]\index{S\-I\-G\-N\-A\-L\-\_\-\-T\-Y\-P\-E\-\_\-\-C\-A\-L\-L\-\_\-\-D\-O\-W\-N@{S\-I\-G\-N\-A\-L\-\_\-\-T\-Y\-P\-E\-\_\-\-C\-A\-L\-L\-\_\-\-D\-O\-W\-N}!elev.\-h@{elev.\-h}}\index{elev.\-h@{elev.\-h}!S\-I\-G\-N\-A\-L\-\_\-\-T\-Y\-P\-E\-\_\-\-C\-A\-L\-L\-\_\-\-D\-O\-W\-N@{S\-I\-G\-N\-A\-L\-\_\-\-T\-Y\-P\-E\-\_\-\-C\-A\-L\-L\-\_\-\-D\-O\-W\-N}}\item[{\em 
+\hypertarget{elev_8h_adcfd1d97f649104e730621bccb3e111da94989330021f43c6ec42ce5d7ec348c2}{S\-I\-G\-N\-A\-L\-\_\-\-T\-Y\-P\-E\-\_\-\-C\-A\-L\-L\-\_\-\-D\-O\-W\-N}\label{elev_8h_adcfd1d97f649104e730621bccb3e111da94989330021f43c6ec42ce5d7ec348c2}
+}]\index{S\-I\-G\-N\-A\-L\-\_\-\-T\-Y\-P\-E\-\_\-\-C\-O\-M\-M\-A\-N\-D@{S\-I\-G\-N\-A\-L\-\_\-\-T\-Y\-P\-E\-\_\-\-C\-O\-M\-M\-A\-N\-D}!elev.\-h@{elev.\-h}}\index{elev.\-h@{elev.\-h}!S\-I\-G\-N\-A\-L\-\_\-\-T\-Y\-P\-E\-\_\-\-C\-O\-M\-M\-A\-N\-D@{S\-I\-G\-N\-A\-L\-\_\-\-T\-Y\-P\-E\-\_\-\-C\-O\-M\-M\-A\-N\-D}}\item[{\em 
+\hypertarget{elev_8h_adcfd1d97f649104e730621bccb3e111da0554fa75f183858a62238ba980272d4d}{S\-I\-G\-N\-A\-L\-\_\-\-T\-Y\-P\-E\-\_\-\-C\-O\-M\-M\-A\-N\-D}\label{elev_8h_adcfd1d97f649104e730621bccb3e111da0554fa75f183858a62238ba980272d4d}
+}]\index{S\-I\-G\-N\-A\-L\-\_\-\-T\-Y\-P\-E\-\_\-\-S\-E\-N\-S\-O\-R@{S\-I\-G\-N\-A\-L\-\_\-\-T\-Y\-P\-E\-\_\-\-S\-E\-N\-S\-O\-R}!elev.\-h@{elev.\-h}}\index{elev.\-h@{elev.\-h}!S\-I\-G\-N\-A\-L\-\_\-\-T\-Y\-P\-E\-\_\-\-S\-E\-N\-S\-O\-R@{S\-I\-G\-N\-A\-L\-\_\-\-T\-Y\-P\-E\-\_\-\-S\-E\-N\-S\-O\-R}}\item[{\em 
+\hypertarget{elev_8h_adcfd1d97f649104e730621bccb3e111daf19b13ca478002888dddd3eecfa62be2}{S\-I\-G\-N\-A\-L\-\_\-\-T\-Y\-P\-E\-\_\-\-S\-E\-N\-S\-O\-R}\label{elev_8h_adcfd1d97f649104e730621bccb3e111daf19b13ca478002888dddd3eecfa62be2}
+}]\index{S\-I\-G\-N\-A\-L\-\_\-\-T\-Y\-P\-E\-\_\-\-S\-T\-O\-P@{S\-I\-G\-N\-A\-L\-\_\-\-T\-Y\-P\-E\-\_\-\-S\-T\-O\-P}!elev.\-h@{elev.\-h}}\index{elev.\-h@{elev.\-h}!S\-I\-G\-N\-A\-L\-\_\-\-T\-Y\-P\-E\-\_\-\-S\-T\-O\-P@{S\-I\-G\-N\-A\-L\-\_\-\-T\-Y\-P\-E\-\_\-\-S\-T\-O\-P}}\item[{\em 
+\hypertarget{elev_8h_adcfd1d97f649104e730621bccb3e111da14b8e81dd4ff95ca253351dccbb4bc31}{S\-I\-G\-N\-A\-L\-\_\-\-T\-Y\-P\-E\-\_\-\-S\-T\-O\-P}\label{elev_8h_adcfd1d97f649104e730621bccb3e111da14b8e81dd4ff95ca253351dccbb4bc31}
+}]\index{S\-I\-G\-N\-A\-L\-\_\-\-T\-Y\-P\-E\-\_\-\-O\-B\-S\-T\-R@{S\-I\-G\-N\-A\-L\-\_\-\-T\-Y\-P\-E\-\_\-\-O\-B\-S\-T\-R}!elev.\-h@{elev.\-h}}\index{elev.\-h@{elev.\-h}!S\-I\-G\-N\-A\-L\-\_\-\-T\-Y\-P\-E\-\_\-\-O\-B\-S\-T\-R@{S\-I\-G\-N\-A\-L\-\_\-\-T\-Y\-P\-E\-\_\-\-O\-B\-S\-T\-R}}\item[{\em 
+\hypertarget{elev_8h_adcfd1d97f649104e730621bccb3e111daa78af6655290d0f51391659f8ba965b8}{S\-I\-G\-N\-A\-L\-\_\-\-T\-Y\-P\-E\-\_\-\-O\-B\-S\-T\-R}\label{elev_8h_adcfd1d97f649104e730621bccb3e111daa78af6655290d0f51391659f8ba965b8}
+}]\end{description}
+\end{Desc}
+
+
+\subsection{Function Documentation}
+\hypertarget{elev_8h_a1c638f89811b7dc27b03c14ded650413}{\index{elev.\-h@{elev.\-h}!elev\-\_\-disable\-\_\-callbacks@{elev\-\_\-disable\-\_\-callbacks}}
+\index{elev\-\_\-disable\-\_\-callbacks@{elev\-\_\-disable\-\_\-callbacks}!elev.h@{elev.\-h}}
+\subsubsection[{elev\-\_\-disable\-\_\-callbacks}]{\setlength{\rightskip}{0pt plus 5cm}void elev\-\_\-disable\-\_\-callbacks (
+\begin{DoxyParamCaption}
+\item[{int}]{thread}
+\end{DoxyParamCaption}
+)}}\label{elev_8h_a1c638f89811b7dc27b03c14ded650413}
+Stops calling callbacks when signals arrive. This function will kill off the thread that polls the elevator for signals. 
+\begin{DoxyParams}{Parameters}
+{\em thread} & Value returned from corresponding \hyperlink{elev_8c_ad521989ab4c1ba0a24937f22dfdae3b4}{elev\-\_\-enable\-\_\-callbacks()}. \\
+\hline
+\end{DoxyParams}
+\hypertarget{elev_8h_ad521989ab4c1ba0a24937f22dfdae3b4}{\index{elev.\-h@{elev.\-h}!elev\-\_\-enable\-\_\-callbacks@{elev\-\_\-enable\-\_\-callbacks}}
+\index{elev\-\_\-enable\-\_\-callbacks@{elev\-\_\-enable\-\_\-callbacks}!elev.h@{elev.\-h}}
+\subsubsection[{elev\-\_\-enable\-\_\-callbacks}]{\setlength{\rightskip}{0pt plus 5cm}int elev\-\_\-enable\-\_\-callbacks (
+\begin{DoxyParamCaption}
+\item[{void}]{}
+\end{DoxyParamCaption}
+)}}\label{elev_8h_ad521989ab4c1ba0a24937f22dfdae3b4}
+Start calling callbacks when signals arrive. This function spawns a new thread that polls the elevator for signals (like the elevator arriving at a new floor, or a button is pushed), and calls the associated callback functions (if registered). \begin{DoxyReturn}{Returns}
+thread index of new thread. Needed to call \hyperlink{elev_8c_a1c638f89811b7dc27b03c14ded650413}{elev\-\_\-disable\-\_\-callbacks()}. 
+\end{DoxyReturn}
+\hypertarget{elev_8h_a97d30b7e2538acf5647515638070fdc5}{\index{elev.\-h@{elev.\-h}!elev\-\_\-get\-\_\-floor\-\_\-sensor\-\_\-signal@{elev\-\_\-get\-\_\-floor\-\_\-sensor\-\_\-signal}}
+\index{elev\-\_\-get\-\_\-floor\-\_\-sensor\-\_\-signal@{elev\-\_\-get\-\_\-floor\-\_\-sensor\-\_\-signal}!elev.h@{elev.\-h}}
+\subsubsection[{elev\-\_\-get\-\_\-floor\-\_\-sensor\-\_\-signal}]{\setlength{\rightskip}{0pt plus 5cm}int elev\-\_\-get\-\_\-floor\-\_\-sensor\-\_\-signal (
+\begin{DoxyParamCaption}
+\item[{void}]{}
+\end{DoxyParamCaption}
+)}}\label{elev_8h_a97d30b7e2538acf5647515638070fdc5}
+Get floor sensor signal. \begin{DoxyReturn}{Returns}
+-\/1 if elevator is not on a floor. 0-\/3 if elevator is on floor. 0 is ground floor, 3 is top floor. 
+\end{DoxyReturn}
+\hypertarget{elev_8h_ab1739733d6d71428b84097de6c523ce6}{\index{elev.\-h@{elev.\-h}!elev\-\_\-if\-\_\-emergency@{elev\-\_\-if\-\_\-emergency}}
+\index{elev\-\_\-if\-\_\-emergency@{elev\-\_\-if\-\_\-emergency}!elev.h@{elev.\-h}}
+\subsubsection[{elev\-\_\-if\-\_\-emergency}]{\setlength{\rightskip}{0pt plus 5cm}int elev\-\_\-if\-\_\-emergency (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{elev_8h_ab1739733d6d71428b84097de6c523ce6}
+\hypertarget{elev_8h_a949b0e1f7c0f03ea6f92008c378e4573}{\index{elev.\-h@{elev.\-h}!elev\-\_\-init@{elev\-\_\-init}}
+\index{elev\-\_\-init@{elev\-\_\-init}!elev.h@{elev.\-h}}
+\subsubsection[{elev\-\_\-init}]{\setlength{\rightskip}{0pt plus 5cm}int elev\-\_\-init (
+\begin{DoxyParamCaption}
+\item[{void}]{}
+\end{DoxyParamCaption}
+)}}\label{elev_8h_a949b0e1f7c0f03ea6f92008c378e4573}
+Initialize elevator. \begin{DoxyReturn}{Returns}
+Non-\/zero on success, 0 on failure. 
+\end{DoxyReturn}
+\hypertarget{elev_8h_a7814fffb1c7cd91d37d8e9ac699de615}{\index{elev.\-h@{elev.\-h}!elev\-\_\-register\-\_\-callback@{elev\-\_\-register\-\_\-callback}}
+\index{elev\-\_\-register\-\_\-callback@{elev\-\_\-register\-\_\-callback}!elev.h@{elev.\-h}}
+\subsubsection[{elev\-\_\-register\-\_\-callback}]{\setlength{\rightskip}{0pt plus 5cm}void elev\-\_\-register\-\_\-callback (
+\begin{DoxyParamCaption}
+\item[{{\bf elev\-\_\-signal\-\_\-t}}]{type, }
+\item[{void($\ast$)(int, int)}]{callback}
+\end{DoxyParamCaption}
+)}}\label{elev_8h_a7814fffb1c7cd91d37d8e9ac699de615}
+Register a callback function to handle signals from the elevator. 
+\begin{DoxyParams}{Parameters}
+{\em type} & Type of signal to register handler for. \\
+\hline
+{\em Callback} & function to call when signal arrives. The callback function must be on the following form\-: `void fun(int floor, int value)'. S\-I\-G\-N\-A\-L\-\_\-\-T\-Y\-P\-E\-\_\-\-S\-T\-O\-P triggers on pushing the stop button, `floor' and `value' is always passed 0. S\-I\-G\-N\-A\-L\-\_\-\-T\-Y\-P\-E\-\_\-\-O\-B\-S\-T\-R triggers on flipping the obstruction switch. `floor' is always passed 0. `value' is one for obstruction enabled, 0 for disabled. S\-I\-G\-N\-A\-L\-\_\-\-T\-Y\-P\-E\-\_\-\-S\-E\-N\-S\-O\-R triggers on both entering and leaving a floor. `floor' is the number of the floor, `value' is 1 for entering the floor, 0 for leaving. S\-I\-G\-N\-A\-L\-\_\-\-T\-Y\-P\-E\-\_\-\-C\-A\-L\-L\-\_\-\-U\-P, S\-I\-G\-N\-A\-L\-\_\-\-T\-Y\-P\-E\-\_\-\-C\-A\-L\-L\-\_\-\-D\-O\-W\-N, S\-I\-G\-N\-A\-L\-\_\-\-T\-Y\-P\-E\-\_\-\-C\-O\-M\-M\-A\-N\-D triggers on button push. The command buttons are the floor buttons \char`\"{}inside\char`\"{} the elevator. `floor' is the floor of the button being pushed, `value' is the type of button, according to elev\-\_\-direction\-\_\-t, defined above (E\-L\-E\-V\-\_\-\-D\-I\-R\-\_\-\-D\-O\-W\-N etc.). \\
+\hline
+\end{DoxyParams}
+\hypertarget{elev_8h_a4b9c82b159077e807108f3647b0f0b8d}{\index{elev.\-h@{elev.\-h}!elev\-\_\-reset\-\_\-all\-\_\-lamps@{elev\-\_\-reset\-\_\-all\-\_\-lamps}}
+\index{elev\-\_\-reset\-\_\-all\-\_\-lamps@{elev\-\_\-reset\-\_\-all\-\_\-lamps}!elev.h@{elev.\-h}}
+\subsubsection[{elev\-\_\-reset\-\_\-all\-\_\-lamps}]{\setlength{\rightskip}{0pt plus 5cm}void elev\-\_\-reset\-\_\-all\-\_\-lamps (
+\begin{DoxyParamCaption}
+\item[{void}]{}
+\end{DoxyParamCaption}
+)}}\label{elev_8h_a4b9c82b159077e807108f3647b0f0b8d}
+Clears all lamps. Clears all lamps. Useful on reset, as lamps from previous runs may still be lit. \hypertarget{elev_8h_a436fb24d0ae312744d416866c89d713d}{\index{elev.\-h@{elev.\-h}!elev\-\_\-set\-\_\-button\-\_\-lamp@{elev\-\_\-set\-\_\-button\-\_\-lamp}}
+\index{elev\-\_\-set\-\_\-button\-\_\-lamp@{elev\-\_\-set\-\_\-button\-\_\-lamp}!elev.h@{elev.\-h}}
+\subsubsection[{elev\-\_\-set\-\_\-button\-\_\-lamp}]{\setlength{\rightskip}{0pt plus 5cm}void elev\-\_\-set\-\_\-button\-\_\-lamp (
+\begin{DoxyParamCaption}
+\item[{{\bf elev\-\_\-direction\-\_\-t}}]{lamp, }
+\item[{int}]{floor, }
+\item[{int}]{value}
+\end{DoxyParamCaption}
+)}}\label{elev_8h_a436fb24d0ae312744d416866c89d713d}
+Set a button lamp. 
+\begin{DoxyParams}{Parameters}
+{\em lamp} & Which type of lamp to set (call up, call down, or \char`\"{}inside\char`\"{} command). \\
+\hline
+{\em floor} & Floor of lamp to set. \\
+\hline
+{\em value} & Non-\/zero value turns lamp on, 0 turns lamp off. \\
+\hline
+\end{DoxyParams}
+\hypertarget{elev_8h_a6ce9a34b8677b483b0d8f9dc47b42c40}{\index{elev.\-h@{elev.\-h}!elev\-\_\-set\-\_\-door\-\_\-open\-\_\-lamp@{elev\-\_\-set\-\_\-door\-\_\-open\-\_\-lamp}}
+\index{elev\-\_\-set\-\_\-door\-\_\-open\-\_\-lamp@{elev\-\_\-set\-\_\-door\-\_\-open\-\_\-lamp}!elev.h@{elev.\-h}}
+\subsubsection[{elev\-\_\-set\-\_\-door\-\_\-open\-\_\-lamp}]{\setlength{\rightskip}{0pt plus 5cm}void elev\-\_\-set\-\_\-door\-\_\-open\-\_\-lamp (
+\begin{DoxyParamCaption}
+\item[{int}]{value}
+\end{DoxyParamCaption}
+)}}\label{elev_8h_a6ce9a34b8677b483b0d8f9dc47b42c40}
+Turn door-\/open lamp on or off. 
+\begin{DoxyParams}{Parameters}
+{\em value} & Non-\/zero value turns lamp on, 0 turns lamp off. \\
+\hline
+\end{DoxyParams}
+\hypertarget{elev_8h_a6af53dd3ebae3a5791ba345eac84d4be}{\index{elev.\-h@{elev.\-h}!elev\-\_\-set\-\_\-floor\-\_\-indicator@{elev\-\_\-set\-\_\-floor\-\_\-indicator}}
+\index{elev\-\_\-set\-\_\-floor\-\_\-indicator@{elev\-\_\-set\-\_\-floor\-\_\-indicator}!elev.h@{elev.\-h}}
+\subsubsection[{elev\-\_\-set\-\_\-floor\-\_\-indicator}]{\setlength{\rightskip}{0pt plus 5cm}void elev\-\_\-set\-\_\-floor\-\_\-indicator (
+\begin{DoxyParamCaption}
+\item[{int}]{floor}
+\end{DoxyParamCaption}
+)}}\label{elev_8h_a6af53dd3ebae3a5791ba345eac84d4be}
+Set floor indicator lamp for a given floor. 
+\begin{DoxyParams}{Parameters}
+{\em floor} & Which floor lamp to turn on. Other floor lamps are turned off. \\
+\hline
+\end{DoxyParams}
+\hypertarget{elev_8h_aa186c7534ee60c6b5bff35317532dc41}{\index{elev.\-h@{elev.\-h}!elev\-\_\-set\-\_\-speed@{elev\-\_\-set\-\_\-speed}}
+\index{elev\-\_\-set\-\_\-speed@{elev\-\_\-set\-\_\-speed}!elev.h@{elev.\-h}}
+\subsubsection[{elev\-\_\-set\-\_\-speed}]{\setlength{\rightskip}{0pt plus 5cm}void elev\-\_\-set\-\_\-speed (
+\begin{DoxyParamCaption}
+\item[{int}]{speed}
+\end{DoxyParamCaption}
+)}}\label{elev_8h_aa186c7534ee60c6b5bff35317532dc41}
+Sets the speed of the elevator. 
+\begin{DoxyParams}{Parameters}
+{\em speed} & New speed of elevator. Positive values denote upward movement and vice versa. Set speed to 0 to stop the elevator. \\
+\hline
+\end{DoxyParams}
+\hypertarget{elev_8h_a85de2a6536b4dd0c83bac19923500740}{\index{elev.\-h@{elev.\-h}!elev\-\_\-set\-\_\-stop\-\_\-lamp@{elev\-\_\-set\-\_\-stop\-\_\-lamp}}
+\index{elev\-\_\-set\-\_\-stop\-\_\-lamp@{elev\-\_\-set\-\_\-stop\-\_\-lamp}!elev.h@{elev.\-h}}
+\subsubsection[{elev\-\_\-set\-\_\-stop\-\_\-lamp}]{\setlength{\rightskip}{0pt plus 5cm}void elev\-\_\-set\-\_\-stop\-\_\-lamp (
+\begin{DoxyParamCaption}
+\item[{int}]{value}
+\end{DoxyParamCaption}
+)}}\label{elev_8h_a85de2a6536b4dd0c83bac19923500740}
+Turn stop lamp on or off. 
+\begin{DoxyParams}{Parameters}
+{\em value} & Non-\/zero value turns lamp on, 0 turns lamp off. \\
+\hline
+\end{DoxyParams}
+\hypertarget{elev_8h_a8590f49cd533698d26231f7273141cc1}{\index{elev.\-h@{elev.\-h}!elev\-\_\-toggle\-\_\-stop\-\_\-lamp@{elev\-\_\-toggle\-\_\-stop\-\_\-lamp}}
+\index{elev\-\_\-toggle\-\_\-stop\-\_\-lamp@{elev\-\_\-toggle\-\_\-stop\-\_\-lamp}!elev.h@{elev.\-h}}
+\subsubsection[{elev\-\_\-toggle\-\_\-stop\-\_\-lamp}]{\setlength{\rightskip}{0pt plus 5cm}void elev\-\_\-toggle\-\_\-stop\-\_\-lamp (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{elev_8h_a8590f49cd533698d26231f7273141cc1}
+Toggle the stop light to turn on and off every other time. \hypertarget{elev_8h_ac3cfd147914faed159ed3290d29d5a4f}{\index{elev.\-h@{elev.\-h}!elev\-\_\-unregister\-\_\-callback@{elev\-\_\-unregister\-\_\-callback}}
+\index{elev\-\_\-unregister\-\_\-callback@{elev\-\_\-unregister\-\_\-callback}!elev.h@{elev.\-h}}
+\subsubsection[{elev\-\_\-unregister\-\_\-callback}]{\setlength{\rightskip}{0pt plus 5cm}void elev\-\_\-unregister\-\_\-callback (
+\begin{DoxyParamCaption}
+\item[{{\bf elev\-\_\-signal\-\_\-t}}]{type}
+\end{DoxyParamCaption}
+)}}\label{elev_8h_ac3cfd147914faed159ed3290d29d5a4f}
+Remove an association from a callback function. After calling this function, callback will not be called when the associated signal arrives. 
+\begin{DoxyParams}{Parameters}
+{\em type} & Type of signal to register handler for. \\
+\hline
+\end{DoxyParams}

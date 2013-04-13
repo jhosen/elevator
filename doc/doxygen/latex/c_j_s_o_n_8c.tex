@@ -1,0 +1,316 @@
+\hypertarget{c_j_s_o_n_8c}{\section{utils/c\-J\-S\-O\-N.c File Reference}
+\label{c_j_s_o_n_8c}\index{utils/c\-J\-S\-O\-N.\-c@{utils/c\-J\-S\-O\-N.\-c}}
+}
+{\ttfamily \#include $<$string.\-h$>$}\\*
+{\ttfamily \#include $<$stdio.\-h$>$}\\*
+{\ttfamily \#include $<$math.\-h$>$}\\*
+{\ttfamily \#include $<$stdlib.\-h$>$}\\*
+{\ttfamily \#include $<$float.\-h$>$}\\*
+{\ttfamily \#include $<$limits.\-h$>$}\\*
+{\ttfamily \#include $<$ctype.\-h$>$}\\*
+{\ttfamily \#include \char`\"{}c\-J\-S\-O\-N.\-h\char`\"{}}\\*
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+const char $\ast$ \hyperlink{c_j_s_o_n_8c_a176d66e0a0e090ce57633ac53a4379fa}{c\-J\-S\-O\-N\-\_\-\-Get\-Error\-Ptr} ()
+\item 
+void \hyperlink{c_j_s_o_n_8c_a20837ed285a3c2abf578330f2bd97ad4}{c\-J\-S\-O\-N\-\_\-\-Init\-Hooks} (\hyperlink{structc_j_s_o_n___hooks}{c\-J\-S\-O\-N\-\_\-\-Hooks} $\ast$hooks)
+\item 
+void \hyperlink{c_j_s_o_n_8c_ab18060251de70a2b55a18dec694f8f8a}{c\-J\-S\-O\-N\-\_\-\-Delete} (\hyperlink{structc_j_s_o_n}{c\-J\-S\-O\-N} $\ast$c)
+\item 
+\hyperlink{structc_j_s_o_n}{c\-J\-S\-O\-N} $\ast$ \hyperlink{c_j_s_o_n_8c_ad3df5f943457d4befebe4109d48e4a50}{c\-J\-S\-O\-N\-\_\-\-Parse} (const char $\ast$value)
+\item 
+char $\ast$ \hyperlink{c_j_s_o_n_8c_aea4f15b04dba4dff2edc2bb1d387b555}{c\-J\-S\-O\-N\-\_\-\-Print} (\hyperlink{structc_j_s_o_n}{c\-J\-S\-O\-N} $\ast$item)
+\item 
+char $\ast$ \hyperlink{c_j_s_o_n_8c_a5539c9504a8e65390a94852707f105d4}{c\-J\-S\-O\-N\-\_\-\-Print\-Unformatted} (\hyperlink{structc_j_s_o_n}{c\-J\-S\-O\-N} $\ast$item)
+\item 
+int \hyperlink{c_j_s_o_n_8c_adb5c049d3211599c90cd5a3d5e68d854}{c\-J\-S\-O\-N\-\_\-\-Get\-Array\-Size} (\hyperlink{structc_j_s_o_n}{c\-J\-S\-O\-N} $\ast$array)
+\item 
+\hyperlink{structc_j_s_o_n}{c\-J\-S\-O\-N} $\ast$ \hyperlink{c_j_s_o_n_8c_ac48335f22f743aff913991d809e0d620}{c\-J\-S\-O\-N\-\_\-\-Get\-Array\-Item} (\hyperlink{structc_j_s_o_n}{c\-J\-S\-O\-N} $\ast$array, int item)
+\item 
+\hyperlink{structc_j_s_o_n}{c\-J\-S\-O\-N} $\ast$ \hyperlink{c_j_s_o_n_8c_aba766c9d2c20996e323522cbf2ba46c6}{c\-J\-S\-O\-N\-\_\-\-Get\-Object\-Item} (\hyperlink{structc_j_s_o_n}{c\-J\-S\-O\-N} $\ast$object, const char $\ast$string)
+\item 
+void \hyperlink{c_j_s_o_n_8c_a164dcefd36af8654942116c444bd0b6a}{c\-J\-S\-O\-N\-\_\-\-Add\-Item\-To\-Array} (\hyperlink{structc_j_s_o_n}{c\-J\-S\-O\-N} $\ast$array, \hyperlink{structc_j_s_o_n}{c\-J\-S\-O\-N} $\ast$item)
+\item 
+void \hyperlink{c_j_s_o_n_8c_a096004811663311569e95aa77518959c}{c\-J\-S\-O\-N\-\_\-\-Add\-Item\-To\-Object} (\hyperlink{structc_j_s_o_n}{c\-J\-S\-O\-N} $\ast$object, const char $\ast$string, \hyperlink{structc_j_s_o_n}{c\-J\-S\-O\-N} $\ast$item)
+\item 
+void \hyperlink{c_j_s_o_n_8c_a076941e875d547f20959c66de97beee5}{c\-J\-S\-O\-N\-\_\-\-Add\-Item\-Reference\-To\-Array} (\hyperlink{structc_j_s_o_n}{c\-J\-S\-O\-N} $\ast$array, \hyperlink{structc_j_s_o_n}{c\-J\-S\-O\-N} $\ast$item)
+\item 
+void \hyperlink{c_j_s_o_n_8c_a001634f84d255810784155f4c8e4e288}{c\-J\-S\-O\-N\-\_\-\-Add\-Item\-Reference\-To\-Object} (\hyperlink{structc_j_s_o_n}{c\-J\-S\-O\-N} $\ast$object, const char $\ast$string, \hyperlink{structc_j_s_o_n}{c\-J\-S\-O\-N} $\ast$item)
+\item 
+\hyperlink{structc_j_s_o_n}{c\-J\-S\-O\-N} $\ast$ \hyperlink{c_j_s_o_n_8c_a68b9e0b2d984f1d873fb571425a98b9b}{c\-J\-S\-O\-N\-\_\-\-Detach\-Item\-From\-Array} (\hyperlink{structc_j_s_o_n}{c\-J\-S\-O\-N} $\ast$array, int which)
+\item 
+void \hyperlink{c_j_s_o_n_8c_a2b08ee3d172cb94e9abea1e4031a366f}{c\-J\-S\-O\-N\-\_\-\-Delete\-Item\-From\-Array} (\hyperlink{structc_j_s_o_n}{c\-J\-S\-O\-N} $\ast$array, int which)
+\item 
+\hyperlink{structc_j_s_o_n}{c\-J\-S\-O\-N} $\ast$ \hyperlink{c_j_s_o_n_8c_a7010822d267256f274e0adf22be2b202}{c\-J\-S\-O\-N\-\_\-\-Detach\-Item\-From\-Object} (\hyperlink{structc_j_s_o_n}{c\-J\-S\-O\-N} $\ast$object, const char $\ast$string)
+\item 
+void \hyperlink{c_j_s_o_n_8c_a148a56617a2a97921d9b9dfbe5dc85bf}{c\-J\-S\-O\-N\-\_\-\-Delete\-Item\-From\-Object} (\hyperlink{structc_j_s_o_n}{c\-J\-S\-O\-N} $\ast$object, const char $\ast$string)
+\item 
+void \hyperlink{c_j_s_o_n_8c_a567d357a7a0c3c0c9c896d98aae3dcec}{c\-J\-S\-O\-N\-\_\-\-Replace\-Item\-In\-Array} (\hyperlink{structc_j_s_o_n}{c\-J\-S\-O\-N} $\ast$array, int which, \hyperlink{structc_j_s_o_n}{c\-J\-S\-O\-N} $\ast$newitem)
+\item 
+void \hyperlink{c_j_s_o_n_8c_a31202ffebc9e4f86c3db12f9793b6800}{c\-J\-S\-O\-N\-\_\-\-Replace\-Item\-In\-Object} (\hyperlink{structc_j_s_o_n}{c\-J\-S\-O\-N} $\ast$object, const char $\ast$string, \hyperlink{structc_j_s_o_n}{c\-J\-S\-O\-N} $\ast$newitem)
+\item 
+\hyperlink{structc_j_s_o_n}{c\-J\-S\-O\-N} $\ast$ \hyperlink{c_j_s_o_n_8c_a3078341e0fbf1970cdc83656614269e9}{c\-J\-S\-O\-N\-\_\-\-Create\-Null} ()
+\item 
+\hyperlink{structc_j_s_o_n}{c\-J\-S\-O\-N} $\ast$ \hyperlink{c_j_s_o_n_8c_a0010944999faa803d32d95cfaea8fbf9}{c\-J\-S\-O\-N\-\_\-\-Create\-True} ()
+\item 
+\hyperlink{structc_j_s_o_n}{c\-J\-S\-O\-N} $\ast$ \hyperlink{c_j_s_o_n_8c_a2617ce9524da7c1fc8bf16148592637b}{c\-J\-S\-O\-N\-\_\-\-Create\-False} ()
+\item 
+\hyperlink{structc_j_s_o_n}{c\-J\-S\-O\-N} $\ast$ \hyperlink{c_j_s_o_n_8c_a06b0c43427994498d770e65b0089f8a8}{c\-J\-S\-O\-N\-\_\-\-Create\-Bool} (int b)
+\item 
+\hyperlink{structc_j_s_o_n}{c\-J\-S\-O\-N} $\ast$ \hyperlink{c_j_s_o_n_8c_a220d076d7d3a309049d6889be6d4904a}{c\-J\-S\-O\-N\-\_\-\-Create\-Number} (double num)
+\item 
+\hyperlink{structc_j_s_o_n}{c\-J\-S\-O\-N} $\ast$ \hyperlink{c_j_s_o_n_8c_a5987bbc1c94d9f602d719a4015ff0e6c}{c\-J\-S\-O\-N\-\_\-\-Create\-String} (const char $\ast$string)
+\item 
+\hyperlink{structc_j_s_o_n}{c\-J\-S\-O\-N} $\ast$ \hyperlink{c_j_s_o_n_8c_a35111de61e3e76681ce47d39cd4b470e}{c\-J\-S\-O\-N\-\_\-\-Create\-Array} ()
+\item 
+\hyperlink{structc_j_s_o_n}{c\-J\-S\-O\-N} $\ast$ \hyperlink{c_j_s_o_n_8c_a56ef70cf5025d81e125030f397a372fc}{c\-J\-S\-O\-N\-\_\-\-Create\-Object} ()
+\item 
+\hyperlink{structc_j_s_o_n}{c\-J\-S\-O\-N} $\ast$ \hyperlink{c_j_s_o_n_8c_a688f7f804570622fa17f2c3b0c47726c}{c\-J\-S\-O\-N\-\_\-\-Create\-Int\-Array} (int $\ast$numbers, int \hyperlink{order_8h_a24fd41885fd2fcb5ff19e7438af17242}{count})
+\item 
+\hyperlink{structc_j_s_o_n}{c\-J\-S\-O\-N} $\ast$ \hyperlink{c_j_s_o_n_8c_a13d8059ba0d64b59907b20816d50289d}{c\-J\-S\-O\-N\-\_\-\-Create\-Float\-Array} (float $\ast$numbers, int \hyperlink{order_8h_a24fd41885fd2fcb5ff19e7438af17242}{count})
+\item 
+\hyperlink{structc_j_s_o_n}{c\-J\-S\-O\-N} $\ast$ \hyperlink{c_j_s_o_n_8c_a857c1545e5673cb8085d3f0336f045c7}{c\-J\-S\-O\-N\-\_\-\-Create\-Double\-Array} (double $\ast$numbers, int \hyperlink{order_8h_a24fd41885fd2fcb5ff19e7438af17242}{count})
+\item 
+\hyperlink{structc_j_s_o_n}{c\-J\-S\-O\-N} $\ast$ \hyperlink{c_j_s_o_n_8c_abeecb344ac9a0318cd42ac32b6e22289}{c\-J\-S\-O\-N\-\_\-\-Create\-String\-Array} (const char $\ast$$\ast$strings, int \hyperlink{order_8h_a24fd41885fd2fcb5ff19e7438af17242}{count})
+\end{DoxyCompactItemize}
+
+
+\subsection{Function Documentation}
+\hypertarget{c_j_s_o_n_8c_a076941e875d547f20959c66de97beee5}{\index{c\-J\-S\-O\-N.\-c@{c\-J\-S\-O\-N.\-c}!c\-J\-S\-O\-N\-\_\-\-Add\-Item\-Reference\-To\-Array@{c\-J\-S\-O\-N\-\_\-\-Add\-Item\-Reference\-To\-Array}}
+\index{c\-J\-S\-O\-N\-\_\-\-Add\-Item\-Reference\-To\-Array@{c\-J\-S\-O\-N\-\_\-\-Add\-Item\-Reference\-To\-Array}!cJSON.c@{c\-J\-S\-O\-N.\-c}}
+\subsubsection[{c\-J\-S\-O\-N\-\_\-\-Add\-Item\-Reference\-To\-Array}]{\setlength{\rightskip}{0pt plus 5cm}void c\-J\-S\-O\-N\-\_\-\-Add\-Item\-Reference\-To\-Array (
+\begin{DoxyParamCaption}
+\item[{{\bf c\-J\-S\-O\-N} $\ast$}]{array, }
+\item[{{\bf c\-J\-S\-O\-N} $\ast$}]{item}
+\end{DoxyParamCaption}
+)}}\label{c_j_s_o_n_8c_a076941e875d547f20959c66de97beee5}
+\hypertarget{c_j_s_o_n_8c_a001634f84d255810784155f4c8e4e288}{\index{c\-J\-S\-O\-N.\-c@{c\-J\-S\-O\-N.\-c}!c\-J\-S\-O\-N\-\_\-\-Add\-Item\-Reference\-To\-Object@{c\-J\-S\-O\-N\-\_\-\-Add\-Item\-Reference\-To\-Object}}
+\index{c\-J\-S\-O\-N\-\_\-\-Add\-Item\-Reference\-To\-Object@{c\-J\-S\-O\-N\-\_\-\-Add\-Item\-Reference\-To\-Object}!cJSON.c@{c\-J\-S\-O\-N.\-c}}
+\subsubsection[{c\-J\-S\-O\-N\-\_\-\-Add\-Item\-Reference\-To\-Object}]{\setlength{\rightskip}{0pt plus 5cm}void c\-J\-S\-O\-N\-\_\-\-Add\-Item\-Reference\-To\-Object (
+\begin{DoxyParamCaption}
+\item[{{\bf c\-J\-S\-O\-N} $\ast$}]{object, }
+\item[{const char $\ast$}]{string, }
+\item[{{\bf c\-J\-S\-O\-N} $\ast$}]{item}
+\end{DoxyParamCaption}
+)}}\label{c_j_s_o_n_8c_a001634f84d255810784155f4c8e4e288}
+\hypertarget{c_j_s_o_n_8c_a164dcefd36af8654942116c444bd0b6a}{\index{c\-J\-S\-O\-N.\-c@{c\-J\-S\-O\-N.\-c}!c\-J\-S\-O\-N\-\_\-\-Add\-Item\-To\-Array@{c\-J\-S\-O\-N\-\_\-\-Add\-Item\-To\-Array}}
+\index{c\-J\-S\-O\-N\-\_\-\-Add\-Item\-To\-Array@{c\-J\-S\-O\-N\-\_\-\-Add\-Item\-To\-Array}!cJSON.c@{c\-J\-S\-O\-N.\-c}}
+\subsubsection[{c\-J\-S\-O\-N\-\_\-\-Add\-Item\-To\-Array}]{\setlength{\rightskip}{0pt plus 5cm}void c\-J\-S\-O\-N\-\_\-\-Add\-Item\-To\-Array (
+\begin{DoxyParamCaption}
+\item[{{\bf c\-J\-S\-O\-N} $\ast$}]{array, }
+\item[{{\bf c\-J\-S\-O\-N} $\ast$}]{item}
+\end{DoxyParamCaption}
+)}}\label{c_j_s_o_n_8c_a164dcefd36af8654942116c444bd0b6a}
+\hypertarget{c_j_s_o_n_8c_a096004811663311569e95aa77518959c}{\index{c\-J\-S\-O\-N.\-c@{c\-J\-S\-O\-N.\-c}!c\-J\-S\-O\-N\-\_\-\-Add\-Item\-To\-Object@{c\-J\-S\-O\-N\-\_\-\-Add\-Item\-To\-Object}}
+\index{c\-J\-S\-O\-N\-\_\-\-Add\-Item\-To\-Object@{c\-J\-S\-O\-N\-\_\-\-Add\-Item\-To\-Object}!cJSON.c@{c\-J\-S\-O\-N.\-c}}
+\subsubsection[{c\-J\-S\-O\-N\-\_\-\-Add\-Item\-To\-Object}]{\setlength{\rightskip}{0pt plus 5cm}void c\-J\-S\-O\-N\-\_\-\-Add\-Item\-To\-Object (
+\begin{DoxyParamCaption}
+\item[{{\bf c\-J\-S\-O\-N} $\ast$}]{object, }
+\item[{const char $\ast$}]{string, }
+\item[{{\bf c\-J\-S\-O\-N} $\ast$}]{item}
+\end{DoxyParamCaption}
+)}}\label{c_j_s_o_n_8c_a096004811663311569e95aa77518959c}
+\hypertarget{c_j_s_o_n_8c_a35111de61e3e76681ce47d39cd4b470e}{\index{c\-J\-S\-O\-N.\-c@{c\-J\-S\-O\-N.\-c}!c\-J\-S\-O\-N\-\_\-\-Create\-Array@{c\-J\-S\-O\-N\-\_\-\-Create\-Array}}
+\index{c\-J\-S\-O\-N\-\_\-\-Create\-Array@{c\-J\-S\-O\-N\-\_\-\-Create\-Array}!cJSON.c@{c\-J\-S\-O\-N.\-c}}
+\subsubsection[{c\-J\-S\-O\-N\-\_\-\-Create\-Array}]{\setlength{\rightskip}{0pt plus 5cm}{\bf c\-J\-S\-O\-N}$\ast$ c\-J\-S\-O\-N\-\_\-\-Create\-Array (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{c_j_s_o_n_8c_a35111de61e3e76681ce47d39cd4b470e}
+\hypertarget{c_j_s_o_n_8c_a06b0c43427994498d770e65b0089f8a8}{\index{c\-J\-S\-O\-N.\-c@{c\-J\-S\-O\-N.\-c}!c\-J\-S\-O\-N\-\_\-\-Create\-Bool@{c\-J\-S\-O\-N\-\_\-\-Create\-Bool}}
+\index{c\-J\-S\-O\-N\-\_\-\-Create\-Bool@{c\-J\-S\-O\-N\-\_\-\-Create\-Bool}!cJSON.c@{c\-J\-S\-O\-N.\-c}}
+\subsubsection[{c\-J\-S\-O\-N\-\_\-\-Create\-Bool}]{\setlength{\rightskip}{0pt plus 5cm}{\bf c\-J\-S\-O\-N}$\ast$ c\-J\-S\-O\-N\-\_\-\-Create\-Bool (
+\begin{DoxyParamCaption}
+\item[{int}]{b}
+\end{DoxyParamCaption}
+)}}\label{c_j_s_o_n_8c_a06b0c43427994498d770e65b0089f8a8}
+\hypertarget{c_j_s_o_n_8c_a857c1545e5673cb8085d3f0336f045c7}{\index{c\-J\-S\-O\-N.\-c@{c\-J\-S\-O\-N.\-c}!c\-J\-S\-O\-N\-\_\-\-Create\-Double\-Array@{c\-J\-S\-O\-N\-\_\-\-Create\-Double\-Array}}
+\index{c\-J\-S\-O\-N\-\_\-\-Create\-Double\-Array@{c\-J\-S\-O\-N\-\_\-\-Create\-Double\-Array}!cJSON.c@{c\-J\-S\-O\-N.\-c}}
+\subsubsection[{c\-J\-S\-O\-N\-\_\-\-Create\-Double\-Array}]{\setlength{\rightskip}{0pt plus 5cm}{\bf c\-J\-S\-O\-N}$\ast$ c\-J\-S\-O\-N\-\_\-\-Create\-Double\-Array (
+\begin{DoxyParamCaption}
+\item[{double $\ast$}]{numbers, }
+\item[{int}]{count}
+\end{DoxyParamCaption}
+)}}\label{c_j_s_o_n_8c_a857c1545e5673cb8085d3f0336f045c7}
+\hypertarget{c_j_s_o_n_8c_a2617ce9524da7c1fc8bf16148592637b}{\index{c\-J\-S\-O\-N.\-c@{c\-J\-S\-O\-N.\-c}!c\-J\-S\-O\-N\-\_\-\-Create\-False@{c\-J\-S\-O\-N\-\_\-\-Create\-False}}
+\index{c\-J\-S\-O\-N\-\_\-\-Create\-False@{c\-J\-S\-O\-N\-\_\-\-Create\-False}!cJSON.c@{c\-J\-S\-O\-N.\-c}}
+\subsubsection[{c\-J\-S\-O\-N\-\_\-\-Create\-False}]{\setlength{\rightskip}{0pt plus 5cm}{\bf c\-J\-S\-O\-N}$\ast$ c\-J\-S\-O\-N\-\_\-\-Create\-False (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{c_j_s_o_n_8c_a2617ce9524da7c1fc8bf16148592637b}
+\hypertarget{c_j_s_o_n_8c_a13d8059ba0d64b59907b20816d50289d}{\index{c\-J\-S\-O\-N.\-c@{c\-J\-S\-O\-N.\-c}!c\-J\-S\-O\-N\-\_\-\-Create\-Float\-Array@{c\-J\-S\-O\-N\-\_\-\-Create\-Float\-Array}}
+\index{c\-J\-S\-O\-N\-\_\-\-Create\-Float\-Array@{c\-J\-S\-O\-N\-\_\-\-Create\-Float\-Array}!cJSON.c@{c\-J\-S\-O\-N.\-c}}
+\subsubsection[{c\-J\-S\-O\-N\-\_\-\-Create\-Float\-Array}]{\setlength{\rightskip}{0pt plus 5cm}{\bf c\-J\-S\-O\-N}$\ast$ c\-J\-S\-O\-N\-\_\-\-Create\-Float\-Array (
+\begin{DoxyParamCaption}
+\item[{float $\ast$}]{numbers, }
+\item[{int}]{count}
+\end{DoxyParamCaption}
+)}}\label{c_j_s_o_n_8c_a13d8059ba0d64b59907b20816d50289d}
+\hypertarget{c_j_s_o_n_8c_a688f7f804570622fa17f2c3b0c47726c}{\index{c\-J\-S\-O\-N.\-c@{c\-J\-S\-O\-N.\-c}!c\-J\-S\-O\-N\-\_\-\-Create\-Int\-Array@{c\-J\-S\-O\-N\-\_\-\-Create\-Int\-Array}}
+\index{c\-J\-S\-O\-N\-\_\-\-Create\-Int\-Array@{c\-J\-S\-O\-N\-\_\-\-Create\-Int\-Array}!cJSON.c@{c\-J\-S\-O\-N.\-c}}
+\subsubsection[{c\-J\-S\-O\-N\-\_\-\-Create\-Int\-Array}]{\setlength{\rightskip}{0pt plus 5cm}{\bf c\-J\-S\-O\-N}$\ast$ c\-J\-S\-O\-N\-\_\-\-Create\-Int\-Array (
+\begin{DoxyParamCaption}
+\item[{int $\ast$}]{numbers, }
+\item[{int}]{count}
+\end{DoxyParamCaption}
+)}}\label{c_j_s_o_n_8c_a688f7f804570622fa17f2c3b0c47726c}
+\hypertarget{c_j_s_o_n_8c_a3078341e0fbf1970cdc83656614269e9}{\index{c\-J\-S\-O\-N.\-c@{c\-J\-S\-O\-N.\-c}!c\-J\-S\-O\-N\-\_\-\-Create\-Null@{c\-J\-S\-O\-N\-\_\-\-Create\-Null}}
+\index{c\-J\-S\-O\-N\-\_\-\-Create\-Null@{c\-J\-S\-O\-N\-\_\-\-Create\-Null}!cJSON.c@{c\-J\-S\-O\-N.\-c}}
+\subsubsection[{c\-J\-S\-O\-N\-\_\-\-Create\-Null}]{\setlength{\rightskip}{0pt plus 5cm}{\bf c\-J\-S\-O\-N}$\ast$ c\-J\-S\-O\-N\-\_\-\-Create\-Null (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{c_j_s_o_n_8c_a3078341e0fbf1970cdc83656614269e9}
+\hypertarget{c_j_s_o_n_8c_a220d076d7d3a309049d6889be6d4904a}{\index{c\-J\-S\-O\-N.\-c@{c\-J\-S\-O\-N.\-c}!c\-J\-S\-O\-N\-\_\-\-Create\-Number@{c\-J\-S\-O\-N\-\_\-\-Create\-Number}}
+\index{c\-J\-S\-O\-N\-\_\-\-Create\-Number@{c\-J\-S\-O\-N\-\_\-\-Create\-Number}!cJSON.c@{c\-J\-S\-O\-N.\-c}}
+\subsubsection[{c\-J\-S\-O\-N\-\_\-\-Create\-Number}]{\setlength{\rightskip}{0pt plus 5cm}{\bf c\-J\-S\-O\-N}$\ast$ c\-J\-S\-O\-N\-\_\-\-Create\-Number (
+\begin{DoxyParamCaption}
+\item[{double}]{num}
+\end{DoxyParamCaption}
+)}}\label{c_j_s_o_n_8c_a220d076d7d3a309049d6889be6d4904a}
+\hypertarget{c_j_s_o_n_8c_a56ef70cf5025d81e125030f397a372fc}{\index{c\-J\-S\-O\-N.\-c@{c\-J\-S\-O\-N.\-c}!c\-J\-S\-O\-N\-\_\-\-Create\-Object@{c\-J\-S\-O\-N\-\_\-\-Create\-Object}}
+\index{c\-J\-S\-O\-N\-\_\-\-Create\-Object@{c\-J\-S\-O\-N\-\_\-\-Create\-Object}!cJSON.c@{c\-J\-S\-O\-N.\-c}}
+\subsubsection[{c\-J\-S\-O\-N\-\_\-\-Create\-Object}]{\setlength{\rightskip}{0pt plus 5cm}{\bf c\-J\-S\-O\-N}$\ast$ c\-J\-S\-O\-N\-\_\-\-Create\-Object (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{c_j_s_o_n_8c_a56ef70cf5025d81e125030f397a372fc}
+\hypertarget{c_j_s_o_n_8c_a5987bbc1c94d9f602d719a4015ff0e6c}{\index{c\-J\-S\-O\-N.\-c@{c\-J\-S\-O\-N.\-c}!c\-J\-S\-O\-N\-\_\-\-Create\-String@{c\-J\-S\-O\-N\-\_\-\-Create\-String}}
+\index{c\-J\-S\-O\-N\-\_\-\-Create\-String@{c\-J\-S\-O\-N\-\_\-\-Create\-String}!cJSON.c@{c\-J\-S\-O\-N.\-c}}
+\subsubsection[{c\-J\-S\-O\-N\-\_\-\-Create\-String}]{\setlength{\rightskip}{0pt plus 5cm}{\bf c\-J\-S\-O\-N}$\ast$ c\-J\-S\-O\-N\-\_\-\-Create\-String (
+\begin{DoxyParamCaption}
+\item[{const char $\ast$}]{string}
+\end{DoxyParamCaption}
+)}}\label{c_j_s_o_n_8c_a5987bbc1c94d9f602d719a4015ff0e6c}
+\hypertarget{c_j_s_o_n_8c_abeecb344ac9a0318cd42ac32b6e22289}{\index{c\-J\-S\-O\-N.\-c@{c\-J\-S\-O\-N.\-c}!c\-J\-S\-O\-N\-\_\-\-Create\-String\-Array@{c\-J\-S\-O\-N\-\_\-\-Create\-String\-Array}}
+\index{c\-J\-S\-O\-N\-\_\-\-Create\-String\-Array@{c\-J\-S\-O\-N\-\_\-\-Create\-String\-Array}!cJSON.c@{c\-J\-S\-O\-N.\-c}}
+\subsubsection[{c\-J\-S\-O\-N\-\_\-\-Create\-String\-Array}]{\setlength{\rightskip}{0pt plus 5cm}{\bf c\-J\-S\-O\-N}$\ast$ c\-J\-S\-O\-N\-\_\-\-Create\-String\-Array (
+\begin{DoxyParamCaption}
+\item[{const char $\ast$$\ast$}]{strings, }
+\item[{int}]{count}
+\end{DoxyParamCaption}
+)}}\label{c_j_s_o_n_8c_abeecb344ac9a0318cd42ac32b6e22289}
+\hypertarget{c_j_s_o_n_8c_a0010944999faa803d32d95cfaea8fbf9}{\index{c\-J\-S\-O\-N.\-c@{c\-J\-S\-O\-N.\-c}!c\-J\-S\-O\-N\-\_\-\-Create\-True@{c\-J\-S\-O\-N\-\_\-\-Create\-True}}
+\index{c\-J\-S\-O\-N\-\_\-\-Create\-True@{c\-J\-S\-O\-N\-\_\-\-Create\-True}!cJSON.c@{c\-J\-S\-O\-N.\-c}}
+\subsubsection[{c\-J\-S\-O\-N\-\_\-\-Create\-True}]{\setlength{\rightskip}{0pt plus 5cm}{\bf c\-J\-S\-O\-N}$\ast$ c\-J\-S\-O\-N\-\_\-\-Create\-True (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{c_j_s_o_n_8c_a0010944999faa803d32d95cfaea8fbf9}
+\hypertarget{c_j_s_o_n_8c_ab18060251de70a2b55a18dec694f8f8a}{\index{c\-J\-S\-O\-N.\-c@{c\-J\-S\-O\-N.\-c}!c\-J\-S\-O\-N\-\_\-\-Delete@{c\-J\-S\-O\-N\-\_\-\-Delete}}
+\index{c\-J\-S\-O\-N\-\_\-\-Delete@{c\-J\-S\-O\-N\-\_\-\-Delete}!cJSON.c@{c\-J\-S\-O\-N.\-c}}
+\subsubsection[{c\-J\-S\-O\-N\-\_\-\-Delete}]{\setlength{\rightskip}{0pt plus 5cm}void c\-J\-S\-O\-N\-\_\-\-Delete (
+\begin{DoxyParamCaption}
+\item[{{\bf c\-J\-S\-O\-N} $\ast$}]{c}
+\end{DoxyParamCaption}
+)}}\label{c_j_s_o_n_8c_ab18060251de70a2b55a18dec694f8f8a}
+\hypertarget{c_j_s_o_n_8c_a2b08ee3d172cb94e9abea1e4031a366f}{\index{c\-J\-S\-O\-N.\-c@{c\-J\-S\-O\-N.\-c}!c\-J\-S\-O\-N\-\_\-\-Delete\-Item\-From\-Array@{c\-J\-S\-O\-N\-\_\-\-Delete\-Item\-From\-Array}}
+\index{c\-J\-S\-O\-N\-\_\-\-Delete\-Item\-From\-Array@{c\-J\-S\-O\-N\-\_\-\-Delete\-Item\-From\-Array}!cJSON.c@{c\-J\-S\-O\-N.\-c}}
+\subsubsection[{c\-J\-S\-O\-N\-\_\-\-Delete\-Item\-From\-Array}]{\setlength{\rightskip}{0pt plus 5cm}void c\-J\-S\-O\-N\-\_\-\-Delete\-Item\-From\-Array (
+\begin{DoxyParamCaption}
+\item[{{\bf c\-J\-S\-O\-N} $\ast$}]{array, }
+\item[{int}]{which}
+\end{DoxyParamCaption}
+)}}\label{c_j_s_o_n_8c_a2b08ee3d172cb94e9abea1e4031a366f}
+\hypertarget{c_j_s_o_n_8c_a148a56617a2a97921d9b9dfbe5dc85bf}{\index{c\-J\-S\-O\-N.\-c@{c\-J\-S\-O\-N.\-c}!c\-J\-S\-O\-N\-\_\-\-Delete\-Item\-From\-Object@{c\-J\-S\-O\-N\-\_\-\-Delete\-Item\-From\-Object}}
+\index{c\-J\-S\-O\-N\-\_\-\-Delete\-Item\-From\-Object@{c\-J\-S\-O\-N\-\_\-\-Delete\-Item\-From\-Object}!cJSON.c@{c\-J\-S\-O\-N.\-c}}
+\subsubsection[{c\-J\-S\-O\-N\-\_\-\-Delete\-Item\-From\-Object}]{\setlength{\rightskip}{0pt plus 5cm}void c\-J\-S\-O\-N\-\_\-\-Delete\-Item\-From\-Object (
+\begin{DoxyParamCaption}
+\item[{{\bf c\-J\-S\-O\-N} $\ast$}]{object, }
+\item[{const char $\ast$}]{string}
+\end{DoxyParamCaption}
+)}}\label{c_j_s_o_n_8c_a148a56617a2a97921d9b9dfbe5dc85bf}
+\hypertarget{c_j_s_o_n_8c_a68b9e0b2d984f1d873fb571425a98b9b}{\index{c\-J\-S\-O\-N.\-c@{c\-J\-S\-O\-N.\-c}!c\-J\-S\-O\-N\-\_\-\-Detach\-Item\-From\-Array@{c\-J\-S\-O\-N\-\_\-\-Detach\-Item\-From\-Array}}
+\index{c\-J\-S\-O\-N\-\_\-\-Detach\-Item\-From\-Array@{c\-J\-S\-O\-N\-\_\-\-Detach\-Item\-From\-Array}!cJSON.c@{c\-J\-S\-O\-N.\-c}}
+\subsubsection[{c\-J\-S\-O\-N\-\_\-\-Detach\-Item\-From\-Array}]{\setlength{\rightskip}{0pt plus 5cm}{\bf c\-J\-S\-O\-N}$\ast$ c\-J\-S\-O\-N\-\_\-\-Detach\-Item\-From\-Array (
+\begin{DoxyParamCaption}
+\item[{{\bf c\-J\-S\-O\-N} $\ast$}]{array, }
+\item[{int}]{which}
+\end{DoxyParamCaption}
+)}}\label{c_j_s_o_n_8c_a68b9e0b2d984f1d873fb571425a98b9b}
+\hypertarget{c_j_s_o_n_8c_a7010822d267256f274e0adf22be2b202}{\index{c\-J\-S\-O\-N.\-c@{c\-J\-S\-O\-N.\-c}!c\-J\-S\-O\-N\-\_\-\-Detach\-Item\-From\-Object@{c\-J\-S\-O\-N\-\_\-\-Detach\-Item\-From\-Object}}
+\index{c\-J\-S\-O\-N\-\_\-\-Detach\-Item\-From\-Object@{c\-J\-S\-O\-N\-\_\-\-Detach\-Item\-From\-Object}!cJSON.c@{c\-J\-S\-O\-N.\-c}}
+\subsubsection[{c\-J\-S\-O\-N\-\_\-\-Detach\-Item\-From\-Object}]{\setlength{\rightskip}{0pt plus 5cm}{\bf c\-J\-S\-O\-N}$\ast$ c\-J\-S\-O\-N\-\_\-\-Detach\-Item\-From\-Object (
+\begin{DoxyParamCaption}
+\item[{{\bf c\-J\-S\-O\-N} $\ast$}]{object, }
+\item[{const char $\ast$}]{string}
+\end{DoxyParamCaption}
+)}}\label{c_j_s_o_n_8c_a7010822d267256f274e0adf22be2b202}
+\hypertarget{c_j_s_o_n_8c_ac48335f22f743aff913991d809e0d620}{\index{c\-J\-S\-O\-N.\-c@{c\-J\-S\-O\-N.\-c}!c\-J\-S\-O\-N\-\_\-\-Get\-Array\-Item@{c\-J\-S\-O\-N\-\_\-\-Get\-Array\-Item}}
+\index{c\-J\-S\-O\-N\-\_\-\-Get\-Array\-Item@{c\-J\-S\-O\-N\-\_\-\-Get\-Array\-Item}!cJSON.c@{c\-J\-S\-O\-N.\-c}}
+\subsubsection[{c\-J\-S\-O\-N\-\_\-\-Get\-Array\-Item}]{\setlength{\rightskip}{0pt plus 5cm}{\bf c\-J\-S\-O\-N}$\ast$ c\-J\-S\-O\-N\-\_\-\-Get\-Array\-Item (
+\begin{DoxyParamCaption}
+\item[{{\bf c\-J\-S\-O\-N} $\ast$}]{array, }
+\item[{int}]{item}
+\end{DoxyParamCaption}
+)}}\label{c_j_s_o_n_8c_ac48335f22f743aff913991d809e0d620}
+\hypertarget{c_j_s_o_n_8c_adb5c049d3211599c90cd5a3d5e68d854}{\index{c\-J\-S\-O\-N.\-c@{c\-J\-S\-O\-N.\-c}!c\-J\-S\-O\-N\-\_\-\-Get\-Array\-Size@{c\-J\-S\-O\-N\-\_\-\-Get\-Array\-Size}}
+\index{c\-J\-S\-O\-N\-\_\-\-Get\-Array\-Size@{c\-J\-S\-O\-N\-\_\-\-Get\-Array\-Size}!cJSON.c@{c\-J\-S\-O\-N.\-c}}
+\subsubsection[{c\-J\-S\-O\-N\-\_\-\-Get\-Array\-Size}]{\setlength{\rightskip}{0pt plus 5cm}int c\-J\-S\-O\-N\-\_\-\-Get\-Array\-Size (
+\begin{DoxyParamCaption}
+\item[{{\bf c\-J\-S\-O\-N} $\ast$}]{array}
+\end{DoxyParamCaption}
+)}}\label{c_j_s_o_n_8c_adb5c049d3211599c90cd5a3d5e68d854}
+\hypertarget{c_j_s_o_n_8c_a176d66e0a0e090ce57633ac53a4379fa}{\index{c\-J\-S\-O\-N.\-c@{c\-J\-S\-O\-N.\-c}!c\-J\-S\-O\-N\-\_\-\-Get\-Error\-Ptr@{c\-J\-S\-O\-N\-\_\-\-Get\-Error\-Ptr}}
+\index{c\-J\-S\-O\-N\-\_\-\-Get\-Error\-Ptr@{c\-J\-S\-O\-N\-\_\-\-Get\-Error\-Ptr}!cJSON.c@{c\-J\-S\-O\-N.\-c}}
+\subsubsection[{c\-J\-S\-O\-N\-\_\-\-Get\-Error\-Ptr}]{\setlength{\rightskip}{0pt plus 5cm}const char$\ast$ c\-J\-S\-O\-N\-\_\-\-Get\-Error\-Ptr (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{c_j_s_o_n_8c_a176d66e0a0e090ce57633ac53a4379fa}
+\hypertarget{c_j_s_o_n_8c_aba766c9d2c20996e323522cbf2ba46c6}{\index{c\-J\-S\-O\-N.\-c@{c\-J\-S\-O\-N.\-c}!c\-J\-S\-O\-N\-\_\-\-Get\-Object\-Item@{c\-J\-S\-O\-N\-\_\-\-Get\-Object\-Item}}
+\index{c\-J\-S\-O\-N\-\_\-\-Get\-Object\-Item@{c\-J\-S\-O\-N\-\_\-\-Get\-Object\-Item}!cJSON.c@{c\-J\-S\-O\-N.\-c}}
+\subsubsection[{c\-J\-S\-O\-N\-\_\-\-Get\-Object\-Item}]{\setlength{\rightskip}{0pt plus 5cm}{\bf c\-J\-S\-O\-N}$\ast$ c\-J\-S\-O\-N\-\_\-\-Get\-Object\-Item (
+\begin{DoxyParamCaption}
+\item[{{\bf c\-J\-S\-O\-N} $\ast$}]{object, }
+\item[{const char $\ast$}]{string}
+\end{DoxyParamCaption}
+)}}\label{c_j_s_o_n_8c_aba766c9d2c20996e323522cbf2ba46c6}
+\hypertarget{c_j_s_o_n_8c_a20837ed285a3c2abf578330f2bd97ad4}{\index{c\-J\-S\-O\-N.\-c@{c\-J\-S\-O\-N.\-c}!c\-J\-S\-O\-N\-\_\-\-Init\-Hooks@{c\-J\-S\-O\-N\-\_\-\-Init\-Hooks}}
+\index{c\-J\-S\-O\-N\-\_\-\-Init\-Hooks@{c\-J\-S\-O\-N\-\_\-\-Init\-Hooks}!cJSON.c@{c\-J\-S\-O\-N.\-c}}
+\subsubsection[{c\-J\-S\-O\-N\-\_\-\-Init\-Hooks}]{\setlength{\rightskip}{0pt plus 5cm}void c\-J\-S\-O\-N\-\_\-\-Init\-Hooks (
+\begin{DoxyParamCaption}
+\item[{{\bf c\-J\-S\-O\-N\-\_\-\-Hooks} $\ast$}]{hooks}
+\end{DoxyParamCaption}
+)}}\label{c_j_s_o_n_8c_a20837ed285a3c2abf578330f2bd97ad4}
+\hypertarget{c_j_s_o_n_8c_ad3df5f943457d4befebe4109d48e4a50}{\index{c\-J\-S\-O\-N.\-c@{c\-J\-S\-O\-N.\-c}!c\-J\-S\-O\-N\-\_\-\-Parse@{c\-J\-S\-O\-N\-\_\-\-Parse}}
+\index{c\-J\-S\-O\-N\-\_\-\-Parse@{c\-J\-S\-O\-N\-\_\-\-Parse}!cJSON.c@{c\-J\-S\-O\-N.\-c}}
+\subsubsection[{c\-J\-S\-O\-N\-\_\-\-Parse}]{\setlength{\rightskip}{0pt plus 5cm}{\bf c\-J\-S\-O\-N}$\ast$ c\-J\-S\-O\-N\-\_\-\-Parse (
+\begin{DoxyParamCaption}
+\item[{const char $\ast$}]{value}
+\end{DoxyParamCaption}
+)}}\label{c_j_s_o_n_8c_ad3df5f943457d4befebe4109d48e4a50}
+\hypertarget{c_j_s_o_n_8c_aea4f15b04dba4dff2edc2bb1d387b555}{\index{c\-J\-S\-O\-N.\-c@{c\-J\-S\-O\-N.\-c}!c\-J\-S\-O\-N\-\_\-\-Print@{c\-J\-S\-O\-N\-\_\-\-Print}}
+\index{c\-J\-S\-O\-N\-\_\-\-Print@{c\-J\-S\-O\-N\-\_\-\-Print}!cJSON.c@{c\-J\-S\-O\-N.\-c}}
+\subsubsection[{c\-J\-S\-O\-N\-\_\-\-Print}]{\setlength{\rightskip}{0pt plus 5cm}char$\ast$ c\-J\-S\-O\-N\-\_\-\-Print (
+\begin{DoxyParamCaption}
+\item[{{\bf c\-J\-S\-O\-N} $\ast$}]{item}
+\end{DoxyParamCaption}
+)}}\label{c_j_s_o_n_8c_aea4f15b04dba4dff2edc2bb1d387b555}
+\hypertarget{c_j_s_o_n_8c_a5539c9504a8e65390a94852707f105d4}{\index{c\-J\-S\-O\-N.\-c@{c\-J\-S\-O\-N.\-c}!c\-J\-S\-O\-N\-\_\-\-Print\-Unformatted@{c\-J\-S\-O\-N\-\_\-\-Print\-Unformatted}}
+\index{c\-J\-S\-O\-N\-\_\-\-Print\-Unformatted@{c\-J\-S\-O\-N\-\_\-\-Print\-Unformatted}!cJSON.c@{c\-J\-S\-O\-N.\-c}}
+\subsubsection[{c\-J\-S\-O\-N\-\_\-\-Print\-Unformatted}]{\setlength{\rightskip}{0pt plus 5cm}char$\ast$ c\-J\-S\-O\-N\-\_\-\-Print\-Unformatted (
+\begin{DoxyParamCaption}
+\item[{{\bf c\-J\-S\-O\-N} $\ast$}]{item}
+\end{DoxyParamCaption}
+)}}\label{c_j_s_o_n_8c_a5539c9504a8e65390a94852707f105d4}
+\hypertarget{c_j_s_o_n_8c_a567d357a7a0c3c0c9c896d98aae3dcec}{\index{c\-J\-S\-O\-N.\-c@{c\-J\-S\-O\-N.\-c}!c\-J\-S\-O\-N\-\_\-\-Replace\-Item\-In\-Array@{c\-J\-S\-O\-N\-\_\-\-Replace\-Item\-In\-Array}}
+\index{c\-J\-S\-O\-N\-\_\-\-Replace\-Item\-In\-Array@{c\-J\-S\-O\-N\-\_\-\-Replace\-Item\-In\-Array}!cJSON.c@{c\-J\-S\-O\-N.\-c}}
+\subsubsection[{c\-J\-S\-O\-N\-\_\-\-Replace\-Item\-In\-Array}]{\setlength{\rightskip}{0pt plus 5cm}void c\-J\-S\-O\-N\-\_\-\-Replace\-Item\-In\-Array (
+\begin{DoxyParamCaption}
+\item[{{\bf c\-J\-S\-O\-N} $\ast$}]{array, }
+\item[{int}]{which, }
+\item[{{\bf c\-J\-S\-O\-N} $\ast$}]{newitem}
+\end{DoxyParamCaption}
+)}}\label{c_j_s_o_n_8c_a567d357a7a0c3c0c9c896d98aae3dcec}
+\hypertarget{c_j_s_o_n_8c_a31202ffebc9e4f86c3db12f9793b6800}{\index{c\-J\-S\-O\-N.\-c@{c\-J\-S\-O\-N.\-c}!c\-J\-S\-O\-N\-\_\-\-Replace\-Item\-In\-Object@{c\-J\-S\-O\-N\-\_\-\-Replace\-Item\-In\-Object}}
+\index{c\-J\-S\-O\-N\-\_\-\-Replace\-Item\-In\-Object@{c\-J\-S\-O\-N\-\_\-\-Replace\-Item\-In\-Object}!cJSON.c@{c\-J\-S\-O\-N.\-c}}
+\subsubsection[{c\-J\-S\-O\-N\-\_\-\-Replace\-Item\-In\-Object}]{\setlength{\rightskip}{0pt plus 5cm}void c\-J\-S\-O\-N\-\_\-\-Replace\-Item\-In\-Object (
+\begin{DoxyParamCaption}
+\item[{{\bf c\-J\-S\-O\-N} $\ast$}]{object, }
+\item[{const char $\ast$}]{string, }
+\item[{{\bf c\-J\-S\-O\-N} $\ast$}]{newitem}
+\end{DoxyParamCaption}
+)}}\label{c_j_s_o_n_8c_a31202ffebc9e4f86c3db12f9793b6800}

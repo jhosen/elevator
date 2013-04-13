@@ -1,0 +1,33 @@
+\hypertarget{statemachine_8c}{\section{utils/statemachine.c File Reference}
+\label{statemachine_8c}\index{utils/statemachine.\-c@{utils/statemachine.\-c}}
+}
+{\ttfamily \#include $<$stdio.\-h$>$}\\*
+{\ttfamily \#include \char`\"{}statemachine.\-h\char`\"{}}\\*
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \hyperlink{statemachine_8c_a97e9e06b2ef72cd073cc7fea1f1af21f}{statemachine\-\_\-init} (\hyperlink{structevent__t}{event\-\_\-t} $\ast$eventvar, \hyperlink{statemachine_8h_a70fb3cb460ce19a89130b2787e73d71d}{state\-\_\-t} $\ast$statevar)
+\item 
+void \hyperlink{statemachine_8c_a97946aadacb85aa61c99d2d726e9b702}{statemachine\-\_\-handle\-Event} (struct \hyperlink{structstate__action__pair__t}{state\-\_\-action\-\_\-pair\-\_\-t} $\ast$\hyperlink{elevator_8c_a0a83c05f6489cf06885b0ced7c79a72c}{state\-Table}, \hyperlink{structsm__config__t}{sm\-\_\-config\-\_\-t} config, \hyperlink{statemachine_8h_a70fb3cb460ce19a89130b2787e73d71d}{state\-\_\-t} $\ast$statevar, \hyperlink{structevent__t}{event\-\_\-t} $\ast$eventvar)
+\end{DoxyCompactItemize}
+
+
+\subsection{Function Documentation}
+\hypertarget{statemachine_8c_a97946aadacb85aa61c99d2d726e9b702}{\index{statemachine.\-c@{statemachine.\-c}!statemachine\-\_\-handle\-Event@{statemachine\-\_\-handle\-Event}}
+\index{statemachine\-\_\-handle\-Event@{statemachine\-\_\-handle\-Event}!statemachine.c@{statemachine.\-c}}
+\subsubsection[{statemachine\-\_\-handle\-Event}]{\setlength{\rightskip}{0pt plus 5cm}void statemachine\-\_\-handle\-Event (
+\begin{DoxyParamCaption}
+\item[{struct {\bf state\-\_\-action\-\_\-pair\-\_\-t} $\ast$}]{state\-Table, }
+\item[{{\bf sm\-\_\-config\-\_\-t}}]{config, }
+\item[{{\bf state\-\_\-t} $\ast$}]{statevar, }
+\item[{{\bf event\-\_\-t} $\ast$}]{eventvar}
+\end{DoxyParamCaption}
+)}}\label{statemachine_8c_a97946aadacb85aa61c99d2d726e9b702}
+\hypertarget{statemachine_8c_a97e9e06b2ef72cd073cc7fea1f1af21f}{\index{statemachine.\-c@{statemachine.\-c}!statemachine\-\_\-init@{statemachine\-\_\-init}}
+\index{statemachine\-\_\-init@{statemachine\-\_\-init}!statemachine.c@{statemachine.\-c}}
+\subsubsection[{statemachine\-\_\-init}]{\setlength{\rightskip}{0pt plus 5cm}void statemachine\-\_\-init (
+\begin{DoxyParamCaption}
+\item[{{\bf event\-\_\-t} $\ast$}]{eventvar, }
+\item[{{\bf state\-\_\-t} $\ast$}]{statevar}
+\end{DoxyParamCaption}
+)}}\label{statemachine_8c_a97e9e06b2ef72cd073cc7fea1f1af21f}

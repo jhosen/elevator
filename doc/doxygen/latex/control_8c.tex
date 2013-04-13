@@ -1,0 +1,189 @@
+\hypertarget{control_8c}{\section{control.\-c File Reference}
+\label{control_8c}\index{control.\-c@{control.\-c}}
+}
+{\ttfamily \#include $<$stdio.\-h$>$}\\*
+{\ttfamily \#include $<$time.\-h$>$}\\*
+{\ttfamily \#include $<$unistd.\-h$>$}\\*
+{\ttfamily \#include \char`\"{}drivers/elev.\-h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}control.\-h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}order.\-h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}communication.\-h\char`\"{}}\\*
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \hyperlink{control_8c_adec2683e0f5128ca72c9e8d3fc71e6ff}{control\-\_\-setcurpos} (int position)
+\item 
+int \hyperlink{control_8c_ae7e1ef0b7b48c30cabec1cf564a49dd1}{control\-\_\-getcurpos} ()
+\item 
+void \hyperlink{control_8c_ae9e53fbf469077308fbff92897ad4cca}{control\-\_\-up} ()
+\item 
+void \hyperlink{control_8c_a08cb0d84203e76eb89e02f9ebc89b92a}{control\-\_\-down} ()
+\item 
+void \hyperlink{control_8c_a30444ff75e062b113e18f4856a51a49f}{control\-\_\-stop} ()
+\item 
+void \hyperlink{control_8c_acf07e343332b8742158699860950e476}{control\-\_\-executeorder} ()
+\item 
+void \hyperlink{control_8c_a0e970914a5f5781681d2a473511fa20a}{control\-\_\-closedoor} ()
+\item 
+void \hyperlink{control_8c_aac8a0cac0492e829f8f08257fea27b39}{control\-\_\-setdir} ()
+\item 
+int \hyperlink{control_8c_a8a647ecffb5763fd3c0382bcbdc29300}{control\-\_\-betweenfloors} ()
+\item 
+int \hyperlink{control_8c_a228f9cd6fb37bbc8e6c8f6fd6f326fa8}{control\-\_\-timeoutdoor} ()
+\item 
+void \hyperlink{control_8c_a3f1b75a1f54de504ff0e3f7ec149c63c}{control\-\_\-emergency} ()
+\item 
+void \hyperlink{control_8c_aefa2590897ff827e03bc1256a47b8db9}{control\-\_\-emrestart} ()
+\item 
+void \hyperlink{control_8c_afab161ffc95f9fc7adcba368411f5f1a}{control\-\_\-obstr} ()
+\item 
+enum \hyperlink{order_8h_ae9ae980041e438eed7a3af43ce4e9f6b}{direction\-\_\-t} \hyperlink{control_8c_ad7cd744f8b33b439ba438318cd0e4c19}{get\-\_\-last\-\_\-dir} ()
+\item 
+void \hyperlink{control_8c_afff452663414cfcc140cb1478c099534}{set\-\_\-last\-\_\-dir} (enum \hyperlink{order_8h_ae9ae980041e438eed7a3af43ce4e9f6b}{direction\-\_\-t} dir)
+\item 
+void \hyperlink{control_8c_ab0d2435f40e8e42dee85f42952b76952}{setactiveobstr} (int value)
+\item 
+int \hyperlink{control_8c_ad66139b6eb2f2149bc74c28af40b53d2}{obstr\-\_\-on} ()
+\item 
+int \hyperlink{control_8c_a31537c2bbde8501818d9a1ce91e2fc76}{obstr\-\_\-off} ()
+\end{DoxyCompactItemize}
+\subsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+struct timeval \hyperlink{control_8c_ac8faacbb5c062f77b9094242e6ca6153}{dooropentime}
+\end{DoxyCompactItemize}
+
+
+\subsection{Function Documentation}
+\hypertarget{control_8c_a8a647ecffb5763fd3c0382bcbdc29300}{\index{control.\-c@{control.\-c}!control\-\_\-betweenfloors@{control\-\_\-betweenfloors}}
+\index{control\-\_\-betweenfloors@{control\-\_\-betweenfloors}!control.c@{control.\-c}}
+\subsubsection[{control\-\_\-betweenfloors}]{\setlength{\rightskip}{0pt plus 5cm}int control\-\_\-betweenfloors (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{control_8c_a8a647ecffb5763fd3c0382bcbdc29300}
+\hypertarget{control_8c_a0e970914a5f5781681d2a473511fa20a}{\index{control.\-c@{control.\-c}!control\-\_\-closedoor@{control\-\_\-closedoor}}
+\index{control\-\_\-closedoor@{control\-\_\-closedoor}!control.c@{control.\-c}}
+\subsubsection[{control\-\_\-closedoor}]{\setlength{\rightskip}{0pt plus 5cm}void control\-\_\-closedoor (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{control_8c_a0e970914a5f5781681d2a473511fa20a}
+\hypertarget{control_8c_a08cb0d84203e76eb89e02f9ebc89b92a}{\index{control.\-c@{control.\-c}!control\-\_\-down@{control\-\_\-down}}
+\index{control\-\_\-down@{control\-\_\-down}!control.c@{control.\-c}}
+\subsubsection[{control\-\_\-down}]{\setlength{\rightskip}{0pt plus 5cm}void control\-\_\-down (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{control_8c_a08cb0d84203e76eb89e02f9ebc89b92a}
+\hypertarget{control_8c_a3f1b75a1f54de504ff0e3f7ec149c63c}{\index{control.\-c@{control.\-c}!control\-\_\-emergency@{control\-\_\-emergency}}
+\index{control\-\_\-emergency@{control\-\_\-emergency}!control.c@{control.\-c}}
+\subsubsection[{control\-\_\-emergency}]{\setlength{\rightskip}{0pt plus 5cm}void control\-\_\-emergency (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{control_8c_a3f1b75a1f54de504ff0e3f7ec149c63c}
+\hypertarget{control_8c_aefa2590897ff827e03bc1256a47b8db9}{\index{control.\-c@{control.\-c}!control\-\_\-emrestart@{control\-\_\-emrestart}}
+\index{control\-\_\-emrestart@{control\-\_\-emrestart}!control.c@{control.\-c}}
+\subsubsection[{control\-\_\-emrestart}]{\setlength{\rightskip}{0pt plus 5cm}void control\-\_\-emrestart (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{control_8c_aefa2590897ff827e03bc1256a47b8db9}
+\hypertarget{control_8c_acf07e343332b8742158699860950e476}{\index{control.\-c@{control.\-c}!control\-\_\-executeorder@{control\-\_\-executeorder}}
+\index{control\-\_\-executeorder@{control\-\_\-executeorder}!control.c@{control.\-c}}
+\subsubsection[{control\-\_\-executeorder}]{\setlength{\rightskip}{0pt plus 5cm}void control\-\_\-executeorder (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{control_8c_acf07e343332b8742158699860950e476}
+\hypertarget{control_8c_ae7e1ef0b7b48c30cabec1cf564a49dd1}{\index{control.\-c@{control.\-c}!control\-\_\-getcurpos@{control\-\_\-getcurpos}}
+\index{control\-\_\-getcurpos@{control\-\_\-getcurpos}!control.c@{control.\-c}}
+\subsubsection[{control\-\_\-getcurpos}]{\setlength{\rightskip}{0pt plus 5cm}int control\-\_\-getcurpos (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{control_8c_ae7e1ef0b7b48c30cabec1cf564a49dd1}
+\hypertarget{control_8c_afab161ffc95f9fc7adcba368411f5f1a}{\index{control.\-c@{control.\-c}!control\-\_\-obstr@{control\-\_\-obstr}}
+\index{control\-\_\-obstr@{control\-\_\-obstr}!control.c@{control.\-c}}
+\subsubsection[{control\-\_\-obstr}]{\setlength{\rightskip}{0pt plus 5cm}void control\-\_\-obstr (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{control_8c_afab161ffc95f9fc7adcba368411f5f1a}
+\hypertarget{control_8c_adec2683e0f5128ca72c9e8d3fc71e6ff}{\index{control.\-c@{control.\-c}!control\-\_\-setcurpos@{control\-\_\-setcurpos}}
+\index{control\-\_\-setcurpos@{control\-\_\-setcurpos}!control.c@{control.\-c}}
+\subsubsection[{control\-\_\-setcurpos}]{\setlength{\rightskip}{0pt plus 5cm}void control\-\_\-setcurpos (
+\begin{DoxyParamCaption}
+\item[{int}]{position}
+\end{DoxyParamCaption}
+)}}\label{control_8c_adec2683e0f5128ca72c9e8d3fc71e6ff}
+\hypertarget{control_8c_aac8a0cac0492e829f8f08257fea27b39}{\index{control.\-c@{control.\-c}!control\-\_\-setdir@{control\-\_\-setdir}}
+\index{control\-\_\-setdir@{control\-\_\-setdir}!control.c@{control.\-c}}
+\subsubsection[{control\-\_\-setdir}]{\setlength{\rightskip}{0pt plus 5cm}void control\-\_\-setdir (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{control_8c_aac8a0cac0492e829f8f08257fea27b39}
+\hypertarget{control_8c_a30444ff75e062b113e18f4856a51a49f}{\index{control.\-c@{control.\-c}!control\-\_\-stop@{control\-\_\-stop}}
+\index{control\-\_\-stop@{control\-\_\-stop}!control.c@{control.\-c}}
+\subsubsection[{control\-\_\-stop}]{\setlength{\rightskip}{0pt plus 5cm}void control\-\_\-stop (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{control_8c_a30444ff75e062b113e18f4856a51a49f}
+\hypertarget{control_8c_a228f9cd6fb37bbc8e6c8f6fd6f326fa8}{\index{control.\-c@{control.\-c}!control\-\_\-timeoutdoor@{control\-\_\-timeoutdoor}}
+\index{control\-\_\-timeoutdoor@{control\-\_\-timeoutdoor}!control.c@{control.\-c}}
+\subsubsection[{control\-\_\-timeoutdoor}]{\setlength{\rightskip}{0pt plus 5cm}int control\-\_\-timeoutdoor (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{control_8c_a228f9cd6fb37bbc8e6c8f6fd6f326fa8}
+\hypertarget{control_8c_ae9e53fbf469077308fbff92897ad4cca}{\index{control.\-c@{control.\-c}!control\-\_\-up@{control\-\_\-up}}
+\index{control\-\_\-up@{control\-\_\-up}!control.c@{control.\-c}}
+\subsubsection[{control\-\_\-up}]{\setlength{\rightskip}{0pt plus 5cm}void control\-\_\-up (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{control_8c_ae9e53fbf469077308fbff92897ad4cca}
+\hypertarget{control_8c_ad7cd744f8b33b439ba438318cd0e4c19}{\index{control.\-c@{control.\-c}!get\-\_\-last\-\_\-dir@{get\-\_\-last\-\_\-dir}}
+\index{get\-\_\-last\-\_\-dir@{get\-\_\-last\-\_\-dir}!control.c@{control.\-c}}
+\subsubsection[{get\-\_\-last\-\_\-dir}]{\setlength{\rightskip}{0pt plus 5cm}enum {\bf direction\-\_\-t} get\-\_\-last\-\_\-dir (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{control_8c_ad7cd744f8b33b439ba438318cd0e4c19}
+\hypertarget{control_8c_a31537c2bbde8501818d9a1ce91e2fc76}{\index{control.\-c@{control.\-c}!obstr\-\_\-off@{obstr\-\_\-off}}
+\index{obstr\-\_\-off@{obstr\-\_\-off}!control.c@{control.\-c}}
+\subsubsection[{obstr\-\_\-off}]{\setlength{\rightskip}{0pt plus 5cm}int obstr\-\_\-off (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{control_8c_a31537c2bbde8501818d9a1ce91e2fc76}
+\hypertarget{control_8c_ad66139b6eb2f2149bc74c28af40b53d2}{\index{control.\-c@{control.\-c}!obstr\-\_\-on@{obstr\-\_\-on}}
+\index{obstr\-\_\-on@{obstr\-\_\-on}!control.c@{control.\-c}}
+\subsubsection[{obstr\-\_\-on}]{\setlength{\rightskip}{0pt plus 5cm}int obstr\-\_\-on (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{control_8c_ad66139b6eb2f2149bc74c28af40b53d2}
+\hypertarget{control_8c_afff452663414cfcc140cb1478c099534}{\index{control.\-c@{control.\-c}!set\-\_\-last\-\_\-dir@{set\-\_\-last\-\_\-dir}}
+\index{set\-\_\-last\-\_\-dir@{set\-\_\-last\-\_\-dir}!control.c@{control.\-c}}
+\subsubsection[{set\-\_\-last\-\_\-dir}]{\setlength{\rightskip}{0pt plus 5cm}void set\-\_\-last\-\_\-dir (
+\begin{DoxyParamCaption}
+\item[{enum {\bf direction\-\_\-t}}]{dir}
+\end{DoxyParamCaption}
+)}}\label{control_8c_afff452663414cfcc140cb1478c099534}
+\hypertarget{control_8c_ab0d2435f40e8e42dee85f42952b76952}{\index{control.\-c@{control.\-c}!setactiveobstr@{setactiveobstr}}
+\index{setactiveobstr@{setactiveobstr}!control.c@{control.\-c}}
+\subsubsection[{setactiveobstr}]{\setlength{\rightskip}{0pt plus 5cm}void setactiveobstr (
+\begin{DoxyParamCaption}
+\item[{int}]{value}
+\end{DoxyParamCaption}
+)}}\label{control_8c_ab0d2435f40e8e42dee85f42952b76952}
+
+
+\subsection{Variable Documentation}
+\hypertarget{control_8c_ac8faacbb5c062f77b9094242e6ca6153}{\index{control.\-c@{control.\-c}!dooropentime@{dooropentime}}
+\index{dooropentime@{dooropentime}!control.c@{control.\-c}}
+\subsubsection[{dooropentime}]{\setlength{\rightskip}{0pt plus 5cm}struct timeval dooropentime}}\label{control_8c_ac8faacbb5c062f77b9094242e6ca6153}
